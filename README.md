@@ -5,7 +5,7 @@
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-0f766e?style=flat-square" alt="MIT License"></a>
   <a href="docs/SETUP.md"><img src="https://img.shields.io/badge/Python-3.12-3776ab?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.12"></a>
-  <a href="requirements.runtime.lock"><img src="https://img.shields.io/badge/Django-5.2-092e20?style=flat-square&amp;logo=django&amp;logoColor=white" alt="Django 5.2"></a>
+  <a href="requirements.runtime.lock"><img src="https://img.shields.io/badge/Django-6.1-092e20?style=flat-square&amp;logo=django&amp;logoColor=white" alt="Django 6.1"></a>
   <a href="compose.yaml"><img src="https://img.shields.io/badge/Docker-Compose-2496ed?style=flat-square&amp;logo=docker&amp;logoColor=white" alt="Docker Compose"></a>
   <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/actions/workflows/verify.yml"><img src="https://github.com/peymanyousefi3/rcj-rescue-platform/actions/workflows/verify.yml/badge.svg" alt="Automated verification status"></a>
 </p>
