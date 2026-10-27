@@ -63,4 +63,4 @@ The bundled snapshot is fictional and contains no scores or login accounts. The 
 .venv/bin/python manage.py collectstatic --noinput
 ```
 
-Use DEBUG and a fresh secret for local management commands. Upload and privacy tests use temporary data. Browser screenshots in this repository were captured from the fictional demo, not from private competition accounts.
+Use DEBUG and a fresh secret for local management commands. Upload and privacy tests use temporary data. Admin and team screenshots use the fictional demo. Replay and field images are frames from actual demonstration footage. No private account credentials are shown.

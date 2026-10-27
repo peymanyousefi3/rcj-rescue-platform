@@ -3,7 +3,7 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from arena.models import Challenge, Competition, EmailDelivery, Score, Team
+from arena.models import Challenge, Competition, EmailDelivery, Notification, Score, Team
 
 
 @pytest.mark.django_db
@@ -21,6 +21,7 @@ def test_fictional_setup_requires_owner_and_refuses_repeat():
     assert get_user_model().objects.count() == 1
     assert Score.objects.count() == 39
     assert Team.objects.count() == 7
+    assert Notification.objects.count() == 7
     assert not EmailDelivery.objects.exists()
     assert not Challenge.objects.filter(rankings_released=True).exists()
     with pytest.raises(CommandError, match='already exist'):
