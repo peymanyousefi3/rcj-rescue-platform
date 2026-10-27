@@ -31,7 +31,7 @@ These are release-preparation checks, not a guarantee of complete security. No l
 - The owner authorized publication on 27 October 2026.
 - Only `peymanyousefi3` has repository write/admin access at release. No deployment keys, collaborator invitations, webhooks, repository secrets, variables or stored Actions artifacts were present in the release check.
 - `.github/CODEOWNERS` assigns every file to `peymanyousefi3`.
-- `main` requires pull requests, a code-owner review, passing checks and resolved conversations; new commits invalidate stale approvals. Force pushes and branch deletion are blocked. The owner retains a personal pull-request bypass for his own work.
+- `main` requires pull requests, a code-owner review, passing checks and resolved conversations; new commits invalidate stale approvals. Force pushes and branch deletion are blocked. The sole administrator, Peyman Yousefi, retains an administrator exemption for his own work.
 - README images and the public YouTube demonstration are checked without GitHub authentication after publication.
 
 Test passwords, keys and email addresses in fixtures and CI are synthetic examples. They are not competition credentials. The source-history and content scans supplement the tests; they are not a guarantee of complete security.
