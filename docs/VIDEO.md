@@ -28,4 +28,4 @@ The walkthrough was filmed during platform development; some interface details m
 
 GitHub renders the linked thumbnail above; selecting it opens the YouTube player. Embedding is enabled on the video for websites that support YouTube iframes.
 
-The MIT license covers project-owned source code. Video music, logos, maps and other third-party materials retain their respective rights. The linked video does not change the repository’s private review status.
+The MIT license covers project-owned source code. Video music, logos, maps and other third-party materials retain their respective rights. The source repository is publicly available under MIT; the video remains available on YouTube.

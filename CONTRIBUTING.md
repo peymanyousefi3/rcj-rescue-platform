@@ -1,6 +1,8 @@
 # Contributing
 
-Created and maintained by Peyman Yousefi. This repository is currently private for owner review.
+Developed and maintained by Peyman Yousefi. Contributions are welcome through pull requests.
+
+Fork the repository, create a branch for your change, and open a pull request against `main`. All files are owned by `@peymanyousefi3` in `.github/CODEOWNERS`; changes require his review. Passing automated checks and resolved review conversations are required before merge. New commits dismiss stale approvals. Outside contributions do not grant write access to this repository.
 
 For a change, describe the user-facing problem, make the smallest correct implementation, and run the relevant tests. Preserve team privacy, server-side authorization, deadline checks, accessible controls and explicit release decisions. Add a regression test for behavior that could expose data or calculate incorrect results.
 
