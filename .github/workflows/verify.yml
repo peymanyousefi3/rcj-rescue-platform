@@ -43,8 +43,8 @@ jobs:
       - run: python manage.py bootstrap_event
       - run: python manage.py collectstatic --noinput
       - run: pytest
-      - name: Verify spreadsheet paste and Undo
-        run: node --test tests/test_score_entry.cjs
+      - name: Verify browser interaction helpers
+        run: node --test tests/*.cjs
       - name: Check production configuration
         run: python manage.py check --deploy --fail-level WARNING
         env:

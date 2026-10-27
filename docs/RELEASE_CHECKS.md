@@ -15,7 +15,7 @@ Prepared for owner review on 27 October 2026. Project-owned code is licensed und
 
 - Local Python suite: 354 passed; two PostgreSQL-only row-lock concurrency tests skipped on SQLite.
 - New fictional setup checks: two passed, including no seeded accounts or outgoing mail, refusal to overwrite scores, and refusal to populate a real competition.
-- JavaScript spreadsheet paste/Undo/time checks: eight passed.
+- JavaScript folder upload, replay callback, spreadsheet paste/Undo/time checks: ten passed.
 - Django system check: no issues. Migration consistency check: no changes detected.
 - Fresh isolated bootstrap: fictional roster only, no scores or accounts.
 - Gitleaks 8.30.1 scanned the staged release export with redacted reporting: no leaks found.
