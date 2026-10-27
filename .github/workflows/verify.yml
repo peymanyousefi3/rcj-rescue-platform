@@ -45,6 +45,8 @@ jobs:
       - run: pytest
       - name: Verify browser interaction helpers
         run: node --test tests/*.cjs
+      - name: Exercise production WSGI server
+        run: python scripts/check_wsgi.py
       - name: Check production configuration
         run: python manage.py check --deploy --fail-level WARNING
         env:
