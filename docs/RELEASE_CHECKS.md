@@ -7,7 +7,7 @@ Prepared for owner review on 27 October 2026. Project-owned code is licensed und
 - Separate repository with a new initial history; no original operational Git history is copied.
 - Production database, account records, uploaded files, original recording/map packages, environment files, keys and deployment access notes are excluded.
 - The roster is fictional. The optional demo command creates no credentials and sends no email.
-- Real screenshots were captured from that isolated fictional local demo. Screenshot EXIF metadata is absent.
+- Admin and team screenshots were captured from the isolated fictional local demo. Replay and field images come from actual demonstration footage. Screenshot EXIF metadata is absent.
 - Original competition logos and the external hero photograph are replaced with project-owned neutral artwork. Bundled dependency licenses remain intact.
 - Original project development-tool labels and workstation/server-access paths are excluded. The creator credit is Peyman Yousefi.
 

@@ -1,29 +1,29 @@
-<p align="center">
-  <img src="docs/assets/readme-banner.svg" alt="Rescue Competition Platform — Created by Peyman Yousefi" width="100%">
-</p>
+# RoboCupJunior Rescue Simulation Competition Platform
 
-<p align="center">
-  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-16304f"></a>
-  <img alt="Python 3.12" src="https://img.shields.io/badge/Python-3.12-16304f">
-  <img alt="Django" src="https://img.shields.io/badge/framework-Django-16304f">
-  <img alt="Self hosted" src="https://img.shields.io/badge/deployment-self--hosted-38a899">
-</p>
+**Developed by Peyman Yousefi** for **RoboCupJunior Rescue Simulation and similar competitions**.
 
-<p align="center"><strong>One place to schedule the competition, protect submissions, publish results and replay every run.</strong></p>
-<p align="center">Developed and maintained by <strong>Peyman Yousefi</strong><br>A competition management platform for <strong>RoboCupJunior Rescue Simulation and similar competitions</strong>.</p>
-<p align="center"><a href="https://rcjrescue.com/">Deployed reference</a> · <a href="#the-workflow">Workflow</a> · <a href="#screenshots">Screenshots</a> · <a href="#quick-start">Quick start</a> · <a href="docs/DEPLOYMENT.md">Deployment</a> · <a href="https://www.youtube.com/watch?v=qQhhGdPYHms">Watch the video</a></p>
+A web platform that helps organizers run a competition, gives teams a private workspace, and lets the public follow schedules, results and interactive match replays.
 
-> **Private review edition.** This repository is prepared for open-source publication under MIT but remains private until the owner approves release. The source includes fictional demonstration data. The deployed reference is a real competition website, not a testing sandbox.
+## Key features
 
-The **RoboCup Americas Super Regional (ASR) 2026** deployment is one demonstration of the platform and its features. The platform brings scheduling, private submissions, scoring, communication and interactive replays together for organizers, teams and public viewers.
+- **Interactive 3D replays:** watch Erebus/Webots recordings, rotate the scene and seek through the action in a browser.
+- **Automatic results:** import a recording package to fill empty score and time fields.
+- **Easy scheduling:** arrange team lineups and move rounds with drag and drop.
+- **Flexible scoring:** choose scoring methods, discard rules and when rankings are released.
+- **Private submissions:** collect team files with deadlines, upload locking and controlled access.
+- **Competition tools:** publish maps, share organizer files, target announcements, manage teams and SuperTeams, and handle complaints.
 
-## Watch the platform in action
+## See a demonstration
 
-[![Watch the platform feature demonstration by Peyman Yousefi](docs/assets/video-preview.jpg)](https://www.youtube.com/watch?v=qQhhGdPYHms)
+The platform was demonstrated for the **Junior Rescue Simulation League at RoboCup Americas Super Regional (ASR) 2026**. This is one example of its features in use.
 
-**[Watch the 4-minute walkthrough on YouTube](https://www.youtube.com/watch?v=qQhhGdPYHms)** · [Chapters and English captions](docs/VIDEO.md)
+**[View the demonstration at RCJRescue.com](https://rcjrescue.com/)** · **[Watch the 4-minute YouTube demonstration](https://www.youtube.com/watch?v=qQhhGdPYHms)**
 
-This video demonstrates a selection of the platform’s features using **RoboCup Americas Super Regional 2026** as an example. Follow the public replay experience, then see how organizers import results, build schedules, release maps and manage private team workflows. Developed and provided by **Peyman Yousefi**.
+[![Watch a real Erebus/Webots Rescue Simulation replay in the platform](docs/assets/rescue-simulation-replay.jpg)](https://www.youtube.com/watch?v=qQhhGdPYHms)
+
+*Actual Rescue Simulation replay footage. Click the image to watch the demonstration. [Video chapters and English captions](docs/VIDEO.md).*
+
+[Setup](docs/SETUP.md) · [Quick start](#quick-start) · [Screenshots](#screenshots) · [Deployment](docs/DEPLOYMENT.md)
 
 ## The workflow
 
@@ -43,11 +43,11 @@ Use one team-by-round matrix with **spreadsheet paste, Undo, missing-score highl
 
 ## Screenshots
 
-Actual application screens captured from a local installation with fictional teams. No private competition accounts, submissions or contact information are shown.
+The replay and field images come from actual demonstration footage. The admin and team screenshots use fictional local demonstration data.
 
-### Public competition programme
+### Rescue Simulation field viewer
 
-![Public programme, competition days and announcements](docs/assets/public-programme.jpg)
+![Actual Rescue Simulation field displayed with its 3D model and field information](docs/assets/rescue-simulation-field.jpg)
 
 <table>
 <tr><td width="50%"><strong>Organizer score entry</strong><br>Raw scores, normalization, discards and ranking release.</td><td width="50%"><strong>Interactive schedule</strong><br>Round blocks and daily competition planning.</td></tr>
@@ -131,9 +131,10 @@ This adds fictional scores and SuperTeams; it creates no login accounts and send
 - [Release preparation checks](docs/RELEASE_CHECKS.md)
 - [Video walkthrough, chapters and captions](docs/VIDEO.md)
 
-
 ## Credit and license
 
-**Developed and maintained by Peyman Yousefi** for **RoboCupJunior Rescue Simulation and similar competitions**. The **RoboCup Americas Super Regional (ASR) 2026** deployment at [RCJRescue.com](https://rcjrescue.com/) is one demonstration of the platform and its features.
+**Developed and maintained by Peyman Yousefi.** Built for **RoboCupJunior Rescue Simulation and similar competitions**. Demonstrated for the **Junior Rescue Simulation League at RoboCup Americas Super Regional 2026**, at [RCJRescue.com](https://rcjrescue.com/).
+
+**Private review edition:** the repository remains private until the owner approves publication. The bundled dataset is fictional; private competition records and credentials are excluded. RCJRescue.com is an operating competition website.
 
 Project-owned code is available under the [MIT License](LICENSE). Copyright © 2026 Peyman Yousefi. See [attribution](NOTICE.md) and [third-party notices](THIRD_PARTY_NOTICES.md). Third-party software, trademarks, competition maps and recording packages retain their own rights; MIT does not grant rights to those materials.
