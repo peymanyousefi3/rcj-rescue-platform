@@ -30,5 +30,5 @@ These are release-preparation checks, not a guarantee of complete security. No l
 
 1. Review the source, screenshots, MIT license and third-party notices.
 2. Review the GitHub workflow result and any reported dependency advisories.
-3. Supply the YouTube walkthrough URL if desired.
+3. Review the linked public YouTube walkthrough, chapters and English captions.
 4. Approve changing repository visibility to public separately. No visibility change is automatic.

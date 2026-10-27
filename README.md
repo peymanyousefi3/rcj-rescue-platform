@@ -11,9 +11,17 @@
 
 <p align="center"><strong>One place to schedule the competition, protect submissions, publish results and replay every run.</strong></p>
 <p align="center">Created and maintained by <strong>Peyman Yousefi</strong><br>Developed for and used in the RoboCupJunior Americas Super Regional 2026 Rescue Simulation competition.</p>
-<p align="center"><a href="https://rcjrescue.com/">Deployed reference</a> · <a href="#the-workflow">Workflow</a> · <a href="#screenshots">Screenshots</a> · <a href="#quick-start">Quick start</a> · <a href="docs/DEPLOYMENT.md">Deployment</a> · <a href="docs/VIDEO.md">Video walkthrough</a></p>
+<p align="center"><a href="https://rcjrescue.com/">Deployed reference</a> · <a href="#the-workflow">Workflow</a> · <a href="#screenshots">Screenshots</a> · <a href="#quick-start">Quick start</a> · <a href="docs/DEPLOYMENT.md">Deployment</a> · <a href="https://www.youtube.com/watch?v=qQhhGdPYHms">Watch the video</a></p>
 
 > **Private review edition.** This repository is prepared for open-source publication under MIT but remains private until the owner approves release. The source includes fictional demonstration data. The deployed reference is a real competition website, not a testing sandbox.
+
+## Watch the platform in action
+
+[![Watch the ASR 2026 feature walkthrough by Peyman Yousefi](docs/assets/video-preview.jpg)](https://www.youtube.com/watch?v=qQhhGdPYHms)
+
+**[Watch the 4-minute walkthrough on YouTube](https://www.youtube.com/watch?v=qQhhGdPYHms)** · [Chapters and English captions](docs/VIDEO.md)
+
+Follow the public replay experience, then see how organizers import results, build schedules, release maps and manage private team workflows. Created and provided by **Peyman Yousefi**.
 
 ## The workflow
 
@@ -119,9 +127,8 @@ This adds fictional scores and SuperTeams; it creates no login accounts and send
 - [Contributing](CONTRIBUTING.md)
 - [Project overview PDF](docs/PROJECT_OVERVIEW.pdf)
 - [Release preparation checks](docs/RELEASE_CHECKS.md)
-- [Video walkthrough](docs/VIDEO.md) — YouTube link will be added when supplied.
+- [Video walkthrough, chapters and captions](docs/VIDEO.md)
 
-[![Video walkthrough — link pending](docs/assets/video-preview.svg)](docs/VIDEO.md)
 
 ## Credit and license
 
