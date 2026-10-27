@@ -114,6 +114,9 @@ def test_shared_upload_and_announcement_list_recipient_names_once(client,event):
         assert f'<li>{escape(team.name)}</li>' in notice_section
 
 
+# Closing a streamed response finishes its request; use committed transactions so
+# Django may close/reopen the PostgreSQL connection between requests.
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.parametrize('initial_audience',['all','selected'])
 def test_recipient_edits_revoke_existing_sessions_and_saved_download_links_immediately(client,event,initial_audience):
     c,r,teams,users,staff=event
@@ -159,6 +162,7 @@ def test_recipient_edits_revoke_existing_sessions_and_saved_download_links_immed
     assert not EmailDelivery.objects.exists()
 
 
+@pytest.mark.django_db(transaction=True)
 def test_public_access_is_explicit_and_can_be_withdrawn_on_the_same_record(client,event):
     c,r,teams,users,staff=event
     asset=upload(client,event,'public_all',teams)
