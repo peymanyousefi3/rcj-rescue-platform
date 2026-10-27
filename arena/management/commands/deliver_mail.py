@@ -1,5 +1,5 @@
 from datetime import timedelta
-from email.mime.image import MIMEImage
+from email.message import MIMEPart
 from pathlib import Path
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
@@ -41,10 +41,10 @@ class Command(BaseCommand):
                     if item.html_body:
                         message.attach_alternative(item.html_body,'text/html')
                         if 'cid:asr-2026-logo' in item.html_body and item.dedupe_key.startswith('announcement:'):
-                            logo=MIMEImage(Path(finders.find('arena/brand/asr-email.png')).read_bytes(),_subtype='png')
-                            logo.add_header('Content-ID','<asr-2026-logo>')
-                            logo.add_header('Content-Disposition','inline',filename='ASR.png')
-                            message.mixed_subtype='related'
+                            logo=MIMEPart()
+                            logo.set_content(Path(finders.find('arena/brand/asr-email.png')).read_bytes(),
+                                maintype='image',subtype='png',disposition='inline',
+                                filename='ASR.png',cid='<asr-2026-logo>')
                             message.attach(logo)
                     if message.send(fail_silently=False) != 1:
                         raise RuntimeError('Email backend did not accept the message.')
