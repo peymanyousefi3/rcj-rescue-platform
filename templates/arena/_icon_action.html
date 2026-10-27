@@ -1,0 +1,2 @@
+{% load static %}
+<form method="post" action="{% url 'control-action' %}" class="row-action" {% if confirm %}data-confirm="{{ confirm }}"{% endif %}>{% csrf_token %}<input type="hidden" name="action" value="{{ action }}"><input type="hidden" name="id" value="{{ record.pk }}"><button class="admin-icon {% if danger %}danger{% endif %}" type="submit" aria-label="{{ label }}" title="{{ label }}"><img src="{% static icon %}" alt=""></button></form>

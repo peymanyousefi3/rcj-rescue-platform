@@ -1,0 +1,48 @@
+{% load static %}<section class="score-table-section" data-score-grid data-preview-url="{% url 'score-preview' %}" aria-label="{{ score_challenge.name|default:'Individual teams' }} score entry">
+<div class="score-table-heading"><div><h3>{{ score_challenge.name|default:'Individual teams' }}</h3>{% if score_challenge %}<span class="muted">{{ score_challenge.get_category_display }}</span>{% endif %}</div>{% if score_challenge %}<a class="button secondary" data-admin-editor data-score-settings href="/control/?editor=round&amp;round_challenge={{ score_challenge.pk }}&amp;return=results-recordings#rounds">{% if score_challenge.category == 'superteam' %}Add round / event{% else %}Add round{% endif %}</a>{% endif %}</div>
+<div class="ranking-release-list" aria-label="Ranking release">
+{% for challenge in ranking_challenges %}<form method="post" action="{% url 'ranking-release' challenge.pk %}" class="ranking-release-form">
+{% csrf_token %}<input type="hidden" name="previous_state" value="{{ challenge.rankings_released|yesno:'1,0' }}"><input type="hidden" name="released" value="0">
+<label><input type="checkbox" name="released" value="1" {% if challenge.rankings_released %}checked{% endif %}><span><strong>Release rankings · {{ challenge.name }}</strong><small>Scores stay public. Ranks appear only when released by an administrator.</small></span></label>
+<button type="submit" class="button secondary">Save release</button><span class="badge neutral">{% if challenge.rankings_released %}Released{% else %}Not released{% endif %}</span>
+</form>{% endfor %}</div>
+{{ score_preview|json_script:preview_id }}
+{% if result_entries %}
+
+<div class="table-tools">
+<label class="table-search"><img src="{% static 'arena/icons/magnifying-glass.svg' %}" alt=""><input type="search" data-score-search placeholder="Find a team…" aria-label="Filter teams in the score-entry table"><span class="score-missing-count" data-score-missing-count title="Missing scores across all teams and rounds; zero is a valid score."></span></label>
+<form method="post" action="{% url 'score-matrix' %}" id="{{ matrix_id }}" class="score-actions" data-score-form>
+{% csrf_token %}<input type="hidden" name="score_challenge" value="{{ score_challenge.pk|default:'' }}"><input type="hidden" name="round_ids" value="{{ score_round_ids }}">{% for item in result_entries %}{{ item.score_form.revision }}{% endfor %}
+<button class="button primary" type="submit">Save all scores</button><button class="button secondary" type="button" data-score-undo disabled title="Undo the last score edit (Control/⌘ + Z)">Undo</button><button class="button secondary" type="reset">Reset</button>
+</form>
+<a class="button secondary" href="#competition-settings" data-score-settings>Scoring settings</a>
+</div>
+<p class="score-preview-status" data-score-preview-status role="status"></p>
+<p class="score-save-status" data-score-status role="status" tabindex="-1"></p>
+<div class="score-matrix-scroll" role="region" aria-label="All teams and rounds score entry" tabindex="0">
+<table class="score-matrix-table" style="--score-columns:{{ result_entries|length }}"><caption class="sr-only">Raw and normalized scores, remaining time entry and elapsed time: teams as rows and rounds as columns.</caption>
+<thead><tr><th scope="col" class="score-team">Team</th>{% for item in result_entries %}
+<th scope="col" data-score-column="{{ item.round.pk }}" data-field-scoring="{{ item.score_form.field_scoring|yesno:'true,false' }}" data-zero-policy="{{ item.round.zero_score_policy }}">
+<a class="score-round-heading" href="?round={{ item.round.pk }}&amp;return=results-recordings#round-editor-{{ item.round.pk }}" data-score-settings aria-label="{{ item.round }} settings" title="Round settings, including all-zero decision"><span>Round {{ item.round.number }}</span><img src="{% static 'arena/icons/pencil-simple.svg' %}" alt=""></a>
+<small class="round-maximum">Map max: {{ item.round.maximum_score|floatformat:"-2"|default_if_none:"—"|default:"—" }}</small>
+{% if item.round.name %}<small class="score-event-name" title="{{ item.round.name }}">{{ item.round.name }}</small>{% endif %}
+{% if item.round.challenge and not item.round.challenge.primary %}<small>{{ item.round.challenge.name }}</small>{% endif %}
+</th>{% endfor %}<th scope="col" class="score-total-heading" data-total-heading>Final %</th><th scope="col" class="score-rank-heading">Rank</th></tr></thead>
+<tbody>{% for row in score_rows %}<tr data-score-row data-team="{{ row.team.pk }}">
+<th scope="row" class="score-team"><strong>{{ row.team.name }}</strong><small>{{ row.team.code }}</small></th>
+{% for cell in row.cells %}<td data-score-cell data-round="{{ cell.round.pk }}" data-team="{{ row.team.pk }}">
+<div class="score-entry">{{ cell.raw_field }}<a class="score-recording{% if cell.recording %} has-recording{% endif %}" data-result-editor href="{% url 'result-editor' cell.round.pk row.team.pk %}?recording=1&amp;inline=1" aria-label="Recording for {{ row.team.name }} in {{ cell.round }}" title="Upload or manage recording"><img src="{% static 'arena/icons/upload-simple.svg' %}" alt=""><span class="sr-only" data-recording-label>{% if cell.recording %}Recording{% else %}Upload{% endif %}</span></a></div>
+<div class="score-cell-meta"><div class="score-normalized"><span>Norm.</span><output data-normalized for="{{ cell.raw_field.id_for_label }}">{% if cell.score and cell.score.normalized != None %}{{ cell.score.normalized|floatformat:4 }}{% else %}—{% endif %}</output>
+<span class="score-discard" data-score-discard hidden></span>
+</div>{% if cell.recording %}<button type="button" class="score-play" data-replay="{% url 'recording-player' cell.recording.pk %}" aria-label="Play {{ row.team.name }} in {{ cell.round }}" title="Play recording">▶</button>{% endif %}</div>
+{% if cell.override_field %}<details class="score-override-menu" {% if cell.score.normalized_override %}open{% endif %}><summary>Override</summary><label>{{ cell.override_field }}<span>Manual normalized score</span></label>{{ cell.normalized_field }}</details>{% endif %}
+<div class="score-time"><label for="{{ cell.remaining_field.id_for_label }}">Remaining <span>of 8:00</span></label>{{ cell.remaining_field }}<span class="score-elapsed">Elapsed <output data-elapsed-time for="{{ cell.remaining_field.id_for_label }}">{{ cell.score.elapsed_time|default:'—' }}</output></span></div>
+<span class="score-field-error" data-score-error hidden></span>
+</td>{% endfor %}<td class="score-total"><output data-score-total aria-label="Final score for {{ row.team.name }}">—</output></td><td class="score-rank"><output data-score-rank aria-label="Rank for {{ row.team.name }}">—</output></td></tr>{% endfor %}</tbody>
+</table></div>
+<p class="section-help score-grid-empty" data-score-empty hidden>No teams match your search.</p>
+<div data-score-issues>{% for item in result_entries %}<p class="scoring-explanation" data-round-issue="{{ item.round.pk }}" hidden></p>{% endfor %}</div>
+<details class="score-help"><summary>Score entry help</summary><p class="section-help">Enter raw scores below. Normalized values calculate automatically within each round. Enter the time remaining out of 8:00 as m:ss or whole seconds (0–480); elapsed time is calculated and stored automatically. For example, 2:30 remaining becomes 5:30 elapsed (330 seconds). Leave unknown times blank. Public results show only the sum of recorded elapsed seconds across all rounds, including discarded scores. Use each cell’s upload icon to add or manage its recording. Leave unscored entries blank. Copy a rectangular block of numbers from Excel, click its first destination score, and paste. Rows follow the visible teams; columns follow the rounds. Blank copied cells clear scores. Invalid or oversized blocks are rejected in full. Undo restores the last cell edit or whole paste; Control/⌘ + Z also works. Saving starts a new Undo baseline. Missing scores use a dashed outline and —; zero counts as a score. Tab moves through scores and times; Enter moves down teams. Control/⌘ + Enter saves everything.</p><p class="section-help score-settings-help">Calculation method, discarded rounds and tie-break policy: <a href="#competition-settings" data-score-settings>Competition settings → Challenges &amp; scoring</a>. Each round’s settings contain its all-zero decision. Manual normalized overrides are available for Sum, Average and Best scores; the field-only method always calculates its own ratios.</p></details>
+{% else %}<p class="empty-cell">Add a round to this event to enter results and recordings. Scores will also appear on the public Results page; rankings require a separate administrator release.</p>{% endif %}
+
+</section>

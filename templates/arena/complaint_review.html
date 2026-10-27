@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% load static %}{% block extra_media %}<link rel="stylesheet" href="{% static 'arena/workspaces.css' %}">{% endblock %}
+{% block title %}Review complaint · ASR 26{% endblock %}
+{% block navigation %}<nav aria-label="Administration"><a href="/control/#complaints">Back to complaints</a></nav>{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">Private · {{ complaint.team.name }}</p><h1>{{ complaint.subject }}</h1><p>{{ complaint.created_at|date:'j M Y · H:i' }}</p></div></div>
+<section class="panel"><div class="inset"><p>{{ complaint.message|linebreaksbr }}</p>{% for file in complaint.attachments.all %}{% include 'arena/file_receipt.html' with editable=False %}{% endfor %}
+<form method="post" class="complaint-form">{% csrf_token %}{{ form.non_field_errors }}<div class="form-grid">{% for field in form %}{% include 'arena/_admin_field.html' %}{% endfor %}</div><div class="form-actions"><button class="button primary" type="submit">Save response</button><a class="button secondary" href="/control/#complaints">Cancel</a></div></form>
+</div></section>{% endblock %}

@@ -1,0 +1,6 @@
+{% load static %}
+<div class="team-picker" data-team-picker>
+ <div class="picker-toolbar"><input type="search" placeholder="Find a team…" aria-label="Filter teams" data-picker-search autocomplete="off"><button type="button" class="admin-icon" data-picker-all title="Select all teams" aria-label="Select all teams"><img src="{% static 'arena/icons/check-square.svg' %}" alt=""></button><button type="button" class="admin-icon" data-picker-clear title="Clear selected teams" aria-label="Clear selected teams"><img src="{% static 'arena/icons/selection-slash.svg' %}" alt=""></button></div>
+ <div class="picker-options">{% for group,options,index in widget.optgroups %}{% for option in options %}<div data-picker-option>{% include option.template_name with widget=option %}</div>{% endfor %}{% endfor %}</div>
+ <p class="picker-status" aria-live="polite" data-picker-count></p><p class="picker-empty" hidden>No matching teams.</p>
+</div>

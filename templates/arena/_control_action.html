@@ -1,0 +1,1 @@
+<form method="post" action="{% url 'control-action' %}" {% if confirm %}data-confirm="{{ confirm }}"{% endif %}>{% csrf_token %}<input type="hidden" name="action" value="{{ action }}"><input type="hidden" name="id" value="{{ record.pk }}"><button class="button secondary small" type="submit">{{ label }}</button></form>

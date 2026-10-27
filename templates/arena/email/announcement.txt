@@ -1,0 +1,10 @@
+{% load announcements %}{% autoescape off %}Dear {{ recipient_name }},
+
+{{ notice.body|announcement_plain }}
+
+{% if dashboard_url %}View this announcement in your team dashboard:
+{{ dashboard_url }}
+
+{% endif %}Best regards,
+RoboCup ASR 2026 Organizing Team
+Junior Rescue Simulation League{% endautoescape %}

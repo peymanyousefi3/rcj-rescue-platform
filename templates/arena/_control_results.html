@@ -1,0 +1,7 @@
+{% load static %}
+<details class="panel admin-section admin-data" id="results-recordings" name="admin-work">
+<summary class="panel-header"><div><h2>Results &amp; recordings</h2><p>Raw scores, recordings and ranking release.</p></div></summary>
+<div class="admin-content">
+<div class="form-actions"><a class="button secondary" data-admin-editor href="/control/?editor=challenge&amp;return=results-recordings#challenge-editor">Add event</a></div>
+{% for table in score_tables %}{% include 'arena/_score_table.html' with score_challenge=table.score_challenge result_entries=table.result_entries score_preview=table.score_preview score_rows=table.score_rows ranking_challenges=table.ranking_challenges score_round_ids=table.score_round_ids matrix_id=table.matrix_id preview_id=table.preview_id %}{% endfor %}
+</div></details>

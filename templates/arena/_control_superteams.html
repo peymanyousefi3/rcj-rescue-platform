@@ -1,0 +1,9 @@
+{% load static %}
+<section class="team-groups" id="superteams" aria-labelledby="superteams-heading">
+<header class="panel-header"><div><h3 id="superteams-heading">SuperTeams</h3><p>Two existing teams share one profile. Individual submissions stay separate.</p></div><span class="badge neutral">{{ superteams|length }} profiles</span></header>
+<div>
+<details class="add-editor" id="superteam-editor"><summary class="add-button"><img src="{% static 'arena/icons/plus.svg' %}" alt="">Add SuperTeam</summary>{% include 'arena/_admin_form.html' with form=superteam_form form_kind='superteam' save_label='Save SuperTeam' cancel_section='accounts' %}</details>
+<p class="section-help">Create a SuperTeam challenge in Competition settings first. Add its rounds in Rounds &amp; archive; select that challenge in Results to enter paired scores.</p>
+<div class="table-scroll"><table class="admin-table"><thead><tr><th>SuperTeam</th><th>Challenge</th><th>Member teams</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+{% for group in superteams %}<tr><td><strong>{{ group.name }}</strong><small>{{ group.code }}</small></td><td>{{ group.superteam_challenge.name }}</td><td>{% for member in group.members.all %}<span class="block">{{ member.name }}</span>{% endfor %}</td><td>{% if group.active %}Active{% else %}Disabled{% endif %}</td><td><a class="admin-icon" data-admin-editor href="?editor=superteam&amp;superteam={{ group.pk }}" aria-label="Edit {{ group.name }}" title="Edit SuperTeam"><img src="{% static 'arena/icons/pencil-simple.svg' %}" alt=""></a></td></tr>{% empty %}<tr><td colspan="5" class="empty-cell">No SuperTeams yet.</td></tr>{% endfor %}
+</tbody></table></div></div></section>

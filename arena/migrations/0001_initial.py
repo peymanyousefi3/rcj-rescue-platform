@@ -1,0 +1,175 @@
+# Initial schema; CI checks for drift against models.
+import uuid
+from django.conf import settings
+from django.db import migrations, models
+from django.db.models import Q
+from django.utils import timezone
+
+class Migration(migrations.Migration):
+    initial = True
+    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
+    operations = [
+        migrations.CreateModel(
+            name='Competition',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=160, default='Americas Super Regional 2026')),
+                ('slug', models.SlugField(unique=True, default='asr26')),
+                ('starts_at', models.DateTimeField()),
+                ('ends_at', models.DateTimeField()),
+                ('phase', models.CharField(max_length=12, choices=[('upcoming', 'Upcoming'), ('running', 'Running'), ('finished', 'Finished')], default='upcoming')),
+                ('archive_released', models.BooleanField(default=False)),
+                ('location', models.CharField(max_length=180, default='Sheridan College · Davis Campus · Brampton, Ontario')),
+                ('workbook_last_synced', models.DateTimeField(null=True, blank=True)),
+                ('workbook_digest', models.CharField(max_length=64, blank=True)),
+            ],
+            options={'constraints': [models.CheckConstraint(condition=Q(ends_at__gt=models.F('starts_at')), name='competition_valid_times')]},
+        ),
+        migrations.CreateModel(
+            name='Team',
+            fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
+                ('code', models.CharField(max_length=24, unique=True)),
+                ('name', models.CharField(max_length=160)),
+                ('country', models.CharField(max_length=80)),
+                ('school', models.CharField(max_length=180, blank=True)),
+                ('leader_email', models.EmailField(blank=True)),
+                ('active', models.BooleanField(default=True)),
+                ('scheduled', models.BooleanField(default=False)),
+                ('competition', models.ForeignKey('arena.competition', on_delete=models.PROTECT)),
+            ],
+            options={},
+        ),
+        migrations.CreateModel(
+            name='Membership',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('user', models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
+                ('team', models.ForeignKey('arena.team', on_delete=models.PROTECT)),
+            ],
+            options={},
+        ),
+        migrations.CreateModel(
+            name='Round',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('number', models.PositiveSmallIntegerField()),
+                ('name', models.CharField(max_length=100, blank=True)),
+                ('opens_at', models.DateTimeField()),
+                ('quarantine_at', models.DateTimeField()),
+                ('starts_at', models.DateTimeField()),
+                ('ends_at', models.DateTimeField()),
+                ('completed', models.BooleanField(default=False)),
+                ('maps_released', models.BooleanField(default=False)),
+                ('competition', models.ForeignKey('arena.competition', on_delete=models.PROTECT)),
+            ],
+            options={'ordering': ['number'], 'constraints': [models.UniqueConstraint(fields=['competition', 'number'], name='unique_competition_round'), models.CheckConstraint(condition=Q(opens_at__lt=models.F('quarantine_at')) & Q(quarantine_at__lte=models.F('starts_at')) & Q(starts_at__lt=models.F('ends_at')), name='round_valid_times')]},
+        ),
+        migrations.CreateModel(
+            name='Programme',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('source_key', models.CharField(max_length=120, unique=True)),
+                ('title', models.CharField(max_length=180)),
+                ('starts_at', models.DateTimeField(db_index=True)),
+                ('ends_at', models.DateTimeField()),
+                ('field', models.CharField(max_length=30, blank=True)),
+                ('confirmed', models.BooleanField(default=True)),
+                ('competition', models.ForeignKey('arena.competition', on_delete=models.PROTECT)),
+                ('round', models.ForeignKey('arena.round', null=True, blank=True, on_delete=models.PROTECT)),
+                ('team', models.ForeignKey('arena.team', null=True, blank=True, on_delete=models.PROTECT)),
+            ],
+            options={'ordering': ['starts_at', 'pk']},
+        ),
+        migrations.CreateModel(
+            name='Score',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('raw', models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)),
+                ('normalized', models.DecimalField(max_digits=14, decimal_places=4, null=True, blank=True)),
+                ('team', models.ForeignKey('arena.team', on_delete=models.PROTECT)),
+                ('round', models.ForeignKey('arena.round', on_delete=models.PROTECT)),
+            ],
+            options={'constraints': [models.UniqueConstraint(fields=['team', 'round'], name='unique_round_score')]},
+        ),
+        migrations.CreateModel(
+            name='Asset',
+            fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
+                ('kind', models.CharField(max_length=20, choices=[('round_code', 'Round Code'), ('round_json', 'Round Json'), ('tdp', 'TDP'), ('video', 'Video'), ('code', 'Code'), ('bom', 'BOM'), ('poster', 'Poster'), ('resource', 'Resource'), ('map', 'Map')])),
+                ('title', models.CharField(max_length=180, blank=True)),
+                ('blob_key', models.CharField(max_length=240, unique=True, editable=False)),
+                ('original_name', models.CharField(max_length=180)),
+                ('size', models.PositiveBigIntegerField()),
+                ('sha256', models.CharField(max_length=64, editable=False)),
+                ('created_at', models.DateTimeField(default=timezone.now, db_index=True)),
+                ('deleted_at', models.DateTimeField(null=True, blank=True)),
+                ('current', models.BooleanField(default=True)),
+                ('scan_status', models.CharField(max_length=12, choices=[('pending', 'Pending'), ('clean', 'Clean'), ('rejected', 'Rejected')], default='pending')),
+                ('public_approved', models.BooleanField(default=False)),
+                ('targets', models.ManyToManyField('arena.team', related_name='targeted_assets', blank=True)),
+                ('general', models.BooleanField(default=False)),
+                ('competition', models.ForeignKey('arena.competition', on_delete=models.PROTECT)),
+                ('team', models.ForeignKey('arena.team', on_delete=models.PROTECT, null=True, blank=True)),
+                ('round', models.ForeignKey('arena.round', on_delete=models.PROTECT, null=True, blank=True)),
+                ('uploader', models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)),
+            ],
+            options={'ordering': ['-created_at'], 'indexes': [models.Index(fields=['team', 'round', 'kind', 'current'], name='arena_asset_slot_idx')], 'constraints': [models.UniqueConstraint(fields=['team', 'round', 'kind'], condition=Q(current=True, deleted_at__isnull=True, kind__in=['round_code', 'round_json']), name='one_current_round_slot'), models.UniqueConstraint(fields=['team', 'kind'], condition=Q(current=True, deleted_at__isnull=True, kind__in=['tdp', 'video', 'code', 'bom', 'poster']), name='one_current_package_slot')]},
+        ),
+        migrations.CreateModel(
+            name='Announcement',
+            fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
+                ('title', models.CharField(max_length=180)),
+                ('body', models.TextField(max_length=12000)),
+                ('general', models.BooleanField(default=True)),
+                ('public', models.BooleanField(default=False)),
+                ('targets', models.ManyToManyField('arena.team', blank=True)),
+                ('created_at', models.DateTimeField(default=timezone.now)),
+                ('competition', models.ForeignKey('arena.competition', on_delete=models.PROTECT)),
+                ('author', models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)),
+            ],
+            options={'ordering': ['-created_at']},
+        ),
+        migrations.CreateModel(
+            name='Notification',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('read_at', models.DateTimeField(null=True, blank=True)),
+                ('team', models.ForeignKey('arena.team', on_delete=models.PROTECT)),
+                ('announcement', models.ForeignKey('arena.announcement', on_delete=models.PROTECT)),
+            ],
+            options={'constraints': [models.UniqueConstraint(fields=['team', 'announcement'], name='one_team_notice')]},
+        ),
+        migrations.CreateModel(
+            name='EmailDelivery',
+            fields=[
+                ('id', models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, serialize=False)),
+                ('dedupe_key', models.CharField(max_length=160, unique=True)),
+                ('subject', models.CharField(max_length=200)),
+                ('body', models.TextField()),
+                ('recipient', models.EmailField()),
+                ('created_at', models.DateTimeField(default=timezone.now)),
+                ('sent_at', models.DateTimeField(null=True, blank=True)),
+                ('attempts', models.PositiveSmallIntegerField(default=0)),
+                ('next_attempt_at', models.DateTimeField(default=timezone.now)),
+                ('last_error', models.CharField(max_length=200, blank=True)),
+                ('team', models.ForeignKey('arena.team', on_delete=models.PROTECT)),
+            ],
+            options={'ordering': ['created_at']},
+        ),
+        migrations.CreateModel(
+            name='AuditEvent',
+            fields=[
+                ('id', models.BigAutoField(primary_key=True, serialize=False)),
+                ('occurred_at', models.DateTimeField(default=timezone.now, db_index=True)),
+                ('action', models.CharField(max_length=80)),
+                ('object_id', models.CharField(max_length=80, blank=True)),
+                ('sha256', models.CharField(max_length=64, blank=True)),
+                ('detail', models.JSONField(default=dict)),
+                ('actor', models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True)),
+                ('team', models.ForeignKey('arena.team', on_delete=models.PROTECT, null=True)),
+            ],
+            options={'ordering': ['-id']},
+        ),
+    ]

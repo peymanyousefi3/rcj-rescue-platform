@@ -1,0 +1,2 @@
+{% extends 'base.html' %}
+{% load static %}{% block content %}<section class="panel auth-card centered"><h1>Password saved.</h1><p>Your account is ready. Sign in with your team username and password.</p><a class="button primary" href="{% url 'two_factor:login' %}">Sign in <img class="ui-icon" src="{% static 'arena/icons/arrow-up-right.svg' %}" alt=""></a></section>{% endblock %}

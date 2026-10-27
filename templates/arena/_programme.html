@@ -1,0 +1,42 @@
+{% load static announcements %}
+<section class="competition-programme" data-programme data-version="{{ programme_version }}" aria-label="Competition programme">
+ <div class="programme-layout">
+  <div class="programme-date-nav">
+   <p class="programme-month">{{ competition.starts_at|date:'F Y' }}</p>
+   <div class="programme-day-list" role="tablist" aria-label="Competition day" aria-orientation="vertical">
+    {% for day in programme_days %}<button type="button" id="programme-tab-{{ day.key }}" role="tab" aria-controls="programme-panel-{{ day.key }}" aria-selected="{{ day.selected|yesno:'true,false' }}" tabindex="{% if day.selected %}0{% else %}-1{% endif %}" data-programme-day="{{ day.key }}"><span>{{ day.date|date:'D' }}</span><strong>{{ day.date|date:'j' }}</strong><span class="sr-only">{{ day.date|date:'F Y' }}</span></button>{% endfor %}
+   </div>
+  </div>
+  <div class="programme-content">
+   {% for day in programme_days %}<section id="programme-panel-{{ day.key }}" class="programme-day-panel" role="tabpanel" aria-labelledby="programme-tab-{{ day.key }}" data-programme-panel="{{ day.key }}" tabindex="0" {% if not day.selected %}hidden{% endif %}>
+    <div class="programme-title-row"><div><h2>{{ day.date|date:'l, j F' }}</h2><p>All times Toronto / EDT</p></div><p class="programme-feed" data-feed-status>{% if not competition.workbook_enabled %}Organizer-managed schedule{% elif competition.workbook_last_synced %}Schedule updated <time datetime="{{ competition.workbook_last_synced|date:'c' }}">{{ competition.workbook_last_synced|date:'j M, H:i' }} EDT</time>{% else %}Schedule feed pending{% endif %}</p></div>
+    {% if public_announcements %}<a class="programme-notices-shortcut" href="#league-announcements">{{ public_announcements|length }} announcement{{ public_announcements|length|pluralize }} <img src="{% static 'arena/icons/arrow-down.svg' %}" alt=""></a>{% endif %}
+    <div class="programme-column-labels" aria-hidden="true"><span>Time</span><span>Programme</span></div>
+    <div class="programme-agenda">
+     {% for block in day.blocks %}{% if block.kind == 'round' %}
+      <details class="programme-round" data-programme-round="{{ day.key }}-{{ block.round.pk }}">
+       <summary><span class="programme-round-time"><time datetime="{{ block.round.starts_at|date:'c' }}">{{ block.round.starts_at|date:'H:i' }}</time> <span aria-hidden="true">–</span> <time datetime="{{ block.round.ends_at|date:'c' }}">{{ block.round.ends_at|date:'H:i' }}</time></span><span class="programme-round-label">{{ block.round }}{% if block.round.name %} · {{ block.round.name }}{% endif %}<small class="round-maximum">Map max: {{ block.round.maximum_score|floatformat:"-2"|default:"—" }}</small><span class="programme-live-label" data-round-live hidden>Live now</span></span>{% if block.round.submissions_enabled %}<span class="programme-deadline">Quarantine <time datetime="{{ block.round.quarantine_at|date:'c' }}">{{ block.round.quarantine_at|date:'H:i' }}</time></span>{% endif %}{% if block.field %}<span class="programme-field">Field {{ block.field }}</span>{% endif %}<img class="programme-expander" src="{% static 'arena/icons/caret-right.svg' %}" alt=""></summary>
+       <div class="programme-run-list" role="table" aria-label="{{ block.round }} run order">
+        <div class="programme-run-head" role="row"><span role="columnheader">Time</span><span role="columnheader">Team code</span><span role="columnheader">Team name</span></div>
+        {% for run in block.runs %}<div class="programme-run" role="row" data-programme-event data-start="{{ run.starts_at|date:'c' }}" data-end="{{ run.ends_at|date:'c' }}" data-confirmed="{{ run.confirmed|yesno:'true,false' }}"><span role="cell"><time datetime="{{ run.starts_at|date:'c' }}">{{ run.starts_at|date:'H:i' }}</time></span><span role="cell" class="programme-team-code">{{ run.team.code }}</span><span role="cell" class="programme-team-name"><span>{{ run.team.name }}<span class="programme-live-label" hidden>Live now</span></span>{% if run.recording %}<button type="button" class="programme-play" data-replay="{% url 'recording-player' run.recording.pk %}" aria-label="Play {{ run.team.name }} in {{ block.round }}"><span aria-hidden="true">▶</span> Play</button>{% endif %}</span></div>{% endfor %}
+       </div>
+      </details>
+     {% else %}<div class="programme-shared programme-{{ block.category }}" data-programme-event data-start="{{ block.event.starts_at|date:'c' }}" data-end="{{ block.event.ends_at|date:'c' }}" data-confirmed="{{ block.event.confirmed|yesno:'true,false' }}"><time datetime="{{ block.event.starts_at|date:'c' }}">{{ block.event.starts_at|date:'H:i' }}</time><span>{{ block.event.title }}{% if not block.event.confirmed %}<span class="programme-unconfirmed">To be confirmed</span>{% endif %}<span class="programme-live-label" hidden>Live now</span></span></div>{% endif %}{% endfor %}
+    </div>
+    <p class="programme-footnote"><img src="{% static 'arena/icons/lock-simple.svg' %}" alt="">Quarantine times are submission deadlines.</p>
+   </section>{% empty %}<div class="empty"><h2>Programme awaiting publication</h2></div>{% endfor %}
+  </div>
+  <aside class="programme-announcements" id="league-announcements" aria-label="Public league announcements">
+   <div class="programme-notice-heading"><img src="{% static 'arena/icons/bell.svg' %}" alt=""><h2>Announcements</h2><span class="programme-notice-count">{{ public_announcements|length }}<span class="sr-only"> public announcements</span></span></div>
+   <div class="programme-notice-list">
+    {% for item in public_announcements %}<details class="programme-notice" data-programme-notice="{{ item.pk }}">
+     <summary><div><time>{{ item.created_at|date:'j M · H:i' }} EDT</time><h3>{{ item.title }}</h3></div><img src="{% static 'arena/icons/caret-right.svg' %}" alt=""></summary>
+     <div class="programme-notice-body"><p>{{ item.body|announcement_bold|linebreaksbr }}</p></div>
+    </details>{% empty %}<div class="programme-notice-empty"><span><img src="{% static 'arena/icons/bell.svg' %}" alt=""></span><h3>No announcements yet</h3><p>New public updates will appear here.</p></div>{% endfor %}
+   </div>
+   <div class="programme-private-notices"><p><img src="{% static 'arena/icons/lock-simple.svg' %}" alt="">Team-specific updates stay in your private workspace.</p><a href="/portal/announcements/">View team notices <img src="{% static 'arena/icons/arrow-right.svg' %}" alt=""></a></div>
+  </aside>
+ </div>
+ <p class="sr-only" role="status" data-programme-update-status></p>
+ <noscript><p>All competition days are shown. Enable JavaScript for day switching and automatic updates.</p></noscript>
+</section>

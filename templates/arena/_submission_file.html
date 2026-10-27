@@ -1,0 +1,11 @@
+<div class="quarantine-file">
+ {% include 'arena/file_receipt.html' with file=file editable=editable %}
+ {% if editable %}<details class="quarantine-replacement"><summary>Replace {{ file.original_name }}</summary>
+  <form class="upload-form" method="post" enctype="multipart/form-data" action="{% if team.is_superteam %}{{ portal_base }}/submit/{{ kind }}/{% if round %}{{ round.pk }}/{% endif %}{% elif round %}{% url 'submit-round' kind round.pk %}{% else %}{% url 'submit-package' kind %}{% endif %}">
+   {% csrf_token %}<input type="hidden" name="replacement" value="{{ file.pk }}">
+   <label for="replace-{{ file.pk }}">Replacement file (any type)</label><input id="replace-{{ file.pk }}" type="file" name="files" required>
+   {% if round %}<label class="check-label"><input type="checkbox" name="attested" required>I confirm this is the file used for this round.</label>{% endif %}
+   <button class="button secondary small" type="submit">Upload replacement</button>
+  </form>
+ </details>{% endif %}
+</div>

@@ -1,0 +1,2 @@
+{% load static %}
+<details class="panel admin-section" id="audit" name="admin-work" ><summary class="panel-header"><div><p class="eyebrow">ACCOUNTABILITY</p><h2>Activity &amp; file hashes</h2></div><a class="button secondary small" href="{% url 'audit-export' %}">Export full audit CSV <img class="ui-icon" src="{% static 'arena/icons/arrow-down.svg' %}" alt=""></a></summary>{% include 'arena/audit_table.html' %}<p class="footnote inset">Showing the most recent 100 events. The export includes the full ledger. Authentication secrets and file contents are excluded.</p></details>

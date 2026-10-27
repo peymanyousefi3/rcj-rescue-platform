@@ -1,0 +1,50 @@
+{% load static %}
+<!doctype html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ASR 26 Rescue Simulation. Official programme, results, team submissions and competition resources.">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}Rescue Simulation · ASR 26{% endblock %}</title>
+  <link rel="icon" href="{% static 'arena/brand/platform.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'arena/site.css' %}">
+  <link rel="stylesheet" href="{% static 'arena/editorial.css' %}">
+  <link rel="stylesheet" href="{% static 'arena/championship.css' %}">
+  <link rel="stylesheet" href="{% static 'arena/responsive.css' %}">
+  <script src="{% static 'arena/site.js' %}" defer></script>
+  <script src="{% static 'arena/programme.js' %}" defer></script>
+  {% block extra_media %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+<header class="masthead"><button class="menu-button" type="button" aria-label="Open navigation" aria-controls="navigation" aria-expanded="false"><img class="ui-icon" src="{% static 'arena/icons/list.svg' %}" alt=""></button>
+ <a class="event-brand" href="/" aria-label="Rescue Competition Platform home"><img src="{% static 'arena/brand/platform.svg' %}" width="231" height="245" alt="Rescue Competition Platform"></a>
+ <div class="masthead-title"><strong>Rescue Competition Platform</strong><span>{{ competition.name }}</span></div>
+ 
+ <div class="masthead-access">{% if user.is_authenticated %}<details class="account-menu"><summary><img class="ui-icon" src="{% static 'arena/icons/user-circle.svg' %}" alt="">{% if user.is_staff %}Organizer{% else %}My team{% endif %}</summary><div class="account-dropdown"><a href="{% if user.is_staff %}/control/{% else %}/portal/{% endif %}">Workspace</a><a href="{% if user.is_staff %}/control/#announce{% else %}/portal/announcements/{% endif %}">Announcements{% if unread_count %} ({{ unread_count }}){% endif %}</a><a href="/">Public competition site</a><a href="{% url 'password_change' %}">Change password</a>{% if user.is_staff %}<a href="/control/#competition-settings">Competition settings</a>{% endif %}<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">Sign out</button></form></div></details>{% else %}<a class="button secondary" href="{% url 'two_factor:login' %}"><img class="ui-icon" src="{% static 'arena/icons/user-circle.svg' %}" alt="">Team sign in</a>{% endif %}</div>
+</header>
+<div class="nav-backdrop" hidden></div>
+<a class="skip" href="#main">Skip to content</a>
+<aside class="sidebar" id="navigation" aria-label="Main navigation"><button class="icon-button drawer-close" type="button" data-close-menu aria-label="Close navigation"><img class="ui-icon" src="{% static 'arena/icons/x.svg' %}" alt=""></button>
+  {% block navigation %}
+  <nav aria-label="Competition">
+    <span class="nav-label">COMPETITION</span>
+    <a href="/" {% if section == 'overview' or section == 'schedule' %}aria-current="page"{% endif %}><span aria-hidden="true"><img class="ui-icon" src="{% static 'arena/icons/calendar-blank.svg' %}" alt=""></span> Programme</a>
+    <a href="/results/" {% if section == 'results' %}aria-current="page"{% endif %}><span aria-hidden="true"><img class="ui-icon" src="{% static 'arena/icons/file.svg' %}" alt=""></span> Results</a>
+    <a href="/teams/" {% if section == 'teams' %}aria-current="page"{% endif %}><span aria-hidden="true"><img class="ui-icon" src="{% static 'arena/icons/user-circle.svg' %}" alt=""></span> Teams</a>
+    <a href="/maps/" {% if section == 'maps' %}aria-current="page"{% endif %}><span aria-hidden="true"><img class="ui-icon" src="{% static 'arena/icons/file.svg' %}" alt=""></span> Maps</a>
+    <a href="/resources/" {% if section == 'resources' %}aria-current="page"{% endif %}><span aria-hidden="true"><img class="ui-icon" src="{% static 'arena/icons/file.svg' %}" alt=""></span> Resources</a>
+  </nav>
+  {% endblock %}
+  <div class="nav-tools"><button class="quick-search" type="button" data-open-search aria-label="Search pages, Control or Command K"><img class="ui-icon" src="{% static 'arena/icons/magnifying-glass.svg' %}" alt=""></button></div>
+</aside>
+{% block event_banner %}{% endblock %}
+<div class="workspace">
+  <main id="main" tabindex="-1">
+    {% if messages %}<div class="messages" aria-live="polite">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% block content_wrapper %}{% block content %}{% endblock %}{% endblock %}
+  </main>
+  <footer class="footer"><span>Rescue Simulation · {{ competition.name }}</span><span>All times in Toronto.</span><a href="/resources/">Rules &amp; resources <img class="ui-icon" src="{% static 'arena/icons/arrow-up-right.svg' %}" alt=""></a></footer>
+</div>
+<dialog class="command-dialog" aria-labelledby="command-title"><div class="command-header"><img class="ui-icon" src="{% static 'arena/icons/magnifying-glass.svg' %}" alt=""><label class="sr-only" id="command-title" for="command-input">Find a page</label><input id="command-input" type="search" autocomplete="off" placeholder="Where would you like to go?"><button class="icon-button" type="button" data-close-search aria-label="Close quick find"><img class="ui-icon" src="{% static 'arena/icons/x.svg' %}" alt=""></button></div><div class="command-results" role="list" aria-label="Matching pages"></div><p class="command-empty" hidden>No matching pages. Try “maps” or “submissions”.</p><div class="command-footer"><span>Arrow keys to explore · Enter to open</span><span>Esc to close</span></div></dialog>
+<div class="toast" role="status" aria-live="polite" hidden></div>
+</body></html>

@@ -1,0 +1,31 @@
+{% extends 'two_factor/_base_focus.html' %}
+{% load two_factor_tags %}
+{% block title %}Sign in · ASR 26{% endblock %}
+{% block extra_media %}{{ form.media }}{% endblock %}
+{% block content %}
+{% if wizard.steps.current == 'auth' %}
+  <h1>Sign in</h1>
+  <p>Enter your team or organizer account details.</p>
+{% elif wizard.steps.current == 'backup' %}
+  <h1>Use a recovery code</h1>
+  <p>Enter one of the recovery codes saved from your authenticator setup.</p>
+{% else %}
+  <h1>Verify your identity</h1>
+  <p>Enter your verification code.</p>
+{% endif %}
+<form method="post">
+  {% csrf_token %}
+  {{ wizard.management_form }}
+  {{ wizard.form.as_p }}
+  {% if wizard.steps.current == 'auth' %}
+  <p><label class="remember-browser"><input type="checkbox" name="remember_browser" {% if request.POST.remember_browser == 'on' %}checked{% endif %} aria-describedby="remember-browser-help">Keep me signed in for 30 days</label><small id="remember-browser-help">Use only on your own trusted browser.</small></p>
+  {% endif %}
+  <button class="button primary" type="submit">{% if wizard.steps.current == 'auth' %}Sign in{% else %}Verify code{% endif %}</button>
+  {% if wizard.steps.current != 'auth' %}<p><button class="btn-link" type="submit" name="wizard_goto_step" value="auth" formnovalidate>Sign in with a different account</button></p>{% endif %}
+  {% if other_devices %}<p>Other verification methods:</p>{% for other in other_devices %}<p><button class="btn-link" name="challenge_device" value="{{ other.persistent_id }}" type="submit" formnovalidate>{{ other|as_action }}</button></p>{% endfor %}{% endif %}
+</form>
+{% if wizard.steps.current == 'auth' %}<p><a href="{% url 'password_reset' %}">Forgot your password?</a></p>{% endif %}
+{% if backup_tokens and wizard.steps.current != 'backup' %}
+<form method="post">{% csrf_token %}<button class="btn-link" name="wizard_goto_step" value="backup" type="submit" formnovalidate>Use a recovery code</button></form>
+{% endif %}
+{% endblock %}

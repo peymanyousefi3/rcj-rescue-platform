@@ -1,0 +1,13 @@
+{% load announcements %}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ notice.title }}</title></head>
+<body style="margin:0;background:#ffffff;color:#20242c;font-family:Arial,Helvetica,sans-serif;">
+ <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:24px 16px;" align="left">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0;"><tr><td style="font-size:15px;line-height:1.6;text-align:left;">
+   <p style="margin:0 0 18px;">Dear {{ recipient_name }},</p>
+   <div style="margin:0 0 18px;overflow-wrap:anywhere;">{{ notice.body|announcement_bold|linebreaksbr }}</div>
+   {% if dashboard_url %}<p style="margin:0 0 22px;"><a href="{{ dashboard_url }}" style="color:#2444c7;text-decoration:underline;">View this announcement in your team dashboard</a></p>{% endif %}
+   <p style="margin:0 0 10px;">Best regards,<br>RoboCup ASR 2026 Organizing Team<br>Junior Rescue Simulation League</p>
+   <img src="cid:asr-2026-logo" alt="RoboCupJunior Americas Super Regional 2026" width="102" style="display:block;width:102px;max-width:100%;height:auto;margin:0;border:0;">
+  </td></tr></table>
+ </td></tr></table>
+</body></html>

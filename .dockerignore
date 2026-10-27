@@ -1,0 +1,16 @@
+.git
+.env
+.env.*
+.venv
+__pycache__
+var
+private
+artifacts
+staticfiles
+*.xlsx
+*.csv
+*.log
+*.pem
+*.key
+credentials*.json
+service-account*.json

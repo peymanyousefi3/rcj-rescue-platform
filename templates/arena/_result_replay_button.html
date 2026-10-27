@@ -1,0 +1,1 @@
+{% if item.recording %}<button type="button" class="score-play result-score-play" data-replay="{% url 'recording-player' item.recording.pk %}" aria-label="Play {{ row.team.name }} in {{ item.round }}" title="Play recording"><span aria-hidden="true">▶</span></button>{% endif %}

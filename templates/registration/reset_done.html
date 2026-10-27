@@ -1,0 +1,2 @@
+{% extends 'base.html' %}
+{% load static %}{% block content %}<section class="panel auth-card centered"><h1>Check your email.</h1><p>If an eligible account matches, you’ll receive a password reset link.</p><a class="text-link" href="{% url 'two_factor:login' %}">Return to sign in <img class="ui-icon" src="{% static 'arena/icons/arrow-up-right.svg' %}" alt=""></a></section>{% endblock %}

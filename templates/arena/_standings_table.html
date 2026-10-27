@@ -1,0 +1,30 @@
+<p class="ranking-release-status" role="status">{% if group.challenge.rankings_released %}Rankings released{% else %}Rankings not released · Scores are available; rankings require administrator approval.{% endif %}</p>
+<div class="table-scroll results-scroll" role="region" aria-label="{{ group.challenge.name }} round scores. Scroll horizontally for additional rounds." tabindex="0">
+<table class="scores results-matrix">
+<caption class="sr-only">{{ group.challenge.name }}: raw and normalized scores for each round, discarded rounds, final score, rank and total elapsed time in seconds.</caption>
+<thead><tr>
+<th scope="col" rowspan="2" class="score-rank">Rank</th><th scope="col" rowspan="2" class="score-team">Team</th>
+{% for r in group.rounds %}<th scope="colgroup" colspan="2" id="round-{{ group.challenge.pk }}-{{ r.pk }}" class="round-group" title="{{ r.name|default:r }}">Round {{ r.number }}{% if r.name %}<small class="score-event-name" title="{{ r.name }}">{{ r.name }}</small>{% endif %}<small class="round-maximum">Map max: {{ r.maximum_score|floatformat:"-2"|default:"—" }}</small></th>{% endfor %}
+<th scope="col" rowspan="2" class="score-total-time" title="Sum of recorded elapsed times across all rounds, including discarded scores. Unknown times are not counted.">Total time (s)</th>
+<th scope="col" rowspan="2" class="score-final">{% if group.challenge.calculation == 'trimmed_mean' %}Final score (%){% else %}{{ group.challenge.get_calculation_display }}{% endif %}</th>
+</tr><tr>{% for r in group.rounds %}<th scope="col" id="raw-{{ group.challenge.pk }}-{{ r.pk }}" class="round-raw">Raw</th><th scope="col" id="normalized-{{ group.challenge.pk }}-{{ r.pk }}" class="round-normalized"><abbr title="Normalized score">Norm.</abbr></th>{% endfor %}</tr></thead>
+<tbody>{% for row in group.rows %}<tr>
+<td class="score-rank"><strong>{{ row.rank|default_if_none:'—' }}</strong>{% if row.tie %}<small class="block muted">Tie</small>{% endif %}</td>
+<th scope="row" class="score-team" id="team-{{ group.challenge.pk }}-{{ row.team.pk }}"><strong>{{ row.team.name }}</strong><small class="block muted">{{ row.team.code }} · {{ row.team.country }}</small></th>
+{% for item in row.round_scores %}{% with score=item.score %}
+<td class="round-raw{% if score.discarded or score.excluded %} score-discarded{% endif %}" headers="team-{{ group.challenge.pk }}-{{ row.team.pk }} round-{{ group.challenge.pk }}-{{ item.round.pk }} raw-{{ group.challenge.pk }}-{{ item.round.pk }}"><span class="result-score-with-replay"><span>{% if score and score.raw != None %}{{ score.raw|floatformat:2 }}{% else %}—{% endif %}</span>{% include 'arena/_result_replay_button.html' %}</span></td>
+<td class="round-normalized{% if score.discarded or score.excluded %} score-discarded{% endif %}" headers="team-{{ group.challenge.pk }}-{{ row.team.pk }} round-{{ group.challenge.pk }}-{{ item.round.pk }} normalized-{{ group.challenge.pk }}-{{ item.round.pk }}">{% if score.excluded %}<span class="discard-label">Excluded</span>{% elif score and score.normalized != None %}{{ score.normalized|floatformat:4 }}{% else %}—{% endif %}{% if score.discarded %}<small class="discard-label">Discarded</small>{% endif %}</td>
+{% endwith %}{% endfor %}
+<td class="score-total-time">{{ row.total_time_seconds|default_if_none:'—' }}</td>
+<td class="score-final"><strong>{% if row.total != None %}{{ row.total|floatformat:2 }}{% if group.challenge.calculation == 'trimmed_mean' %}<span class="score-percent">%</span>{% endif %}{% else %}<span class="score-pending">Pending</span>{% endif %}</strong>{% if row.issue %}<span class="sr-only">{{ row.issue }}</span>{% endif %}</td>
+</tr>{% empty %}<tr><td colspan="99" class="empty-cell">No team scores yet.</td></tr>{% endfor %}</tbody>
+</table></div>
+
+<div class="mobile-standings" aria-label="{{ group.challenge.name }} team results">
+{% for row in group.rows %}<details class="team-result">
+<summary><span class="mobile-rank">{{ row.rank|default_if_none:'—' }}{% if row.tie %}<small>Tie</small>{% endif %}</span><span class="mobile-team"><strong>{{ row.team.name }}</strong><small>{{ row.team.code }} · {{ row.team.country }}</small></span><span class="mobile-final">{% if row.total != None %}{{ row.total|floatformat:2 }}{% if group.challenge.calculation == 'trimmed_mean' %}<small>%</small>{% endif %}{% else %}<span class="score-pending">Pending</span>{% endif %}</span><span class="result-chevron" aria-hidden="true"></span></summary>
+<div class="team-result-detail">{% if row.issue %}<p class="result-issue">{{ row.issue }}</p>{% endif %}
+<table class="team-round-table"><caption class="sr-only">{{ row.team.name }} scores by round</caption><thead><tr><th scope="col">Round</th><th scope="col">Raw</th><th scope="col">Normalized</th></tr></thead><tbody>
+{% for item in row.round_scores %}{% with score=item.score %}<tr{% if score.discarded or score.excluded %} class="score-discarded"{% endif %}><th scope="row">Round {{ item.round.number }}{% if item.round.name %}<small class="score-event-name">{{ item.round.name }}</small>{% endif %}<small class="round-maximum">Map max: {{ item.round.maximum_score|floatformat:"-2"|default:"—" }}</small>{% if score.discarded %}<small class="discard-label">Discarded</small>{% elif score.excluded %}<small class="discard-label">Excluded</small>{% endif %}</th><td><span class="result-score-with-replay"><span>{% if score and score.raw != None %}{{ score.raw|floatformat:2 }}{% else %}—{% endif %}</span>{% include 'arena/_result_replay_button.html' %}</span></td><td>{% if score and score.normalized != None %}{{ score.normalized|floatformat:4 }}{% else %}—{% endif %}</td></tr>{% endwith %}{% endfor %}
+</tbody></table><p class="team-total-time"><span>Total time (s)</span><span>{{ row.total_time_seconds|default_if_none:'—' }}</span></p></div></details>{% empty %}<p class="empty-cell">No team scores yet.</p>{% endfor %}
+</div>

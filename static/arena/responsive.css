@@ -1,0 +1,235 @@
+/* Shared readable scale: reflow on small screens, grow on wide screens. */
+:root {
+  font-size: clamp(1rem, calc(.75rem + .3125vw), 1.5rem);
+  --site-width: 90rem;
+  --page-gutter: clamp(1rem, 2.5vw, 2.75rem);
+}
+body { font-size: 1rem; min-width: 0; }
+main, .masthead, .footer { max-width: var(--site-width); padding-inline: var(--page-gutter); }
+main { padding-block: 2rem 3rem; }
+.masthead { min-height: 8rem; gap: 1.75rem; }
+.event-brand img { width: 5.75rem; height: 6.125rem; }
+.masthead-title > strong { font-size: 2rem; }
+.masthead-title > span { font-size: 1.0625rem; }
+.official-marks img:first-child { width: 9.375rem; height: 5.4375rem; }
+.masthead-access .button, .account-menu > summary { font-size: .9375rem; min-height: 2.75rem; }
+.sidebar { padding-inline: max(var(--page-gutter), calc((100vw - var(--site-width)) / 2 + var(--page-gutter))); min-height: 3.875rem; gap: 1.5rem; }
+.sidebar nav { gap: 1rem; }
+.sidebar nav > a, .sidebar nav[aria-label="Administration"] > a, .sidebar nav[aria-label="Team dashboard"] > a {
+  font-size: 1rem; min-height: 3.875rem; padding: 1rem .75rem;
+}
+.workspace { min-height: calc(100svh - 11.875rem); }
+.footer, .footer a { font-size: .8125rem; }
+.footer { padding-block: 1.25rem; }
+.ui-icon { width: 1.125rem; height: 1.125rem; }
+h1, .page-heading h1 { font-size: clamp(2rem, 2.8vw, 3rem); }
+h2, .panel-header h2, .round-heading h2, .document-card .panel-header h2 { font-size: 1.375rem; }
+h3, .slot-title h3, .map-body h2, .resource-tile h2, .event-row h3, .review-notice h3 { font-size: 1.125rem; }
+.lead, .page-heading .lead, .note-box p, .info-strip p, .empty p, .empty.compact p,
+.resource-tile p, .team-card > p, .map-body p, .event-row p, .announcement-body > p,
+.notice-list p, .review-notice p, .document-body, .quarantine-instructions, table, td { font-size: .9375rem; }
+.lead { max-width: 65ch; }
+.eyebrow, .page-heading .eyebrow, .panel-header .eyebrow, .slot-title .eyebrow,
+.control-status .eyebrow, .admin-section > summary .eyebrow { font-size: .6875rem; }
+.button, .button.small, .text-link, .panel-header .text-link, .danger-link,
+.admin-section > summary .text-link, .admin-section > summary .button { font-size: .875rem; }
+.button { min-height: 2.75rem; padding: .75rem 1rem; }
+.badge, .admin-section > summary .badge, .count { font-size: .75rem; }
+.footnote, .helptext, .file-picker small, .check-label, .deadline-strip, .round-heading p,
+.privacy-line, .team-account-list small, .control-status p, .file-history, .file-download,
+.review-receipt small, .review-notice time, td small, th { font-size: .8125rem; }
+.file-receipt code, .hash-details code, .review-receipt code { font-size: .75rem; }
+.message, .errorlist, .standard-form p, .standard-form label, .standard-form ul,
+.standard-form [data-gmail-help], .file-picker strong, .review-receipt strong { font-size: .875rem; }
+.standard-form { max-width: 46rem; }
+.standard-form input:not([type=checkbox],[type=radio],[type=hidden]), .standard-form select { width: 100%; min-width: 0; }
+input, select, textarea { font: inherit; min-height: 2.75rem; }
+input:not([type=checkbox],[type=radio],[type=hidden]), select, textarea { font-size: 1rem; padding: .75rem; }
+input[type=checkbox], input[type=radio] { min-height: 0; width: 1.125rem; height: 1.125rem; }
+.standard-form .email-field { gap: .5rem; margin-bottom: 1.125rem; }
+.standard-form p { margin-bottom: 1.125rem; }
+.panel-header, .admin-section .inset, .document-body, .upload-slot, .quarantine-card .inset { padding: 1.5rem; }
+.admin-section > summary { padding-right: 3rem; }
+.admin-section > summary::after, .submission-round > summary::after { right: 1.125rem; }
+.control-status strong { font-size: 1.625rem; }
+.metrics strong, .metrics strong.metric-place { font-size: 2rem; }
+.metrics > div > span:last-child { font-size: .8125rem; }
+th, td { padding: 1rem 1.25rem; }
+.two-column, .document-grid, .round-grid, .team-grid { gap: 1.5rem; }
+.two-column { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.two-column > *, .document-grid > *, .round-grid > *, .team-grid > *, .resource-tile > div { min-width: 0; }
+.two-column .panel-header { flex-wrap: wrap; gap: .75rem; }
+.two-column .panel-header h2 { min-width: 0; overflow-wrap: anywhere; }
+.notice-list article { padding: 1.25rem 1.5rem; min-width: 0; overflow-wrap: anywhere; }
+.notice-list h3 { font-size: 1rem; line-height: 1.5; margin: .5rem 0; }
+.notice-list time { font-size: .8125rem; }
+.notice-list p { margin: 0; overflow-wrap: anywhere; }
+.team-account-list form { position: static; }
+.team-account-list strong, .team-account-list small { overflow-wrap: anywhere; }
+.team-card { padding: 1.5rem; }
+.team-card h2 { font-size: 1.375rem; }
+.resource-tile { padding: 1.5rem; }
+.playback-toolbar label, .playback-toolbar select, .playback-meta p, .playback-help,
+.playback-status-list p, .playback-empty p { font-size: 1rem; }
+.playback-meta h2, .playback-empty h3 { font-size: 1.75rem; }
+.playback-toolbar select { min-width: 0; }
+main:has(.auth-layout) { display: flex; align-items: center; }
+.auth-layout { width: 100%; max-width: 78rem; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: clamp(2rem,5vw,6rem); margin: clamp(2rem,6vh,5rem) auto; }
+.auth-intro h1 { font-size: clamp(2.25rem,3.2vw,4rem); margin-block: 1.25rem; }
+.auth-intro > p:not(.eyebrow) { font-size: 1.125rem; max-width: 42ch; }
+.auth-card { padding: clamp(1.5rem,3vw,3rem); }
+.auth-card h1 { font-size: 2rem; }
+.auth-card > p, .auth-card form p, .auth-card label, .auth-card a, .auth-card li,
+.auth-card button, .auth-card input[type=submit] { font-size: 1rem; }
+.auth-card form p { margin-block: 1rem; gap: .5rem; }
+.auth-card button { min-height: 3rem; padding: .75rem 1.25rem; }
+.auth-card form input:not([type=hidden],[type=checkbox],[type=radio]) { min-height: 3rem; }
+.auth-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1.25rem; }
+.auth-card .auth-actions .button { margin: 0; min-height: 3rem; }
+.auth-card .auth-actions .secondary { background: white; color: var(--ink); border: 1px solid var(--line); }
+.auth-card .auth-actions .secondary:hover { background: #f5f8ff; border-color: #b9c6e6; }
+.auth-card .remember-browser { display: flex; align-items: center; gap: .75rem; min-height: 44px; cursor: pointer; }
+.auth-card .remember-browser input { width: 20px; height: 20px; flex: 0 0 20px; }
+
+/* Keep the schedule compact relative to its independent announcement board. */
+main:has(.competition-programme) { max-width: none; padding: 0; }
+.competition-programme { font-size: 1rem; padding-block: 1.75rem 2.5rem; min-height: calc(100svh - 11.875rem); }
+.programme-layout { width: calc(100% - 2 * var(--page-gutter)); max-width: 82rem; grid-template-columns: 4.5rem minmax(0,37.5rem) minmax(20rem,1fr); gap: 1.5rem; }
+.programme-date-nav { top: 5.25rem; }
+.programme-month, .programme-day-list button span:first-child, .programme-feed, .programme-column-labels,
+.programme-field, .programme-footnote, .programme-notice time, .programme-notice-heading p,
+.programme-private-notices p, .programme-run-head { font-size: .8125rem; }
+.programme-day-list button { min-height: 5.375rem; }
+.programme-day-list button strong { font-size: 2rem; }
+.programme-content { padding: 1.375rem 1.25rem; }
+.programme-title-row h1 { font-size: 1.75rem; }
+.programme-title-row > div > p, .programme-round-time, .programme-notice-body p { font-size: 1rem; }
+.programme-column-labels, .programme-shared { grid-template-columns: 7rem minmax(0,1fr); padding: .625rem .75rem; }
+.programme-shared, .programme-run, .programme-notice-empty p, .programme-private-notices a { font-size: .9375rem; }
+.programme-round > summary { grid-template-columns: 7rem max-content max-content minmax(0,1fr) 1rem; gap: .375rem; min-height: 3.25rem; padding: .625rem; }
+.programme-round-label { font-size: 1.0625rem; }
+.programme-deadline:not(.programme-shared), .programme-unconfirmed, .programme-live-label { font-size: .75rem; }
+.programme-expander { width: 1rem; height: 1rem; }
+.programme-run-head, .programme-run { grid-template-columns: 4.75rem 5rem minmax(0,1fr); padding: .5rem .625rem; }
+.programme-notice-heading, .programme-notice > summary { padding: 1.375rem; }
+.programme-notice-heading h2 { font-size: 1.375rem; }
+.programme-notice h3, .programme-notice-empty h3 { font-size: 1.125rem; }
+.programme-notice-body { padding: 0 1.375rem 1.375rem; }
+.programme-notice-empty { padding: 2rem 1.375rem; }
+.programme-private-notices { padding: 1.125rem 1.375rem; }
+
+/* Titles stay visible; each notice reveals its body on demand. */
+.programme-announcements > .programme-notice-heading { min-height: 3.5rem; padding: .875rem 1rem; gap: .625rem; }
+.programme-announcements .programme-notice-heading h2 { flex: 1; min-width: 0; margin: 0; font-size: 1rem; }
+.programme-notice-count { font-size: .8125rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.programme-announcements .programme-notice > summary { padding: .875rem 1rem; gap: .75rem; }
+.programme-announcements .programme-notice h3 { font-size: 1rem; line-height: 1.45; margin-top: .25rem; }
+.programme-announcements .programme-private-notices { padding: .75rem 1rem; }
+.team-groups { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.team-groups > .panel-header { padding: 0 0 1rem; border: 0; }
+.team-groups h3 { margin: 0 0 .25rem; }
+
+@media (max-width: 1100px) {
+  .sidebar nav { gap: 0; }
+  .sidebar nav > a, .sidebar nav[aria-label="Administration"] > a, .sidebar nav[aria-label="Team dashboard"] > a { padding-inline: .65rem; font-size: .9375rem; }
+  .official-marks { display: none; }
+  .programme-layout { grid-template-columns: 4rem minmax(0,1fr) 20rem; gap: 1rem; }
+  .programme-round > summary { grid-template-columns: 6.5rem minmax(0,1fr) 1rem; gap: .375rem .5rem; }
+  .programme-round-label { grid-column: 2; grid-row: 1; }
+  .programme-round-time { grid-column: 1; grid-row: 1; }
+  .programme-round > summary > .programme-deadline { grid-column: 2; grid-row: 2; justify-self: start; }
+  .programme-field { grid-column: 1; grid-row: 2; justify-self: start; }
+  .programme-expander { grid-column: 3; grid-row: 1/3; }
+}
+@media (max-width: 960px) {
+  .programme-layout { grid-template-columns: 4rem minmax(0,1fr); max-width: 44rem; }
+  .programme-date-nav { grid-row: 1/3; }
+  .programme-announcements { grid-column: 2; }
+  .programme-field { justify-self: start; }
+}
+@media (max-width: 900px) {
+  .two-column { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 780px) {
+  .masthead { gap: .625rem; min-height: 5.625rem; padding: .75rem 1rem; }
+  .event-brand img { width: 2.75rem; height: 3rem; }
+  .masthead-title > strong { font-size: 1.375rem; }
+  .masthead-title > span { font-size: .75rem; }
+  .masthead-access .button, .account-menu > summary { font-size: .8125rem; }
+  .sidebar { padding: 4rem 1.375rem 1.5rem; gap: 1.375rem; }
+  .sidebar nav > a, .sidebar nav[aria-label="Administration"] > a, .sidebar nav[aria-label="Team dashboard"] > a { font-size: 1rem; min-height: 3rem; }
+  .workspace { min-height: calc(100svh - 5.625rem); }
+  .footer { gap: 1rem; }
+  main:has(.auth-layout) { align-items: flex-start; }
+  .auth-layout { grid-template-columns: minmax(0,1fr); max-width: 36rem; gap: 1.5rem; margin-block: 1rem; }
+  .auth-intro h1 { font-size: 2.25rem; }
+  .auth-intro > p:not(.eyebrow) { font-size: 1rem; }
+  .programme-layout { grid-template-columns: 3.5rem minmax(0,1fr); gap: 1rem .75rem; width: calc(100% - 1.5rem); }
+  .programme-date-nav { top: 6.5rem; }
+  .programme-round > summary { grid-template-columns: 6.25rem minmax(0,1fr) 1rem; }
+  .programme-run { grid-template-columns: 3.375rem minmax(0,1fr); padding: .625rem .25rem; }
+  .programme-notices-shortcut { font-size: .875rem; }
+  .control-status strong { font-size: 1.25rem; }
+}
+@media (max-width: 520px) {
+  .masthead { gap: .4375rem; padding: .625rem .75rem; }
+  .event-brand img { width: 2.25rem; height: 2.5rem; }
+  .masthead-title > strong { font-size: 1.0625rem; }
+  .masthead-title > span { font-size: .6875rem; }
+  .masthead-access .button { font-size: .75rem; }
+  .programme-layout { grid-template-columns: 3rem minmax(0,1fr); }
+  .programme-content { padding: 1.125rem .75rem; }
+  .programme-month { font-size: .6875rem; }
+  .programme-day-list button span:first-child { font-size: .75rem; }
+  .programme-title-row h1 { font-size: 1.5rem; }
+  .programme-title-row > div > p { font-size: .875rem; }
+  .programme-column-labels, .programme-shared { grid-template-columns: 3.25rem minmax(0,1fr); padding-inline: .5rem; }
+  .programme-round > summary { grid-template-columns: minmax(0,1fr) max-content .875rem; gap: .4375rem .375rem; padding: .625rem .5rem; }
+  .programme-round-time, .programme-field { font-size: .8125rem; }
+  .programme-round-label { font-size: 1rem; grid-column: 1; grid-row: 1; }
+  .programme-round-time { grid-column: 1; grid-row: 2; }
+  .programme-round > summary > .programme-deadline { font-size: .6875rem; white-space: normal; }
+  .programme-field { grid-column: 2; grid-row: 1; justify-self: end; }
+  .programme-run { grid-template-columns: 2.625rem minmax(0,1fr); font-size: .875rem; }
+  .programme-notice-heading, .programme-notice > summary { padding: 1rem; }
+  .programme-notice-body { padding: 0 1rem 1rem; }
+  .programme-notice-body p { font-size: .9375rem; }
+  .programme-notice-heading h2 { font-size: 1.25rem; }
+  .programme-notice-empty p, .programme-private-notices p { font-size: .875rem; }
+  .control-status .eyebrow { font-size: .625rem; }
+  .admin-section > summary { flex-wrap: wrap; }
+  .resource-tile { gap: 1rem; }
+}
+@media (max-width: 360px) {
+  .programme-round > summary > .programme-round-time { grid-column: 1/3; grid-row: 2; }
+  .programme-round > summary > .programme-deadline { grid-column: 1/3; grid-row: 3; }
+  .programme-expander { grid-row: 1/4; }
+}
+/* Keep accessible table labels inside their horizontal scroll container. */
+.table-scroll { position: relative; max-width: 100%; }
+
+/* A run keeps its recording action alongside the team at every viewport size. */
+.programme-team-name { display:flex; align-items:center; justify-content:space-between; gap:.5rem; min-width:0; }
+.programme-team-name > span { min-width:0; }
+.programme-play { display:inline-flex; align-items:center; justify-content:center; gap:.375rem; flex:none; min-height:2.75rem; padding:.375rem .75rem; border:1px solid #cfdbf2; border-radius:.5rem; background:#f0f5ff; color:#244d91; font-size:.8125rem; font-weight:600; }
+.programme-play:hover { background:#e2ecff; border-color:#9fb8e7; }
+.programme-play:focus-visible { outline:3px solid #567bd1; outline-offset:2px; }
+.programme-play > span { font-size:.625rem; }
+/* Long round names and field labels wrap into their own grid rows. */
+.programme-round > summary { grid-template-columns:7rem minmax(0,1fr) 1rem; }
+.programme-round > summary > .programme-round-time { grid-column:1; grid-row:1; }
+.programme-round > summary > .programme-round-label { grid-column:2; grid-row:1; white-space:normal; overflow-wrap:anywhere; min-width:0; }
+.programme-round > summary > .programme-expander { grid-column:3; grid-row:1; }
+.programme-round > summary > .programme-deadline { grid-column:2; grid-row:2; justify-self:start; }
+.programme-round > summary > .programme-field { grid-column:2; grid-row:2; justify-self:start; white-space:normal; overflow-wrap:anywhere; }
+.programme-round > summary:has(.programme-deadline) > .programme-field { grid-row:3; }
+.scores .score-total-time { color:var(--muted); font-size:.75rem; font-weight:400; font-variant-numeric:tabular-nums; }
+.scores.results-matrix .score-total-time { min-width:5.5rem; text-align:right; white-space:nowrap; color:var(--muted); font-size:.75rem; font-weight:400; }
+.team-total-time { display:flex; justify-content:space-between; gap:1rem; margin:1rem 0 0; padding-top:.75rem; border-top:1px solid var(--champion-line,#dce3ef); font-size:.75rem; color:var(--muted); font-weight:400; font-variant-numeric:tabular-nums; }
+@media (max-width:520px) {
+ .programme-round > summary { grid-template-columns:minmax(0,1fr) max-content 1rem; }
+ .programme-round > summary > .programme-round-label { grid-column:1 / 3; }
+ .programme-round > summary > .programme-round-time { grid-column:1; grid-row:2; }
+ .programme-round > summary > .programme-deadline { grid-column:2; grid-row:2; }
+ .programme-round > summary > .programme-field { grid-column:1 / 3; grid-row:3; }
+}

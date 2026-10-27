@@ -1,0 +1,630 @@
+{
+  "teams": [
+    {
+      "Team name": "Aurora Robotics",
+      "Code": "101ZZ",
+      "Country": "Demo",
+      "School": "Fictional demonstration school"
+    },
+    {
+      "Team name": "Atlas Rescue",
+      "Code": "102ZZ",
+      "Country": "Demo",
+      "School": "Fictional demonstration school"
+    },
+    {
+      "Team name": "Cedar Circuit",
+      "Code": "103ZZ",
+      "Country": "Demo",
+      "School": "Fictional demonstration school"
+    },
+    {
+      "Team name": "Orbit Robotics",
+      "Code": "104ZZ",
+      "Country": "Demo",
+      "School": "Fictional demonstration school"
+    },
+    {
+      "Team name": "Pioneer Lab",
+      "Code": "105ZZ",
+      "Country": "Demo",
+      "School": "Fictional demonstration school"
+    }
+  ],
+  "rounds": [
+    {
+      "number": 1,
+      "opens_at": "2026-10-22T08:30:00-04:00",
+      "quarantine_at": "2026-10-23T10:45:00-04:00",
+      "starts_at": "2026-10-23T11:00:00-04:00",
+      "ends_at": "2026-10-23T16:00:00.000Z"
+    },
+    {
+      "number": 2,
+      "opens_at": "2026-10-22T08:30:00-04:00",
+      "quarantine_at": "2026-10-23T13:15:00-04:00",
+      "starts_at": "2026-10-23T13:30:00-04:00",
+      "ends_at": "2026-10-23T18:30:00.000Z"
+    },
+    {
+      "number": 3,
+      "opens_at": "2026-10-22T08:30:00-04:00",
+      "quarantine_at": "2026-10-23T15:45:00-04:00",
+      "starts_at": "2026-10-23T16:00:00-04:00",
+      "ends_at": "2026-10-23T21:00:00.000Z"
+    },
+    {
+      "number": 4,
+      "opens_at": "2026-10-22T08:30:00-04:00",
+      "quarantine_at": "2026-10-24T10:45:00-04:00",
+      "starts_at": "2026-10-24T11:00:00-04:00",
+      "ends_at": "2026-10-24T16:00:00.000Z"
+    },
+    {
+      "number": 5,
+      "opens_at": "2026-10-22T08:30:00-04:00",
+      "quarantine_at": "2026-10-24T13:15:00-04:00",
+      "starts_at": "2026-10-24T13:30:00-04:00",
+      "ends_at": "2026-10-24T18:30:00.000Z"
+    },
+    {
+      "number": 6,
+      "opens_at": "2026-10-22T08:30:00-04:00",
+      "quarantine_at": "2026-10-24T15:30:00-04:00",
+      "starts_at": "2026-10-24T15:45:00-04:00",
+      "ends_at": "2026-10-24T20:45:00.000Z"
+    },
+    {
+      "number": 7,
+      "opens_at": "2026-10-22T08:30:00-04:00",
+      "quarantine_at": "2026-10-25T10:45:00-04:00",
+      "starts_at": "2026-10-25T11:00:00-04:00",
+      "ends_at": "2026-10-25T16:00:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "source_key": "asr26:2026-10-22:08:30:00:programme",
+      "title": "Setup | Practice",
+      "starts_at": "2026-10-22T08:30:00-04:00",
+      "ends_at": "2026-10-22T11:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-22:11:00:00:programme",
+      "title": "Opening ceremony",
+      "starts_at": "2026-10-22T11:00:00-04:00",
+      "ends_at": "2026-10-22T12:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-22:12:00:00:programme",
+      "title": "Lunch",
+      "starts_at": "2026-10-22T12:00:00-04:00",
+      "ends_at": "2026-10-22T13:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-22:13:00:00:programme",
+      "title": "Setup | Practice",
+      "starts_at": "2026-10-22T13:00:00-04:00",
+      "ends_at": "2026-10-22T13:15:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-22:13:15:00:programme",
+      "title": "Team Meeting SuperTeam Draw",
+      "starts_at": "2026-10-22T13:15:00-04:00",
+      "ends_at": "2026-10-22T14:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-22:14:00:00:programme",
+      "title": "Client-Server Connection Test",
+      "starts_at": "2026-10-22T14:00:00-04:00",
+      "ends_at": "2026-10-22T15:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-22:15:00:00:programme",
+      "title": "Setup | Practice Poster Installation",
+      "starts_at": "2026-10-22T15:00:00-04:00",
+      "ends_at": "2026-10-22T17:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-22:17:00:00:programme",
+      "title": "Closing",
+      "starts_at": "2026-10-22T17:00:00-04:00",
+      "ends_at": "2026-10-22T21:15:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:08:30:00:programme",
+      "title": "Setup | Practice",
+      "starts_at": "2026-10-23T08:30:00-04:00",
+      "ends_at": "2026-10-23T10:45:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:10:45:00:programme",
+      "title": "Quarantine due",
+      "starts_at": "2026-10-23T10:45:00-04:00",
+      "ends_at": "2026-10-23T15:00:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:11:00:00:101ZZ",
+      "title": "Round 1",
+      "starts_at": "2026-10-23T11:00:00-04:00",
+      "ends_at": "2026-10-23T15:15:00.000Z",
+      "team_code": "101ZZ",
+      "round_number": 1,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:11:15:00:102ZZ",
+      "title": "Round 1",
+      "starts_at": "2026-10-23T11:15:00-04:00",
+      "ends_at": "2026-10-23T15:30:00.000Z",
+      "team_code": "102ZZ",
+      "round_number": 1,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:11:30:00:103ZZ",
+      "title": "Round 1",
+      "starts_at": "2026-10-23T11:30:00-04:00",
+      "ends_at": "2026-10-23T15:45:00.000Z",
+      "team_code": "103ZZ",
+      "round_number": 1,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:11:45:00:104ZZ",
+      "title": "Round 1",
+      "starts_at": "2026-10-23T11:45:00-04:00",
+      "ends_at": "2026-10-23T16:00:00.000Z",
+      "team_code": "104ZZ",
+      "round_number": 1,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:12:00:00:programme",
+      "title": "Lunch",
+      "starts_at": "2026-10-23T12:00:00-04:00",
+      "ends_at": "2026-10-23T13:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:13:00:00:programme",
+      "title": "Setup | Practice",
+      "starts_at": "2026-10-23T13:00:00-04:00",
+      "ends_at": "2026-10-23T13:15:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:13:15:00:programme",
+      "title": "Quarantine due",
+      "starts_at": "2026-10-23T13:15:00-04:00",
+      "ends_at": "2026-10-23T17:30:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:13:30:00:102ZZ",
+      "title": "Round 2",
+      "starts_at": "2026-10-23T13:30:00-04:00",
+      "ends_at": "2026-10-23T17:45:00.000Z",
+      "team_code": "102ZZ",
+      "round_number": 2,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:13:45:00:103ZZ",
+      "title": "Round 2",
+      "starts_at": "2026-10-23T13:45:00-04:00",
+      "ends_at": "2026-10-23T18:00:00.000Z",
+      "team_code": "103ZZ",
+      "round_number": 2,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:14:00:00:104ZZ",
+      "title": "Round 2",
+      "starts_at": "2026-10-23T14:00:00-04:00",
+      "ends_at": "2026-10-23T18:15:00.000Z",
+      "team_code": "104ZZ",
+      "round_number": 2,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:14:15:00:101ZZ",
+      "title": "Round 2",
+      "starts_at": "2026-10-23T14:15:00-04:00",
+      "ends_at": "2026-10-23T18:30:00.000Z",
+      "team_code": "101ZZ",
+      "round_number": 2,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:14:30:00:programme",
+      "title": "Poster session",
+      "starts_at": "2026-10-23T14:30:00-04:00",
+      "ends_at": "2026-10-23T15:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": false
+    },
+    {
+      "source_key": "asr26:2026-10-23:15:00:00:programme",
+      "title": "Sheridan visit B213",
+      "starts_at": "2026-10-23T15:00:00-04:00",
+      "ends_at": "2026-10-23T15:30:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:15:30:00:programme",
+      "title": "Setup",
+      "starts_at": "2026-10-23T15:30:00-04:00",
+      "ends_at": "2026-10-23T15:45:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:15:45:00:programme",
+      "title": "Quarantine due",
+      "starts_at": "2026-10-23T15:45:00-04:00",
+      "ends_at": "2026-10-23T20:00:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:16:00:00:103ZZ",
+      "title": "Round 3",
+      "starts_at": "2026-10-23T16:00:00-04:00",
+      "ends_at": "2026-10-23T20:15:00.000Z",
+      "team_code": "103ZZ",
+      "round_number": 3,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:16:15:00:104ZZ",
+      "title": "Round 3",
+      "starts_at": "2026-10-23T16:15:00-04:00",
+      "ends_at": "2026-10-23T20:30:00.000Z",
+      "team_code": "104ZZ",
+      "round_number": 3,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:16:30:00:101ZZ",
+      "title": "Round 3",
+      "starts_at": "2026-10-23T16:30:00-04:00",
+      "ends_at": "2026-10-23T20:45:00.000Z",
+      "team_code": "101ZZ",
+      "round_number": 3,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:16:45:00:102ZZ",
+      "title": "Round 3",
+      "starts_at": "2026-10-23T16:45:00-04:00",
+      "ends_at": "2026-10-23T21:00:00.000Z",
+      "team_code": "102ZZ",
+      "round_number": 3,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-23:17:00:00:programme",
+      "title": "Closing",
+      "starts_at": "2026-10-23T17:00:00-04:00",
+      "ends_at": "2026-10-23T21:15:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:08:30:00:programme",
+      "title": "Setup | Practice",
+      "starts_at": "2026-10-24T08:30:00-04:00",
+      "ends_at": "2026-10-24T10:45:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:10:45:00:programme",
+      "title": "Quarantine due",
+      "starts_at": "2026-10-24T10:45:00-04:00",
+      "ends_at": "2026-10-24T15:00:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:11:00:00:104ZZ",
+      "title": "Round 4",
+      "starts_at": "2026-10-24T11:00:00-04:00",
+      "ends_at": "2026-10-24T15:15:00.000Z",
+      "team_code": "104ZZ",
+      "round_number": 4,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:11:15:00:101ZZ",
+      "title": "Round 4",
+      "starts_at": "2026-10-24T11:15:00-04:00",
+      "ends_at": "2026-10-24T15:30:00.000Z",
+      "team_code": "101ZZ",
+      "round_number": 4,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:11:30:00:102ZZ",
+      "title": "Round 4",
+      "starts_at": "2026-10-24T11:30:00-04:00",
+      "ends_at": "2026-10-24T15:45:00.000Z",
+      "team_code": "102ZZ",
+      "round_number": 4,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:11:45:00:103ZZ",
+      "title": "Round 4",
+      "starts_at": "2026-10-24T11:45:00-04:00",
+      "ends_at": "2026-10-24T16:00:00.000Z",
+      "team_code": "103ZZ",
+      "round_number": 4,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:12:00:00:programme",
+      "title": "Lunch",
+      "starts_at": "2026-10-24T12:00:00-04:00",
+      "ends_at": "2026-10-24T13:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:13:00:00:programme",
+      "title": "Setup | Practice",
+      "starts_at": "2026-10-24T13:00:00-04:00",
+      "ends_at": "2026-10-24T13:15:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:13:15:00:programme",
+      "title": "Quarantine due",
+      "starts_at": "2026-10-24T13:15:00-04:00",
+      "ends_at": "2026-10-24T17:30:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:13:30:00:101ZZ",
+      "title": "Round 5",
+      "starts_at": "2026-10-24T13:30:00-04:00",
+      "ends_at": "2026-10-24T17:45:00.000Z",
+      "team_code": "101ZZ",
+      "round_number": 5,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:13:45:00:102ZZ",
+      "title": "Round 5",
+      "starts_at": "2026-10-24T13:45:00-04:00",
+      "ends_at": "2026-10-24T18:00:00.000Z",
+      "team_code": "102ZZ",
+      "round_number": 5,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:14:00:00:103ZZ",
+      "title": "Round 5",
+      "starts_at": "2026-10-24T14:00:00-04:00",
+      "ends_at": "2026-10-24T18:15:00.000Z",
+      "team_code": "103ZZ",
+      "round_number": 5,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:14:15:00:104ZZ",
+      "title": "Round 5",
+      "starts_at": "2026-10-24T14:15:00-04:00",
+      "ends_at": "2026-10-24T18:30:00.000Z",
+      "team_code": "104ZZ",
+      "round_number": 5,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:14:30:00:programme",
+      "title": "Setup | Practice",
+      "starts_at": "2026-10-24T14:30:00-04:00",
+      "ends_at": "2026-10-24T15:30:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:15:30:00:programme",
+      "title": "Quarantine due",
+      "starts_at": "2026-10-24T15:30:00-04:00",
+      "ends_at": "2026-10-24T19:45:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:15:45:00:102ZZ",
+      "title": "Round 6",
+      "starts_at": "2026-10-24T15:45:00-04:00",
+      "ends_at": "2026-10-24T20:00:00.000Z",
+      "team_code": "102ZZ",
+      "round_number": 6,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:16:00:00:103ZZ",
+      "title": "Round 6",
+      "starts_at": "2026-10-24T16:00:00-04:00",
+      "ends_at": "2026-10-24T20:15:00.000Z",
+      "team_code": "103ZZ",
+      "round_number": 6,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:16:15:00:104ZZ",
+      "title": "Round 6",
+      "starts_at": "2026-10-24T16:15:00-04:00",
+      "ends_at": "2026-10-24T20:30:00.000Z",
+      "team_code": "104ZZ",
+      "round_number": 6,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:16:30:00:101ZZ",
+      "title": "Round 6",
+      "starts_at": "2026-10-24T16:30:00-04:00",
+      "ends_at": "2026-10-24T20:45:00.000Z",
+      "team_code": "101ZZ",
+      "round_number": 6,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-24:16:45:00:programme",
+      "title": "Closing",
+      "starts_at": "2026-10-24T16:45:00-04:00",
+      "ends_at": "2026-10-24T21:00:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:08:30:00:programme",
+      "title": "Setup | Practice",
+      "starts_at": "2026-10-25T08:30:00-04:00",
+      "ends_at": "2026-10-25T10:45:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:10:45:00:programme",
+      "title": "Quarantine due",
+      "starts_at": "2026-10-25T10:45:00-04:00",
+      "ends_at": "2026-10-25T15:00:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:11:00:00:103ZZ",
+      "title": "Round 7",
+      "starts_at": "2026-10-25T11:00:00-04:00",
+      "ends_at": "2026-10-25T15:15:00.000Z",
+      "team_code": "103ZZ",
+      "round_number": 7,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:11:15:00:104ZZ",
+      "title": "Round 7",
+      "starts_at": "2026-10-25T11:15:00-04:00",
+      "ends_at": "2026-10-25T15:30:00.000Z",
+      "team_code": "104ZZ",
+      "round_number": 7,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:11:30:00:101ZZ",
+      "title": "Round 7",
+      "starts_at": "2026-10-25T11:30:00-04:00",
+      "ends_at": "2026-10-25T15:45:00.000Z",
+      "team_code": "101ZZ",
+      "round_number": 7,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:11:45:00:102ZZ",
+      "title": "Round 7",
+      "starts_at": "2026-10-25T11:45:00-04:00",
+      "ends_at": "2026-10-25T16:00:00.000Z",
+      "team_code": "102ZZ",
+      "round_number": 7,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:12:00:00:programme",
+      "title": "Lunch",
+      "starts_at": "2026-10-25T12:00:00-04:00",
+      "ends_at": "2026-10-25T13:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:13:00:00:programme",
+      "title": "SuperTeam Challenge",
+      "starts_at": "2026-10-25T13:00:00-04:00",
+      "ends_at": "2026-10-25T16:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:16:00:00:programme",
+      "title": "Awards ceremony",
+      "starts_at": "2026-10-25T16:00:00-04:00",
+      "ends_at": "2026-10-25T17:00:00-04:00",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    },
+    {
+      "source_key": "asr26:2026-10-25:17:00:00:programme",
+      "title": "Closing",
+      "starts_at": "2026-10-25T17:00:00-04:00",
+      "ends_at": "2026-10-25T21:15:00.000Z",
+      "team_code": null,
+      "round_number": null,
+      "confirmed": true
+    }
+  ],
+  "scores": [],
+  "mode": "Sample",
+  "source_note": "Fictional demonstration roster and timetable. No participant records or private competition data."
+}

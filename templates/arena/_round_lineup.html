@@ -1,0 +1,12 @@
+{% load static %}
+<section class="round-lineup" data-lineup-editor>
+ <header class="editor-heading"><div><h3>Team order &amp; run times</h3><p>Drag teams into order, or use the arrow buttons. Run times follow the round start, run minutes and gaps automatically.</p></div></header>
+ {{ lineup_form.revision }}{{ lineup_form.lineup }}
+  {{ lineup_form.non_field_errors }}{{ lineup_form.lineup.errors }}
+  <details class="lineup-team-selection"><summary>Choose participating teams</summary>{{ lineup_form.teams.as_field_group }}</details>
+  <div class="lineup-head" aria-hidden="true"><span>Order / team</span><span>Run time</span><span>Minutes</span><span>Gap before</span><span>Location</span><span>Move</span></div>
+  <ol class="lineup-list" data-lineup-list aria-label="Team run order"></ol>
+  <p class="lineup-message" data-lineup-status role="status"></p>
+  <noscript><p>Enable JavaScript to arrange teams.</p></noscript>
+
+</section>

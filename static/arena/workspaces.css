@@ -1,0 +1,12 @@
+.workspace-links{display:flex;flex-wrap:wrap;gap:.75rem}
+.complaint-form{display:grid;gap:1rem;max-width:64rem}
+.complaint-form .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem 1.25rem}
+.complaint-form .form-field{min-width:0;display:grid;align-content:start;gap:.4rem}
+.complaint-form .field-message,.complaint-form .field-response,.complaint-form .field-files{grid-column:1/-1}
+.complaint-form label{font-weight:650;color:var(--ink,#142854)}
+.complaint-form input,.complaint-form textarea,.complaint-form select{width:100%;box-sizing:border-box;min-height:44px;padding:.7rem .8rem;border:1px solid #c9d3e5;border-radius:.55rem;font:inherit;background:#fff;color:#142854}
+.complaint-form textarea{resize:vertical;line-height:1.5}
+.complaint-form .helptext{font-size:.875rem;line-height:1.5;color:#52627b}
+.complaint-form .errorlist{margin:.25rem 0;color:#9e2334}
+.complaint-form .form-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem}
+@media(max-width:600px){.complaint-form .form-grid{grid-template-columns:minmax(0,1fr)}.workspace-links .button{width:100%;white-space:normal}.complaint-form .form-actions>.button{flex:1}}

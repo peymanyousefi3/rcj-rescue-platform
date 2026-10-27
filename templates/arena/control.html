@@ -1,0 +1,22 @@
+{% extends 'base.html' %}{% load static %}
+{% block body_class %}admin-page{% endblock %}
+{% block title %}Administration · ASR 26{% endblock %}{% block breadcrumb %}Administration{% endblock %}
+{% block navigation %}<nav aria-label="Administration"><a href="#programme">Schedule calendar</a><a href="#results-recordings">Results &amp; recordings</a><a href="#rounds" aria-current="page">Rounds &amp; archive</a><a href="#quarantines">Participant uploads</a><a href="#files">Organizer uploads</a><a href="#announce">Announcements</a><a href="#complaints">Complaints</a><a href="#accounts">Team accounts</a><a href="#competition-settings">Competition settings</a><a href="#email-settings">Email settings</a><a href="#audit">Activity</a></nav>{% endblock %}
+{% block extra_media %}<link rel="stylesheet" href="{% static 'arena/replay.css' %}"><script src="{% static 'arena/replay.js' %}" defer></script><meta name="csp-nonce" content="{{ request.csp_nonce }}"><script src="{% static 'arena/vendor/fullcalendar-6.1.22.min.js' %}" defer></script><script src="{% static 'arena/vendor/sortable-1.15.6.min.js' %}" defer></script><link rel="stylesheet" href="{% static 'arena/admin.css' %}"><script src="{% static 'arena/admin.js' %}" defer></script><script src="{% static 'arena/calendar.js' %}" defer></script>{% endblock %}
+{% block content %}<div class="organizer-workspace">
+<div class="page-heading"><div><h1>Competition control</h1><p class="lead">Manage the competition, team access and private submissions.</p></div><span class="badge success">Administrator</span></div>
+<div class="control-status"><div class="panel"><span>Competition rounds</span><strong>{{ rounds|length }}</strong><p>Manage rounds and the archive below</p></div><div class="panel"><span>Competition data</span><strong>{% if competition.workbook_enabled %}Linked workbook{% else %}Managed here{% endif %}</strong><p>{% if competition.workbook_last_synced %}Last import {{ competition.workbook_last_synced|date:'j M · H:i' }}{% else %}No workbook import yet{% endif %}</p></div><div class="panel"><span>Outgoing email</span><strong>{{ email_pending }} pending</strong><p>{% if email_configured %}Delivery enabled{% else %}Delivery paused{% endif %}</p></div></div>
+{{ lineup_teams|json_script:'lineup-team-data' }}{{ superteam_challenge_ids|json_script:'superteam-challenge-data' }}
+{% include 'arena/_control_programme.html' %}
+{% include 'arena/_control_results.html' %}
+{% include 'arena/_control_rounds.html' %}
+{% include 'arena/_quarantine_control.html' %}
+{% include 'arena/_control_files.html' %}
+{% include 'arena/_control_announcements.html' %}
+{% include 'arena/_control_complaints.html' %}{% include 'arena/_control_teams.html' %}
+{% include 'arena/_control_competition.html' %}
+{% include 'arena/_control_email.html' %}
+{% include 'arena/_control_audit.html' %}
+{% include 'arena/_replay_dialog.html' %}
+<dialog class="admin-dialog" data-admin-dialog aria-labelledby="admin-dialog-title"><header class="dialog-header"><h2 id="admin-dialog-title">Edit schedule</h2><button type="button" class="admin-icon" data-dialog-close aria-label="Close editor">×</button></header><div data-dialog-content></div></dialog>
+</div>{% endblock %}

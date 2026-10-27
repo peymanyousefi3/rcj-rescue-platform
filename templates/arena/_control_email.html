@@ -1,0 +1,4 @@
+{% load static %}
+<details class="panel admin-section" id="email-settings" name="admin-work" {% if email_form.is_bound %}open{% endif %}><summary class="panel-header"><div><h2>Email settings</h2><p>Sender connection and announcement copies.</p></div><span class="badge neutral">{% if email_configured %}Enabled{% else %}Paused / not configured{% endif %}</span></summary>
+<div class="admin-content"><button type="button" class="button secondary" data-open-editor="email-settings">Edit email settings</button>
+{% if email_password_saved %}<form method="post" class="connection-check">{% csrf_token %}<input type="hidden" name="form" value="email-check"><div><h3>Check saved connection</h3><p class="section-help">Authenticates with your provider. No email is sent.</p></div><button class="button secondary" type="submit">Check connection</button></form>{% endif %}</div></details>

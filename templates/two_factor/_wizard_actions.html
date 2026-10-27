@@ -1,0 +1,10 @@
+{% load i18n %}
+<div class="auth-actions">
+  {% if cancel_url %}
+    <a href="{% if request.resolver_match.view_name == 'two_factor:setup' %}/{% else %}{{ cancel_url }}{% endif %}" class="button secondary">{% trans "Cancel" %}</a>
+  {% endif %}
+  {% if wizard.steps.prev %}
+    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="button secondary" formnovalidate>{% trans "Back" %}</button>
+  {% endif %}
+  <button type="submit" class="button primary">{% trans "Next" %}</button>
+</div>

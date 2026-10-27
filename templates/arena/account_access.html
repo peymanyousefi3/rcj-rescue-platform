@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Private account setup · Rescue Simulation{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>Private account setup</h1><p class="lead">{{ team.name }} · {{ team.code }}</p></div></div>
+<section class="panel inset"><h2>Username: {{ account.username }}</h2><p>Share this link privately with this team’s leader. It allows them to set a password and expires in one hour. Completing setup invalidates the link.</p><label for="setup-link">Password setup link</label><textarea id="setup-link" rows="4" readonly>{{ setup_link }}</textarea><button class="button secondary" type="button" data-copy="{{ setup_link }}" data-copy-label="Private setup link copied.">Copy private link</button><p class="footnote">Keep this link out of public announcements and shared documents.</p><a class="button primary" href="/control/#accounts">Back to team accounts</a></section>
+{% endblock %}

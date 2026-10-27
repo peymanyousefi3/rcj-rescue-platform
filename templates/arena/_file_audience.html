@@ -1,0 +1,7 @@
+{% if file.kind == 'resource' %}
+{% if file.public_copy %}<strong>Public{% if file.general %} + all teams{% elif file.targets.all %} + teams{% endif %}</strong>{% endif %}
+{% if file.general %}{% if not file.public_copy %}<strong>All teams</strong>{% endif %}<details class="notice-preview"><summary>Recipient names</summary><ul class="recipient-name-list">{% for team in teams %}{% if team.active %}<li>{{ team.name }}</li>{% endif %}{% endfor %}</ul></details>
+{% elif file.targets.all %}<details class="notice-preview"><summary>{{ file.targets.all|length }} team recipient{{ file.targets.all|length|pluralize }}</summary><ul class="recipient-name-list">{% for team in file.targets.all %}<li>{{ team.name }}</li>{% endfor %}</ul></details>
+{% elif not file.public_copy %}<span>Organizers only</span>{% endif %}
+{% else %}{{ file.team.name|default:'Organizers' }}{% endif %}
+<small>{{ file.get_kind_display }}</small>
