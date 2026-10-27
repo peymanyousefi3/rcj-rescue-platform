@@ -1,6 +1,6 @@
 Django>=5.2.18,<5.3
 argon2-cffi>=25.1,<26
-django-axes>=8,<9
+django-axes>=8.3.1,<9
 django-two-factor-auth[phonenumberslite]>=1.18.1,<2
 django-storages[s3]>=1.14.6,<2
 dj-database-url>=3,<4
