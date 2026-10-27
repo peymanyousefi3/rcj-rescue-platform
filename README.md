@@ -1,8 +1,18 @@
-# RoboCupJunior Rescue Simulation Competition Platform
+<h1 align="center">RoboCupJunior Rescue Simulation<br>Competition Platform</h1>
 
-**Developed by Peyman Yousefi** for **RoboCupJunior Rescue Simulation and similar competitions**.
+<p align="center"><strong>Developed by Peyman Yousefi</strong><br>For RoboCupJunior Rescue Simulation and similar competitions.</p>
 
-A web platform that helps organizers run a competition, gives teams a private workspace, and lets the public follow schedules, results and interactive match replays.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-0f766e?style=flat-square" alt="MIT License"></a>
+  <a href="docs/SETUP.md"><img src="https://img.shields.io/badge/Python-3.12-3776ab?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.12"></a>
+  <a href="requirements.runtime.lock"><img src="https://img.shields.io/badge/Django-5.2-092e20?style=flat-square&amp;logo=django&amp;logoColor=white" alt="Django 5.2"></a>
+  <a href="compose.yaml"><img src="https://img.shields.io/badge/Docker-Compose-2496ed?style=flat-square&amp;logo=docker&amp;logoColor=white" alt="Docker Compose"></a>
+  <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/actions/workflows/verify.yml"><img src="https://github.com/peymanyousefi3/rcj-rescue-platform/actions/workflows/verify.yml/badge.svg" alt="Automated verification status"></a>
+</p>
+
+<p align="center">A web platform that helps organizers run a competition, gives teams a private workspace, and lets the public follow schedules, results and interactive match replays.</p>
+
+<p align="center"><a href="https://rcjrescue.com/">Live demonstration</a> · <a href="https://www.youtube.com/watch?v=qQhhGdPYHms">Watch the video</a> · <a href="#quick-start">Quick start</a> · <a href="#screenshots">Screenshots</a> · <a href="docs/DEPLOYMENT.md">Deployment</a></p>
 
 ## Key features
 
@@ -23,7 +33,7 @@ The platform was demonstrated for the **Junior Rescue Simulation League at RoboC
 
 *Actual Rescue Simulation replay footage. Click the image to watch the demonstration. [Video chapters and English captions](docs/VIDEO.md).*
 
-[Setup](docs/SETUP.md) · [Quick start](#quick-start) · [Screenshots](#screenshots) · [Deployment](docs/DEPLOYMENT.md)
+---
 
 ## The workflow
 
