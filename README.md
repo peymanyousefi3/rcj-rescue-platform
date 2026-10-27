@@ -35,38 +35,52 @@ The platform was demonstrated for the **Junior Rescue Simulation League at RoboC
 
 ---
 
-## The workflow
-
-### Record once. Replay anywhere.
-
-Upload a complete **Erebus/Webots recording folder or ZIP**. The platform preserves its HTML, scene, animation, textures and relative paths, and opens the interactive recording in a responsive popup. Visitors can replay, seek, rotate the camera and use fullscreen in their browser, without installing Webots. An uploaded video is also supported and takes precedence when present.
-
-Recording metadata can **fill an empty score and time automatically**, preserving values already entered by an organizer. The exported `final_score` is the total; bonuses are not counted twice. Final results remain labelled as final results while the supplied player's synchronized event history follows playback and seeking. Older recordings remain playable when result metadata is absent.
-
-### Arrange the round. Let the schedule follow.
-
-Create a round, arrange its teams with drag and drop, and place the round block in the calendar. Individual run times come from the lineup. Click an event to edit in a popup, drag it to another time, or drag across an empty interval to add an activity. Switch between a day and the whole competition.
-
-### Enter scores. Review. Release rankings.
-
-Use one team-by-round matrix with **spreadsheet paste, Undo, missing-score highlighting and recording uploads inside each match cell**. Main competition and SuperTeam tables appear together. Raw and normalized scores, discarded rounds, time and final percentages stay visible. **Rankings require an explicit administrator release**, independently of public scores.
-
 ## Screenshots
 
-The replay and field images come from actual demonstration footage. The admin and team screenshots use fictional local demonstration data.
+Explore the platform from three perspectives. Replay and field images show actual Rescue Simulation footage; dashboard screenshots use fictional demonstration data.
 
-### Rescue Simulation field viewer
+### Public view
 
-![Actual Rescue Simulation field displayed with its 3D model and field information](docs/assets/rescue-simulation-field.jpg)
+**Follow the competition from any browser.** Visitors can check the programme, see published scores and released rankings, and open interactive match replays from the schedule or beside a score.
+
+- **Interactive 3D playback:** play, pause, seek, rotate the camera and use fullscreen without installing Webots. Replays open in a responsive popup; optional uploaded video is also supported.
+- **Released maps:** inspect the 3D field, thumbnail and map information, and download the map JSON and WBT.
+- **Competition updates:** browse public announcements, teams, main competition results and SuperTeam results on desktop or mobile.
+
+![Public results with scores and match playback access](docs/assets/public-results.jpg)
 
 <table>
-<tr><td width="50%"><strong>Organizer score entry</strong><br>Raw scores, normalization, discards and ranking release.</td><td width="50%"><strong>Interactive schedule</strong><br>Round blocks and daily competition planning.</td></tr>
-<tr><td><img src="docs/assets/admin-results.jpg" alt="Administrator score-entry table with fictional teams"></td><td><img src="docs/assets/admin-calendar.jpg" alt="Administrator calendar with scheduled activities"></td></tr>
-<tr><td><strong>Audience controls</strong><br>One announcement with its complete recipient list.</td><td><strong>Private team workspace</strong><br>Upcoming runs, resources and SuperTeam access.</td></tr>
-<tr><td><img src="docs/assets/admin-announcements.jpg" alt="Announcement popup with searchable team recipients"></td><td><img src="docs/assets/team-dashboard.jpg" alt="Private dashboard for the fictional Aurora Robotics team"></td></tr>
+<tr><td width="50%"><strong>Interactive match replay</strong></td><td width="50%"><strong>Released field and map information</strong></td></tr>
+<tr><td><img src="docs/assets/rescue-simulation-replay.jpg" alt="Actual Webots Rescue Simulation replay with browser playback controls"></td><td><img src="docs/assets/rescue-simulation-field.jpg" alt="Actual Rescue Simulation field in the 3D map viewer"></td></tr>
 </table>
 
-[More: public results](docs/assets/public-results.jpg) · [Participant upload management](docs/assets/admin-quarantines.jpg)
+### Team view
+
+**One private workspace for each team.** Participants see their upcoming runs, relevant announcements and organizer resources, with access controlled by the organizer.
+
+- **Private multi-file submissions:** respond to named quarantine requests within upload windows; deadlines lock further changes.
+- **Relevant resources:** access files and announcements addressed to the team, with permission changes applied immediately.
+- **Team tools:** manage passwords, use shared SuperTeam workspaces, and submit private complaints with attachments and organizer responses.
+
+![Private team dashboard showing upcoming runs and SuperTeam access for fictional Aurora Robotics](docs/assets/team-dashboard.jpg)
+
+### Admin view
+
+**Set up the event once, then let connected workflows reduce repetitive work.** Manage teams, SuperTeams, challenges, rounds, uploads, communications and release decisions from the organizer panel.
+
+- **Recording to results:** upload a complete Erebus/Webots folder or ZIP. Filenames and relative paths are preserved. Recording metadata fills empty score and time fields while preserving manual values; final scores already include bonuses. Older recordings remain playable without result metadata.
+- **Lineup to schedule:** arrange teams with drag and drop, then place the round block in the calendar. Individual run times follow the lineup. Click to edit in a popup, drag to move, or select an empty interval to add an activity.
+- **One score-entry matrix:** enter or paste team-by-round scores, undo changes and highlight missing values. Main and SuperTeam tables appear together. Review normalization, discards and final percentages, then explicitly release rankings.
+- **Controlled collection and publication:** configure quarantine deadlines, browse participant files, upload map folders and choose when maps or recordings become public.
+- **One record, many recipients:** publish multi-file organizer packages or announcements with searchable audience controls, optional personalized email and configurable CC/BCC.
+- **Event administration:** configure dates, timezone, challenges, scoring policies, accounts, storage, email and activity records.
+
+<table>
+<tr><td width="50%"><strong>Results and recordings</strong><br>Scores, normalization, discards and ranking release.</td><td width="50%"><strong>Schedule calendar</strong><br>Round blocks, team lineups and daily planning.</td></tr>
+<tr><td><img src="docs/assets/admin-results.jpg" alt="Administrator score-entry table with fictional teams"></td><td><img src="docs/assets/admin-calendar.jpg" alt="Administrator calendar with scheduled activities"></td></tr>
+<tr><td><strong>Announcements and recipients</strong><br>One announcement with its complete audience.</td><td><strong>Participant upload management</strong><br>Named quarantines, deadlines and private files.</td></tr>
+<tr><td><img src="docs/assets/admin-announcements.jpg" alt="Announcement editor with searchable team recipients"></td><td><img src="docs/assets/admin-quarantines.jpg" alt="Administrator participant upload and quarantine management"></td></tr>
+</table>
 
 ## Capabilities
 
