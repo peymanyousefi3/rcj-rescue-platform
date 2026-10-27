@@ -4,8 +4,9 @@ from django.core.management.base import BaseCommand,CommandError
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
-from arena.models import Competition,Challenge,Round,Team,Score,Programme,Quarantine,Announcement
+from arena.models import Competition,Challenge,Round,Team,Score,Programme,Quarantine
 from arena.scoring import normalize_round
+from arena.services import announce
 
 class Command(BaseCommand):
     help='Populate the fictional bootstrap competition for a local walkthrough. Creates no accounts and sends no email.'
@@ -41,5 +42,5 @@ class Command(BaseCommand):
                 Programme.objects.create(competition=c,source_key=f'demo-relay-{n}-{i}',title=r.name,round=r,team=t,starts_at=start+timedelta(minutes=15*i),ends_at=start+timedelta(minutes=15*(i+1)))
             normalize_round(r)
         Quarantine.objects.create(competition=c,name='Round 2 controller submission',instructions='Demonstration request. Submit the complete controller package before the deadline.',opens_at=now-timedelta(hours=1),deadline=now+timedelta(hours=2))
-        Announcement.objects.create(competition=c,title='Competition briefing',body='**Welcome to the demonstration.** Check the programme, review your run times and prepare your submissions.',general=True,public=True,author=author)
+        announce(user=author,competition=c,title='Competition briefing',body='**Welcome to the demonstration.** Check the programme, review your run times and prepare your submissions.',general=True,public=True,target_ids=[],queue_email=False)
         self.stdout.write('Fictional scores, SuperTeams, schedule, upload request and announcement created. No accounts or emails were created.')
