@@ -10,18 +10,20 @@
 </p>
 
 <p align="center"><strong>One place to schedule the competition, protect submissions, publish results and replay every run.</strong></p>
-<p align="center">Created and maintained by <strong>Peyman Yousefi</strong><br>Developed for and used in the RoboCupJunior Americas Super Regional 2026 Rescue Simulation competition.</p>
+<p align="center">Developed and maintained by <strong>Peyman Yousefi</strong><br>A competition management platform for <strong>RoboCupJunior Rescue Simulation and similar competitions</strong>.</p>
 <p align="center"><a href="https://rcjrescue.com/">Deployed reference</a> · <a href="#the-workflow">Workflow</a> · <a href="#screenshots">Screenshots</a> · <a href="#quick-start">Quick start</a> · <a href="docs/DEPLOYMENT.md">Deployment</a> · <a href="https://www.youtube.com/watch?v=qQhhGdPYHms">Watch the video</a></p>
 
 > **Private review edition.** This repository is prepared for open-source publication under MIT but remains private until the owner approves release. The source includes fictional demonstration data. The deployed reference is a real competition website, not a testing sandbox.
 
+The **RoboCup Americas Super Regional (ASR) 2026** deployment is one demonstration of the platform and its features. The platform brings scheduling, private submissions, scoring, communication and interactive replays together for organizers, teams and public viewers.
+
 ## Watch the platform in action
 
-[![Watch the ASR 2026 feature walkthrough by Peyman Yousefi](docs/assets/video-preview.jpg)](https://www.youtube.com/watch?v=qQhhGdPYHms)
+[![Watch the platform feature demonstration by Peyman Yousefi](docs/assets/video-preview.jpg)](https://www.youtube.com/watch?v=qQhhGdPYHms)
 
 **[Watch the 4-minute walkthrough on YouTube](https://www.youtube.com/watch?v=qQhhGdPYHms)** · [Chapters and English captions](docs/VIDEO.md)
 
-Follow the public replay experience, then see how organizers import results, build schedules, release maps and manage private team workflows. Created and provided by **Peyman Yousefi**.
+This video demonstrates a selection of the platform’s features using **RoboCup Americas Super Regional 2026** as an example. Follow the public replay experience, then see how organizers import results, build schedules, release maps and manage private team workflows. Developed and provided by **Peyman Yousefi**.
 
 ## The workflow
 
@@ -132,6 +134,6 @@ This adds fictional scores and SuperTeams; it creates no login accounts and send
 
 ## Credit and license
 
-**Created and maintained by Peyman Yousefi.** Developed for and used in the **ASR 2026 Junior Rescue Simulation competition**. [RCJRescue.com](https://rcjrescue.com/) is a deployed reference of the competition platform.
+**Developed and maintained by Peyman Yousefi** for **RoboCupJunior Rescue Simulation and similar competitions**. The **RoboCup Americas Super Regional (ASR) 2026** deployment at [RCJRescue.com](https://rcjrescue.com/) is one demonstration of the platform and its features.
 
 Project-owned code is available under the [MIT License](LICENSE). Copyright © 2026 Peyman Yousefi. See [attribution](NOTICE.md) and [third-party notices](THIRD_PARTY_NOTICES.md). Third-party software, trademarks, competition maps and recording packages retain their own rights; MIT does not grant rights to those materials.

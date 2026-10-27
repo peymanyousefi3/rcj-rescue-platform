@@ -4,7 +4,7 @@
 
 **[Watch on YouTube](https://www.youtube.com/watch?v=qQhhGdPYHms)**
 
-**Created and provided by Peyman Yousefi.** A four-minute walkthrough of the ASR 2026 Rescue Competition Platform, from the public replay experience to the organizer and team workspaces.
+**Developed and provided by Peyman Yousefi.** A four-minute demonstration of a platform for **RoboCupJunior Rescue Simulation and similar competitions**. The video uses **RoboCup Americas Super Regional (ASR) 2026** as one example to show its features, from the public replay experience to the organizer and team workspaces.
 
 ## Chapters
 

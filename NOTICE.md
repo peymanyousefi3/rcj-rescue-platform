@@ -2,7 +2,7 @@
 
 Project creator and maintainer: **Peyman Yousefi**.
 
-Developed for and used in the **RoboCupJunior Americas Super Regional (ASR) 2026 Rescue Simulation competition**. Deployed reference: https://rcjrescue.com/.
+Developed by **Peyman Yousefi** for **RoboCupJunior Rescue Simulation and similar competitions**. The **RoboCup Americas Super Regional (ASR) 2026** deployment is one demonstration of the platform and its features: https://rcjrescue.com/.
 
 This private review repository contains a clean source snapshot and fictional demonstration data. The original competition repository, database, uploaded packages, account records, server credentials and operational history are not included.
 
