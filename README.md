@@ -32,9 +32,9 @@
 | Admin | `demo_admin` | `RCJ-Admin-Preview-2026!` |
 | Participant | `demo_participant` | `RCJ-Team-Preview-2026!` |
 
-The demo is clearly labelled and uses fictional teams and sample competition data. Explore the panels, open editors, adjust the calendar and preview score changes. Changes exist only in the current page; reloading restores the sample.
+The clearly labelled demo includes a snapshot of publicly released ASR teams, scores, schedules and announcements, plus **nine interactive 3D fields and sixteen Webots match replays**. Explore the panels, rotate maps, play and seek recordings, open editors and preview calendar or score changes. Edits stay in the current page and reset on reload. Private workflow examples are illustrative.
 
-**No live account access, database writes, file downloads, real uploads or email delivery.** File names and metadata are examples; private competition files are not supplied. Replay and field viewers show sample screenshots instead of distributing recording or map packages. As with any webpage, displayed preview content can be captured or saved.
+**Public downloads are available:** released map JSON/WBT files and public replay packages. **Private team submissions are never included**: controller JSON, TDPs, internal videos and other private documents have no content or download links in the demo. Illustrative file names show how the workflow looks. There is no live account access, database saving, real upload processing or email delivery.
 
 These are public preview codes, **not** credentials for the live admin or participant portal. The hosted demo is specific to RCJRescue.com; its implementation is separate from this repository and the `v1.0.0` release.
 
