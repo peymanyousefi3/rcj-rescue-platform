@@ -12,7 +12,7 @@
 
 <p align="center">A web platform that helps organizers run a competition, gives teams a private workspace, and lets the public follow schedules, results and interactive match replays.</p>
 
-<p align="center"><a href="https://rcjrescue.com/">Live demonstration</a> · <a href="https://www.youtube.com/watch?v=qQhhGdPYHms">Watch the video</a> · <a href="#quick-start">Quick start</a> · <a href="#screenshots">Screenshots</a> · <a href="docs/DEPLOYMENT.md">Deployment</a></p>
+<p align="center"><a href="#try-the-interactive-demo">Try the demo</a> · <a href="https://rcjrescue.com/">Live demonstration</a> · <a href="https://www.youtube.com/watch?v=qQhhGdPYHms">Watch the video</a> · <a href="#quick-start">Quick start</a> · <a href="#screenshots">Screenshots</a> · <a href="docs/DEPLOYMENT.md">Deployment</a></p>
 
 ## Key features
 
@@ -22,6 +22,21 @@
 - **Flexible scoring:** choose scoring methods, discard rules and when rankings are released.
 - **Private submissions:** collect team files with deadlines, upload locking and controlled access.
 - **Competition tools:** publish maps, share organizer files, target announcements, manage teams and SuperTeams, and handle complaints.
+
+## Try the interactive demo
+
+**[Open the demo workspace](https://rcjrescue.com/demo/)** — use these public preview codes on the demo page only:
+
+| Preview | Username | Password |
+| --- | --- | --- |
+| Admin | `demo_admin` | `RCJ-Admin-Preview-2026!` |
+| Participant | `demo_participant` | `RCJ-Team-Preview-2026!` |
+
+The demo is clearly labelled and uses fictional teams and sample competition data. Explore the panels, open editors, adjust the calendar and preview score changes. Changes exist only in the current page; reloading restores the sample.
+
+**No live account access, database writes, file downloads, real uploads or email delivery.** File names and metadata are examples; private competition files are not supplied. Replay and field viewers show sample screenshots instead of distributing recording or map packages. As with any webpage, displayed preview content can be captured or saved.
+
+These are public preview codes, **not** credentials for the live admin or participant portal. The hosted demo is specific to RCJRescue.com; its implementation is separate from this repository and the `v1.0.0` release.
 
 ## See a demonstration
 
