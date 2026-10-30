@@ -8,6 +8,7 @@ urlpatterns = [
     path('live.json',views.live_data,name='live-data'),
     path('schedule/fragment/',views.programme_fragment,name='programme-fragment'),
     path('health/',views.health,name='health'),
+    path('ready/',views.readiness,name='ready'),
     path('portal/',views.portal,name='portal'),
     path('portal/complaints/',workspaces.complaints,name='complaints'),
     path('portal/superteams/<uuid:superteam_id>/complaints/',workspaces.complaints,name='superteam-complaints'),

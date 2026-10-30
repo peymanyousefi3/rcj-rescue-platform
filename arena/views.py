@@ -19,7 +19,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.debug import sensitive_post_parameters
 
 from .access import can_download, can_download_file, public_asset, team_assets, team_for, superteams_for
-from .forms import (AdminQuarantineUploadForm, AdminUploadForm, AnnouncementForm, EmailConfigurationForm, InviteForm,
+from .forms import (prepare_dialog_form, AdminQuarantineUploadForm, AdminUploadForm, AnnouncementForm, EmailConfigurationForm, InviteForm,
                     ResourceForm, UploadForm, PlaybackForm, QuarantineDeadlineForm,
                     QuarantineForm, QuarantineUploadForm, SubmissionUploadForm)
 from .models import (Asset, AuditEvent, Challenge, Competition, EmailConfiguration, EmailDelivery, Notification,
@@ -377,7 +377,7 @@ def control(request):
                         try:
                             connection.close()
                         except Exception:
-                            pass
+                            connection=None  # Failed cleanup must not turn a successful check into an error.
                 return redirect('/control/#email-settings')
             if form_kind=='email-settings' and email_form.is_valid():
                 config=email_form.save()
@@ -458,7 +458,7 @@ def control(request):
             messages.error(request,error)
     editor=request.GET.get('editor')
     if editor in ['quarantine','email-settings']:
-        return render(request,'arena/_email_editor.html' if editor=='email-settings' else 'arena/_record_editor.html',{'editor_modal':True,'form':email_form if editor=='email-settings' else quarantine_form, 'form_kind':editor,'record':editing if editor=='quarantine' else None,'cancel_section':'quarantines' if editor=='quarantine' else 'email-settings','email_password_saved':bool(email_config.password_encrypted)})
+        return render(request,'arena/_email_editor.html' if editor=='email-settings' else 'arena/_record_editor.html',{'editor_modal':True,'form':prepare_dialog_form(email_form if editor=='email-settings' else quarantine_form), 'form_kind':editor,'record':editing if editor=='quarantine' else None,'cancel_section':'quarantines' if editor=='quarantine' else 'email-settings','email_password_saved':bool(email_config.password_encrypted)})
     from .workspaces import admin_shares
     teams=list(Team.objects.regular().filter(competition=c).prefetch_related('membership_set__user').order_by('name'))
     quarantine_rows=[]
@@ -579,10 +579,28 @@ def audit_export(request):
 
 @require_GET
 def health(request):
-    from django.db import connection
-    with connection.cursor() as cursor:
-        cursor.execute('SELECT 1')
-    return JsonResponse({'status':'ok'})
+    from django.db import connection, DatabaseError
+    try:
+        with connection.cursor() as cursor: cursor.execute('SELECT 1')
+    except DatabaseError:
+        response=JsonResponse({'status':'unavailable'},status=503)
+    else:
+        response=JsonResponse({'status':'ok'})
+    response['Cache-Control']='no-store'
+    return response
+
+@require_GET
+def readiness(request):
+    import shutil
+    from django.conf import settings
+    result=health(request)
+    if result.status_code!=200: return result
+    try:
+        ready=shutil.disk_usage(settings.PRIVATE_ROOT).free>=settings.UPLOAD_MIN_FREE_BYTES
+    except (OSError,ValueError,KeyError): ready=False
+    response=JsonResponse({'status':'ok' if ready else 'unavailable'},status=200 if ready else 503)
+    response['Cache-Control']='no-store'
+    return response
 
 @never_cache
 @require_POST

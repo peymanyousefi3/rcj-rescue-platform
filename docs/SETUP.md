@@ -6,8 +6,10 @@ Install Docker Engine with Compose, or Docker Desktop. Clone this repository, th
 
 ```sh
 python3 scripts/configure_local.py
-docker compose up -d --build
-docker compose exec app python manage.py migrate
+docker compose build
+docker compose up -d db clamav
+docker compose run --rm migrate
+docker compose up -d app worker
 docker compose exec app python manage.py bootstrap_event
 docker compose exec app python manage.py createsuperuser
 ```
@@ -30,7 +32,7 @@ Use Python 3.12 and a virtual environment:
 
 ```sh
 python3.12 -m venv .venv
-.venv/bin/pip install -r requirements.runtime.lock
+.venv/bin/pip install --require-hashes -r requirements.runtime.lock
 mkdir -p var
 export DJANGO_DEBUG=1
 export DJANGO_SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(64))')"
@@ -57,7 +59,7 @@ The bundled snapshot is fictional and contains no scores or login accounts. The 
 ## Tests
 
 ```sh
-.venv/bin/pip install -r requirements.in
+.venv/bin/pip install --require-hashes -r requirements.runtime.lock -r requirements.dev.lock
 .venv/bin/python -m pytest
 .venv/bin/python manage.py makemigrations --check --dry-run
 .venv/bin/python manage.py collectstatic --noinput

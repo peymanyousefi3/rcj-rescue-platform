@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:17
+        image: postgres:17@sha256:31ba9c94a03ada9988f2bb493a22a75eef3a185884533e5cdbcd498ea835b08f
         env:
           POSTGRES_USER: arena
           POSTGRES_PASSWORD: ci-only-password
@@ -27,16 +27,16 @@ jobs:
       DATABASE_URL: postgres://arena:ci-only-password@localhost:5432/arena
       DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,testserver
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: '3.12'
           cache: pip
           cache-dependency-path: requirements.runtime.lock
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '22'
-      - run: pip install -r requirements.runtime.lock -r requirements.in
+      - run: pip install --require-hashes -r requirements.runtime.lock -r requirements.dev.lock
       - run: python manage.py makemigrations --check --dry-run
       - run: python manage.py migrate --noinput
       - run: python manage.py check
@@ -56,4 +56,86 @@ jobs:
           DJANGO_CSRF_TRUSTED_ORIGINS: https://rescue.example.test
           DJANGO_SECRET_KEY: CI-ONLY-SECURITY-CHECK-EXAMPLE-NOT-A-PRODUCTION-KEY-8293440128734
       - name: Audit runtime dependencies
-        run: pip-audit -r requirements.runtime.lock --no-deps
+        run: pip-audit -r requirements.runtime.lock --no-deps --disable-pip
+      - name: Python security checks
+        run: bandit -r arena config scripts -ll
+      - name: Generate dependency inventory
+        run: |
+          python -m venv /tmp/runtime-sbom
+          /tmp/runtime-sbom/bin/pip install --require-hashes -r requirements.runtime.lock
+          cyclonedx-py environment /tmp/runtime-sbom/bin/python --gather-license-texts --of JSON -o dependency-sbom.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: dependency-inventory
+          path: dependency-sbom.json
+          retention-days: 7
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Scan source history for secrets
+        run: |
+          curl --fail --silent --show-error --location https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz -o /tmp/gitleaks_8.30.1_linux_x64.tar.gz
+          curl --fail --silent --show-error --location https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_checksums.txt -o /tmp/gitleaks_checksums.txt
+          cd /tmp
+          sha256sum --check --ignore-missing gitleaks_checksums.txt
+          tar -xzf gitleaks_8.30.1_linux_x64.tar.gz gitleaks
+          cd "$GITHUB_WORKSPACE"
+          /tmp/gitleaks git . --log-opts=--all --redact
+      - name: Scan deployment configuration
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          version: v0.76.1
+          scan-type: config
+          scan-ref: .
+          exit-code: '1'
+          severity: CRITICAL,HIGH
+      - name: Build runtime image
+        run: docker build -t rcj-platform:audit .
+      - name: Scan runtime image
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        with:
+          version: v0.76.1
+          image-ref: rcj-platform:audit
+          exit-code: '1'
+          severity: CRITICAL,HIGH
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: github/codeql-action/init@793b778da9c9275a0f276522b27cb5fc14bba279 # v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+      - uses: github/codeql-action/analyze@793b778da9c9275a0f276522b27cb5fc14bba279 # v4
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y age
+      - name: Test isolated deployment and encrypted recovery
+        env:
+          RUN_SCANNER: '1'
+          RUN_ZAP: '1'
+          RUN_RUNTIME: '1'
+        run: python scripts/test_deployment.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: isolated-passive-scan
+          path: |
+            artifacts/zap/
+            artifacts/runtime/
+          if-no-files-found: ignore
+          retention-days: 7

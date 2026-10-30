@@ -9,6 +9,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files.storage import default_storage
 from django.db import transaction
+from django.db.models import Sum
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -16,6 +17,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from .access import team_for
+from .outbox import queue_delivery
 from .models import (Announcement, Asset, AuditEvent, Competition, EmailDelivery,
                      Membership, Notification, Quarantine, QuarantineTeam, Round, Team)
 from .policy import PACKAGE_KINDS, ROUND_KINDS, submission_open
@@ -128,6 +130,8 @@ def upload_asset(*, user, file, kind, team=None, round_=None, title='', general=
     measured = 0
     for chunk in file.chunks():
         measured += len(chunk)
+        if measured > settings.UPLOAD_MAX_FILE_BYTES:
+            raise ValidationError('This file exceeds the configured upload limit.')
         digest.update(chunk)
     file.seek(0)
     # Storage keys never contain team identities, original filenames or executable extensions.
@@ -142,6 +146,9 @@ def upload_asset(*, user, file, kind, team=None, round_=None, title='', general=
                 competition = round_.competition
             if team:
                 team = Team.objects.select_for_update().get(pk=team.pk)
+                used = Asset.objects.filter(team=team).aggregate(total=Sum('size'))['total'] or 0
+                if used + measured > settings.UPLOAD_TEAM_MAX_BYTES:
+                    raise ValidationError('This team has reached its configured private-storage allowance. Contact the organizer.')
                 if not staff:
                     from .access import owns_team
                     if not owns_team(user,team): raise PermissionDenied()
@@ -281,7 +288,7 @@ def queue_announcement_copy(notice,teams,*,resend=False):
     for address,name,team,key in recipients:
         context={'team':team,'notice':notice,'recipient_name':name,
             'dashboard_url':f'{settings.PUBLIC_ORIGIN}/portal/announcements/#announcement-{notice.pk}' if team else ''}
-        EmailDelivery.objects.create(team=team,dedupe_key=f'announcement:{notice.pk}:{key}'+(':'+uuid.uuid4().hex if resend else ''),
+        queue_delivery(team=team,dedupe_key=f'announcement:{notice.pk}:{key}'+(':'+uuid.uuid4().hex if resend else ''),
             recipient=address,subject=('RoboCup ASR 2026 - Junior Rescue Simulation - '+' '.join(notice.title.splitlines()))[:200],
             body=render_to_string('arena/email/announcement.txt',context),
             html_body=render_to_string('arena/email/announcement.html',context))
@@ -302,7 +309,7 @@ def invite_team(*, user, team, email, username=None):
     uid = urlsafe_base64_encode(force_bytes(account.pk))
     token = default_token_generator.make_token(account)
     link = settings.PUBLIC_ORIGIN + reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
-    EmailDelivery.objects.create(team=team, dedupe_key=f'invite:{account.pk}:{uuid.uuid4()}',
+    queue_delivery(team=team, dedupe_key=f'invite:{account.pk}:{uuid.uuid4()}',
         recipient=email, subject='Your ASR 26 team account',
         expires_at=timezone.now()+timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT),
         body=f'Your team account is ready.\n\nUsername: {account.username}\n\nSet your password within one hour:\n{link}\n\nOnly your team and authorized administrators can access your private submissions.')
@@ -326,7 +333,7 @@ def resend_invitation(*,user,team,queue_email=True):
     token=default_token_generator.make_token(account)
     link=settings.PUBLIC_ORIGIN+reverse('password_reset_confirm',kwargs={'uidb64':uid,'token':token})
     if queue_email:
-        EmailDelivery.objects.create(team=team,dedupe_key=f'reinvite:{account.pk}:{uuid.uuid4()}',
+        queue_delivery(team=team,dedupe_key=f'reinvite:{account.pk}:{uuid.uuid4()}',
             recipient=team.leader_email,subject='Your new ASR 26 account setup link',
             expires_at=timezone.now()+timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT),
             body=f'Username: {account.username}\n\nSet your password within one hour:\n{link}')

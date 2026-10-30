@@ -1,6 +1,6 @@
 {% load static %}<section class="score-table-section" data-score-grid data-preview-url="{% url 'score-preview' %}" aria-label="{{ score_challenge.name|default:'Individual teams' }} score entry">
 <div class="score-table-heading"><div><h3>{{ score_challenge.name|default:'Individual teams' }}</h3>{% if score_challenge %}<span class="muted">{{ score_challenge.get_category_display }}</span>{% endif %}</div>{% if score_challenge %}<a class="button secondary" data-admin-editor data-score-settings href="/control/?editor=round&amp;round_challenge={{ score_challenge.pk }}&amp;return=results-recordings#rounds">{% if score_challenge.category == 'superteam' %}Add round / event{% else %}Add round{% endif %}</a>{% endif %}</div>
-<div class="ranking-release-list" aria-label="Ranking release">
+<div class="ranking-release-list" role="group" aria-label="Ranking release">
 {% for challenge in ranking_challenges %}<form method="post" action="{% url 'ranking-release' challenge.pk %}" class="ranking-release-form">
 {% csrf_token %}<input type="hidden" name="previous_state" value="{{ challenge.rankings_released|yesno:'1,0' }}"><input type="hidden" name="released" value="0">
 <label><input type="checkbox" name="released" value="1" {% if challenge.rankings_released %}checked{% endif %}><span><strong>Release rankings · {{ challenge.name }}</strong><small>Scores stay public. Ranks appear only when released by an administrator.</small></span></label>
@@ -36,7 +36,7 @@
 <span class="score-discard" data-score-discard hidden></span>
 </div>{% if cell.recording %}<button type="button" class="score-play" data-replay="{% url 'recording-player' cell.recording.pk %}" aria-label="Play {{ row.team.name }} in {{ cell.round }}" title="Play recording">▶</button>{% endif %}</div>
 {% if cell.override_field %}<details class="score-override-menu" {% if cell.score.normalized_override %}open{% endif %}><summary>Override</summary><label>{{ cell.override_field }}<span>Manual normalized score</span></label>{{ cell.normalized_field }}</details>{% endif %}
-<div class="score-time"><label for="{{ cell.remaining_field.id_for_label }}">Remaining <span>of 8:00</span></label>{{ cell.remaining_field }}<span class="score-elapsed">Elapsed <output data-elapsed-time for="{{ cell.remaining_field.id_for_label }}">{{ cell.score.elapsed_time|default:'—' }}</output></span></div>
+<div class="score-time"><label for="{{ cell.remaining_field.id_for_label }}">Remaining <span>of 8:00</span></label>{{ cell.remaining_field }}{% if cell.remaining_field.help_text %}<span class="sr-only" id="{{ cell.remaining_field.auto_id }}_helptext">{{ cell.remaining_field.help_text }}</span>{% endif %}<span class="score-elapsed">Elapsed <output data-elapsed-time for="{{ cell.remaining_field.id_for_label }}">{{ cell.score.elapsed_time|default:'—' }}</output></span></div>
 <span class="score-field-error" data-score-error hidden></span>
 </td>{% endfor %}<td class="score-total"><output data-score-total aria-label="Final score for {{ row.team.name }}">—</output></td><td class="score-rank"><output data-score-rank aria-label="Rank for {{ row.team.name }}">—</output></td></tr>{% endfor %}</tbody>
 </table></div>

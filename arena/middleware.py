@@ -22,14 +22,25 @@ class ProxyAddressMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
     def __call__(self, request):
-        if settings.TRUST_PROXY_CLIENT_IP:
+        from django.utils.crypto import constant_time_compare
+        if (settings.TRUST_PROXY_CLIENT_IP and settings.PROXY_SHARED_SECRET and
+                constant_time_compare(settings.PROXY_SHARED_SECRET, request.META.get('HTTP_X_ASR_PROXY_TOKEN', ''))):
             from ipaddress import ip_address
-            try:
-                address = ip_address(request.META.get('HTTP_X_ASR_CLIENT_IP', ''))
-            except ValueError:
-                pass
-            else:
-                request.META['REMOTE_ADDR'] = str(address)
+            try: address = ip_address(request.META.get('HTTP_X_ASR_CLIENT_IP', ''))
+            except ValueError: pass
+            else: request.META['REMOTE_ADDR'] = str(address)
+        return self.get_response(request)
+
+class UploadBoundaryMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+    def __call__(self, request):
+        if request.method in ('POST', 'PUT', 'PATCH'):
+            try: size = int(request.META.get('CONTENT_LENGTH') or 0)
+            except ValueError: size = 0
+            limit=65536 if request.path.startswith(('/account','/system/login/')) else settings.UPLOAD_MAX_BATCH_BYTES
+            if size > limit:
+                return HttpResponse('This upload exceeds the configured batch size. Ask the organizer to adjust the limit.', status=413)
         return self.get_response(request)
 
 class SecurityBoundaryMiddleware:
@@ -38,7 +49,7 @@ class SecurityBoundaryMiddleware:
     def __call__(self, request):
         protected = request.path.startswith(('/portal/', '/control/', '/system/', '/files/', '/submit/', '/quarantines/', '/notices/', '/recordings/', '/replay-view/', '/fields/', '/field-media/', '/field-viewer/'))
         # Reject anonymous upload bodies before CSRF/form parsing can spool them to disk.
-        if request.method=='POST' and request.path.startswith(('/submit/','/quarantines/','/control/')) and not request.user.is_authenticated:
+        if request.method=='POST' and request.path.startswith(('/submit/','/quarantines/','/control/','/portal/','/system/')) and not request.user.is_authenticated:
             response=redirect('two_factor:login') if request.path.startswith('/control/') else HttpResponse('Sign in before uploading files.',status=403)
             response['Cache-Control']='private, no-store'
             return response
@@ -50,13 +61,15 @@ class SecurityBoundaryMiddleware:
             response['Cache-Control']='private, no-store'
             return response
         quota=None
-        if request.path.startswith('/recordings/'): quota=(120,60)
-        if request.method=='POST' and request.path=='/accounts/reset/': quota=(10,3600)
-        elif request.method=='POST' and request.path=='/account/login/': quota=(40,60)
-        elif request.method=='POST' and request.path.startswith(('/submit/','/quarantines/')): quota=(30,60)
-        elif request.path.startswith('/files/') and request.method=='GET': quota=(180,60)
+        if request.path.startswith('/recordings/'): quota=(300,60,'recordings')
+        elif request.path.startswith(('/replay-view/', '/field-media/', '/field-viewer/')): quota=(2400,60,'viewer-assets')
+        if request.method=='POST' and request.path=='/accounts/reset/': quota=(10,3600,'password-reset')
+        elif request.method=='POST' and request.path in ('/account/login/','/system/login/'): quota=(40,60,'login')
+        elif request.method=='POST' and request.path.startswith(('/submit/','/quarantines/')): quota=(30,60,'uploads')
+        elif request.method=='POST' and request.path.startswith('/control/'): quota=(120,60,'admin-writes')
+        elif request.path.startswith('/files/') and request.method=='GET': quota=(180,60,'downloads')
         if quota:
-            accepted,retry=allow_request(request,limit=quota[0],period=quota[1])
+            accepted,retry=allow_request(request,limit=quota[0],period=quota[1],scope=quota[2])
             if not accepted:
                 response=HttpResponse('Too many requests. Please retry shortly.',status=429)
                 response['Retry-After']=str(retry)

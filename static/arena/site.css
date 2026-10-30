@@ -52,7 +52,7 @@
 .scores.results-matrix tbody tr:nth-child(even){--score-row-bg:#fafbfd}
 .scores.results-matrix tbody tr:hover{--score-row-bg:#f0f5fc}
 .scores.results-matrix tbody td,.scores.results-matrix tbody th{background:var(--score-row-bg)}
-.scores.results-matrix .score-rank{position:sticky;left:0;z-index:2;width:3rem;min-width:3rem;text-align:center;color:#65748a}
+.scores.results-matrix .score-rank{position:sticky;left:0;z-index:2;width:3rem;min-width:3rem;text-align:center;color:#53647c}
 .scores.results-matrix .score-team{position:sticky;left:3rem;z-index:2;width:12rem;min-width:12rem;max-width:12rem;text-align:left;white-space:normal;padding-inline:.75rem;box-shadow:1px 0 #dce5f0;font-weight:400;color:var(--ink);letter-spacing:0;text-transform:none}
 .scores.results-matrix .score-team strong{font-size:.8125rem;overflow-wrap:anywhere}
 .scores.results-matrix .score-team small{margin-top:.25rem;font-size:.6875rem;font-weight:400}
@@ -60,7 +60,7 @@
 .scores.results-matrix .score-final strong{font-size:.9375rem;color:#224c78}
 .scores.results-matrix thead .score-final{white-space:normal}
 .scores.results-matrix tbody tr:last-child td,.scores.results-matrix tbody tr:last-child th{border-bottom:0}
-.scores.results-matrix .score-discarded{background:#f3f4f6;color:#687387}
+.scores.results-matrix .score-discarded{background:#f3f4f6;color:#566276}
 .score-discarded.round-raw,.score-discarded.round-normalized{text-decoration:line-through;text-decoration-color:#6b7789}
 .scores.results-matrix .discard-label{display:block;margin-top:.25rem;font-size:.625rem;font-weight:500;text-decoration:none;color:#56657a}
 .score-percent{font-size:.6875rem;font-weight:400;margin-left:.125rem}

@@ -95,7 +95,7 @@ if(calendarElement&&window.FullCalendar){
    views:{competition:{type:'timeGrid',visibleRange:{start:calendarElement.dataset.firstDay,end:calendarElement.dataset.endDay},buttonText:'Competition'}},
    headerToolbar:{left:'prev,next today',center:'title',right:'timeGridDay,competition'},
    buttonIcons:false,buttonText:{today:'Today',prev:'Previous',next:'Next',day:'Day'},allDaySlot:false,
-   height:680,slotMinTime:'00:00:00',slotMaxTime:'24:00:00',scrollTime:'09:00:00',slotDuration:'00:30:00',snapDuration:'00:05:00',
+   height:680,eventMinHeight:24,slotMinTime:'00:00:00',slotMaxTime:'24:00:00',scrollTime:'09:00:00',slotDuration:'00:30:00',snapDuration:'00:05:00',
    eventTimeFormat:{hour:'2-digit',minute:'2-digit',hour12:false},slotLabelFormat:{hour:'2-digit',minute:'2-digit',hour12:false},
    firstDay:1,nowIndicator:true,editable:true,eventResizableFromStart:true,longPressDelay:500,events:entries,
    selectable:true,selectMirror:true,unselectAuto:true,
@@ -106,7 +106,7 @@ if(calendarElement&&window.FullCalendar){
    select:info=>{editor('event',null,info.startStr.slice(0,19),info.endStr.slice(0,19));calendar.unselect();}
  });
  document.querySelector('[data-calendar-add]').addEventListener('click',()=>editor('event',null,day.value+'T09:00:00',day.value+'T09:30:00'));
- calendar.render();day.addEventListener('change',()=>{if(day.value)calendar.changeView('timeGridDay',day.value);});
+ calendar.render();calendarElement.querySelector('.fc-view-harness')?.setAttribute('role','group');day.addEventListener('change',()=>{if(day.value)calendar.changeView('timeGridDay',day.value);});
  document.querySelector('#programme').addEventListener('toggle',()=>{if(document.querySelector('#programme').open)calendar.updateSize();});
 }
 window.ASRAdmin.lineups=function(root=document){

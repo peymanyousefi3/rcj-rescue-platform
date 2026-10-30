@@ -1,0 +1,8 @@
+{
+  "python:3.12-alpine": "sha256:e6dae589c1c05976188fd3bd019afd091445fc533ed2ea29001beddc7368a9c8",
+  "postgres:17-alpine": "sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b",
+  "postgres:17": "sha256:31ba9c94a03ada9988f2bb493a22a75eef3a185884533e5cdbcd498ea835b08f",
+  "caddy:2-alpine": "sha256:e70b164da81ef698b3ad19af799ea6086ce6d9e48ed4079eb9fe26f6fbf14ee5",
+  "clamav/clamav:stable": "sha256:bda39705e291105049c3936e2803ac90b955172af8030f94f05dce1252df6c6d",
+  "ghcr.io/zaproxy/zaproxy:stable": "sha256:030d3df57735dacbb83464854758e674dd9ad01d79d12a129a8e58b1fd384238"
+}
