@@ -110,6 +110,7 @@ def test_runtime_failure_pages_are_generic_and_private(client,event,settings):
     with patch('arena.views.current_competition',side_effect=RuntimeError('SYNTHETIC-SECRET-MUST-NOT-LEAK')):
         page=client.get('/results/')
     assert page.status_code==500
+    assert b'Before retrying an upload' in page.content
     assert b'SYNTHETIC-SECRET-MUST-NOT-LEAK' not in page.content
     with patch('django.db.connection.cursor',side_effect=DatabaseError('synthetic database failure')):
         for path in ['/health/','/ready/']:

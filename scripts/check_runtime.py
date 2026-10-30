@@ -44,7 +44,7 @@ def runtime_checks(project,env):
                 if container else compose(which,configuration,'exec','-T','app','python','manage.py','shell','-c',code,stdout=subprocess.PIPE)).stdout.decode()
         return json.loads(next(line[7:] for line in output.splitlines() if line.startswith('RESULT ')))
     # The cookie is captured privately and never printed or included in the evidence.
-    fixture_code="from django.contrib.auth import get_user_model; from django.core.management import call_command; from django.test import Client; from django.conf import settings; from django.core.files.uploadedfile import SimpleUploadedFile; from arena.models import Team,Membership,Competition,Score,Round; from arena.services import upload_asset; u=get_user_model().objects.create_user('runtime-owner'); u.set_unusable_password(); u.save(); c=Competition.objects.first(); t=Team.objects.regular().first(); Membership.objects.create(user=u,team=t); a=upload_asset(user=u,team=t,kind='tdp',file=SimpleUploadedFile('private-audit.txt',b'synthetic-private-audit')); client=Client(); client.force_login(u); cookie=client.cookies[settings.SESSION_COOKIE_NAME].value; Team.objects.bulk_create([Team(competition=c,code=f'PERF{i:04}',name=f'Performance Team {i:04}') for i in range(25)]); Score.objects.bulk_create([Score(team=team,round=r,raw=100,normalized=1) for team in Team.objects.regular() for r in Round.objects.filter(challenge__primary=True)]); import json; print('RESULT '+json.dumps({'cookie':cookie,'cookie_name':settings.SESSION_COOKIE_NAME,'file':str(a.pk),'team':t.pk}))"
+    fixture_code="from django.contrib.auth import get_user_model; from django.core.management import call_command; from django.test import Client; from django.conf import settings; from django.core.files.uploadedfile import SimpleUploadedFile; from arena.models import Team,Membership,Competition,Score,Round; from arena.services import upload_asset; u=get_user_model().objects.create_user('runtime-owner'); u.set_unusable_password(); u.save(); c=Competition.objects.first(); t=Team.objects.regular().first(); Membership.objects.create(user=u,team=t); a=upload_asset(user=u,team=t,kind='tdp',file=SimpleUploadedFile('private-audit.txt',b'synthetic-private-audit')); client=Client(); client.force_login(u); cookie=client.cookies[settings.SESSION_COOKIE_NAME].value; Team.objects.bulk_create([Team(competition=c,code=f'PERF{i:04}',name=f'Performance Team {i:04}') for i in range(25)]); Score.objects.bulk_create([Score(team=team,round=r,raw=100,normalized=1) for team in Team.objects.regular() for r in Round.objects.filter(challenge__primary=True)]); import json; print('RESULT '+json.dumps({'cookie':cookie,'cookie_name':settings.SESSION_COOKIE_NAME,'file':str(a.pk),'team':str(t.pk)}))"
     fixture=shell(fixture_code)
     cookie=fixture['cookie_name']+'='+fixture['cookie'];path='/files/'+fixture['file']+'/'
     peer=project+'-peer';proxy=project+'-probe';second=project+'-event2';second_app=second+'-app'
@@ -80,7 +80,23 @@ def runtime_checks(project,env):
             proxy_port=port_for(proxy,8080);wait(proxy_port)
             for _ in range(8):
                 if request(proxy_port,'/results/')[0]!=200:raise RuntimeError('Load-balanced public page failed.')
-            run(['docker','stop','--time','10',peer],stdout=subprocess.DEVNULL)
+            # Finish an authenticated request already in flight during graceful shutdown.
+            jar=SimpleCookie();jar.load(request(peer_port,'/portal/documents/',cookie)[1].get('Set-Cookie',''))
+            csrf_token=jar['csrftoken'].value
+            body=b'--grace\r\nContent-Disposition: form-data; name="files"; filename="graceful.txt"\r\nContent-Type: text/plain\r\n\r\n'+b'x'*65536+b'\r\n--grace--\r\n'
+            connection=http.client.HTTPConnection('127.0.0.1',peer_port,timeout=15)
+            connection.putrequest('POST','/submit/tdp/')
+            for key,value in {'Cookie':cookie+'; csrftoken='+csrf_token,'X-CSRFToken':csrf_token,'Content-Type':'multipart/form-data; boundary=grace','Content-Length':str(len(body))}.items():connection.putheader(key,value)
+            connection.endheaders();connection.send(body[:32768]);statuses=[]
+            def finish_upload():
+                time.sleep(.4);connection.send(body[32768:]);response=connection.getresponse();response.read();statuses.append(response.status);connection.close()
+            uploader=threading.Thread(target=finish_upload);uploader.start();time.sleep(.2)
+            run(['docker','stop','--time','10',peer],stdout=subprocess.DEVNULL);uploader.join(timeout=20)
+            if statuses!=[302]:raise RuntimeError('In-flight upload did not finish during graceful shutdown.')
+            stored=shell("from arena.models import Asset; import json; print('RESULT '+json.dumps(Asset.objects.filter(original_name='graceful.txt',size=65536).count()))")
+            if stored!=1:raise RuntimeError('Graceful upload was lost or duplicated.')
+            evidence['graceful_shutdown']='pass: in-flight authenticated upload finished once before peer stopped'
+
             time.sleep(3)
             for _ in range(8):
                 if request(proxy_port,'/results/')[0]!=200:raise RuntimeError('Unhealthy peer was not bypassed.')
@@ -126,11 +142,11 @@ def runtime_checks(project,env):
             retried=shell("from arena.models import Asset; import json; print('RESULT '+json.dumps(Asset.objects.filter(original_name='retry.txt').count()))")
             if status!=302 or retried!=1:raise RuntimeError('A complete upload retry failed.')
             evidence['upload_retry']='pass: complete retry persisted exactly one file'
-            shell(f"from arena.models import Team; Team.objects.filter(pk={fixture['team']}).update(active=False); import json; print('RESULT '+json.dumps(True))")
+            shell(f"from arena.models import Team; Team.objects.filter(pk={fixture['team']!r}).update(active=False); import json; print('RESULT '+json.dumps(True))")
             for port in [8000,peer_port]:
                 if request(port,path,cookie)[0]!=404:raise RuntimeError('Replica retained revoked team access.')
             evidence['revocation_across_replicas']='pass: disabled team denied immediately on both replicas'
-            shell(f"from arena.models import Team; Team.objects.filter(pk={fixture['team']}).update(active=True); import json; print('RESULT '+json.dumps(True))")
+            shell(f"from arena.models import Team; Team.objects.filter(pk={fixture['team']!r}).update(active=True); import json; print('RESULT '+json.dumps(True))")
         finally:
             for name in [proxy,peer]:
                 try:run(['docker','rm','--force',name],stdout=subprocess.DEVNULL)
