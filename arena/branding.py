@@ -45,3 +45,13 @@ def image(request,competition_id,slot):
     response['ETag']='"'+key.rsplit('/',1)[-1]+'"'
     patch_cache_control(response,no_cache=True,must_revalidate=True)
     return response
+
+
+def branding_urls(competition):
+    from django.urls import reverse
+    from django.templatetags.static import static
+    urls={'logo':static('arena/brand/platform.svg'),'partner':None,'banner':static('arena/brand/platform-hero.svg')}
+    if competition:
+        for slot,field in SLOTS.items():
+            if getattr(competition,field):urls[slot]=reverse('branding-image',args=[competition.pk,slot])
+    return urls
