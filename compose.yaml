@@ -211,7 +211,8 @@ services:
     - migrate
     - --noinput
     environment:
-      DATABASE_URL: postgres://${DB_ADMIN_USER:-arena_admin}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/arena
+      DATABASE_URL: postgres://${DB_ADMIN_USER:-arena_admin}:${POSTGRES_PASSWORD:?Set
+        POSTGRES_PASSWORD}@db:5432/arena
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-0}
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
@@ -276,6 +277,12 @@ services:
       timeout: 15s
       start_period: 180s
       retries: 3
+    environment:
+      CLAMD_CONF_StreamMaxLength: ${UPLOAD_MAX_FILE_BYTES:-1073741824}
+      CLAMD_CONF_MaxFileSize: ${UPLOAD_MAX_FILE_BYTES:-1073741824}
+      CLAMD_CONF_MaxScanSize: ${UPLOAD_MAX_BATCH_BYTES:-2147483648}
+      CLAMD_CONF_MaxFiles: ${UPLOAD_MAX_FILES:-5000}
+      CLAMD_CONF_AlertExceedsMax: 'yes'
 volumes:
   postgres: null
   private: null
