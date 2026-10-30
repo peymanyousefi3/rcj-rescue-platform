@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import threading
 import time
+import secrets
 from http.cookies import SimpleCookie
 from recovery import compose,run,ROOT
 
@@ -38,16 +39,33 @@ def port_for(name,container_port):
 def runtime_checks(project,env):
     if not project.startswith('rcj-ci-'):raise ValueError('Only disposable CI projects are permitted.')
     evidence={'environment':'disposable Docker project; synthetic data; no mail sender','phases':[],'resources':[]}
-    def shell(code):
-        output=compose(project,env,'exec','-T','app','python','manage.py','shell','-c',code,stdout=subprocess.PIPE).stdout.decode()
+    def shell(code,which=project,configuration=env,container=None):
+        output=(run(['docker','exec',container,'python','manage.py','shell','-c',code],stdout=subprocess.PIPE)
+                if container else compose(which,configuration,'exec','-T','app','python','manage.py','shell','-c',code,stdout=subprocess.PIPE)).stdout.decode()
         return json.loads(next(line[7:] for line in output.splitlines() if line.startswith('RESULT ')))
     # The cookie is captured privately and never printed or included in the evidence.
-    fixture=shell("from django.contrib.auth import get_user_model; from django.core.management import call_command; from django.test import Client; from django.conf import settings; from django.core.files.uploadedfile import SimpleUploadedFile; from arena.models import Team,Membership,Competition,Score,Round; from arena.services import upload_asset; u=get_user_model().objects.create_user('runtime-owner'); u.set_unusable_password(); u.save(); c=Competition.objects.first(); t=Team.objects.regular().first(); Membership.objects.create(user=u,team=t); a=upload_asset(user=u,team=t,kind='tdp',file=SimpleUploadedFile('private-audit.txt',b'synthetic-private-audit')); client=Client(); client.force_login(u); cookie=client.cookies[settings.SESSION_COOKIE_NAME].value; Team.objects.bulk_create([Team(competition=c,code=f'PERF{i:04}',name=f'Performance Team {i:04}') for i in range(95)]); Score.objects.bulk_create([Score(team=team,round=r,raw=100,normalized=1) for team in Team.objects.regular() for r in Round.objects.filter(challenge__primary=True)]); import json; print('RESULT '+json.dumps({'cookie':cookie,'cookie_name':settings.SESSION_COOKIE_NAME,'file':str(a.pk),'team':t.pk}))")
+    fixture_code="from django.contrib.auth import get_user_model; from django.core.management import call_command; from django.test import Client; from django.conf import settings; from django.core.files.uploadedfile import SimpleUploadedFile; from arena.models import Team,Membership,Competition,Score,Round; from arena.services import upload_asset; u=get_user_model().objects.create_user('runtime-owner'); u.set_unusable_password(); u.save(); c=Competition.objects.first(); t=Team.objects.regular().first(); Membership.objects.create(user=u,team=t); a=upload_asset(user=u,team=t,kind='tdp',file=SimpleUploadedFile('private-audit.txt',b'synthetic-private-audit')); client=Client(); client.force_login(u); cookie=client.cookies[settings.SESSION_COOKIE_NAME].value; Team.objects.bulk_create([Team(competition=c,code=f'PERF{i:04}',name=f'Performance Team {i:04}') for i in range(25)]); Score.objects.bulk_create([Score(team=team,round=r,raw=100,normalized=1) for team in Team.objects.regular() for r in Round.objects.filter(challenge__primary=True)]); import json; print('RESULT '+json.dumps({'cookie':cookie,'cookie_name':settings.SESSION_COOKIE_NAME,'file':str(a.pk),'team':t.pk}))"
+    fixture=shell(fixture_code)
     cookie=fixture['cookie_name']+'='+fixture['cookie'];path='/files/'+fixture['file']+'/'
-    peer=project+'-peer';proxy=project+'-probe'
+    peer=project+'-peer';proxy=project+'-probe';second=project+'-event2';second_app=second+'-app'
     with tempfile.TemporaryDirectory(prefix='rcj-ingress-check-') as temporary:
         config=Path(temporary)/'Caddyfile'
+        second_env=Path(temporary)/'event2.env'
+        values=dict(line.split('=',1) for line in Path(env).read_text().splitlines() if '=' in line)
+        for key in ['POSTGRES_PASSWORD','APP_DB_PASSWORD','DJANGO_SECRET_KEY','PROXY_SHARED_SECRET']:values[key]=secrets.token_urlsafe(48)
+        second_env.write_text(''.join(f'{key}={value}\n' for key,value in values.items()));second_env.chmod(0o600)
         try:
+            compose(second,second_env,'up','-d','--wait','db',stdout=subprocess.DEVNULL)
+            compose(second,second_env,'run','--rm','migrate',stdout=subprocess.DEVNULL)
+            compose(second,second_env,'run','--rm','app','python','manage.py','bootstrap_event',stdout=subprocess.DEVNULL)
+            compose(second,second_env,'run','-d','--no-deps','--name',second_app,'--publish','127.0.0.1::8000','app',stdout=subprocess.DEVNULL)
+            second_port=port_for(second_app,8000);wait(second_port)
+            other=shell(fixture_code,container=second_app)
+            other_cookie=other['cookie_name']+'='+other['cookie'];other_path='/files/'+other['file']+'/'
+            if request(second_port,other_path,other_cookie)[0]!=200:raise RuntimeError('Second event own-file access failed.')
+            if request(second_port,path,cookie)[0]!=404 or request(8000,other_path,other_cookie)[0]!=404:raise RuntimeError('Cross-event private access was not denied.')
+            if request(second_port,'/portal/',cookie)[0]!=302 or request(8000,'/portal/',other_cookie)[0]!=302:raise RuntimeError('Cross-event session was accepted.')
+            evidence['event_isolation']='pass: two separate events, 30 teams each; independent secrets, DBs, files and sessions'
             compose(project,env,'run','-d','--no-deps','--name',peer,'--publish','127.0.0.1::8000','app',stdout=subprocess.DEVNULL)
             peer_port=port_for(peer,8000);wait(peer_port)
             for port in [8000,peer_port]:
@@ -81,7 +99,7 @@ def runtime_checks(project,env):
                         measured=[]
                         while time.monotonic()<deadline:
                             started=time.perf_counter()
-                            try:status=request(proxy_port,'/results/')[0]
+                            try:status=request(second_port if _%2 else proxy_port,'/results/')[0]
                             except (OSError,http.client.HTTPException):status=0
                             measured.append((time.perf_counter()-started,status))
                         return measured
@@ -116,6 +134,7 @@ def runtime_checks(project,env):
         finally:
             for name in [proxy,peer]:
                 run(['docker','rm','--force',name],stdout=subprocess.DEVNULL)
+            compose(second,second_env,'down','--volumes','--remove-orphans',stdout=subprocess.DEVNULL)
     target=ROOT/'artifacts'/'runtime';target.mkdir(parents=True,exist_ok=True)
     (target/'runtime-checks.json').write_text(json.dumps(evidence,indent=2))
     print('Bounded runtime, shared-session/storage, failover, compression, interrupted-upload and revocation checks passed.')
