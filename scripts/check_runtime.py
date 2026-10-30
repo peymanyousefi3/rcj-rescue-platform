@@ -71,14 +71,15 @@ def runtime_checks(project,env):
             for port in [8000,peer_port]:
                 if request(port,path,cookie)[0]!=200 or request(port,path)[0]!=404:raise RuntimeError('Replica private-file authorization failed.')
             evidence['shared_session_and_private_storage']='pass across two independent app containers'
-            config.write_text(f':8080 {{\n encode gzip\n reverse_proxy app:8000 {peer}:8000 {{\n lb_policy round_robin\n health_uri /ready/\n health_interval 1s\n health_timeout 2s\n fail_duration 3s\n lb_try_duration 3s\n }}\n}}\n')
+            config.write_text(f':8080 {{\n encode gzip\n reverse_proxy app:8000 {peer}:8000 {{\n lb_policy round_robin\n health_uri /ready/\n health_interval 1s\n health_timeout 2s\n health_headers {{\n Host localhost\n }}\n fail_duration 3s\n lb_try_duration 3s\n }}\n}}\n')
             run(['docker','run','-d','--name',proxy,'--label','com.docker.compose.project='+project,'--network',project+'_default','-p','127.0.0.1::8080','--mount',f'type=bind,src={config},dst=/etc/caddy/Caddyfile,readonly','caddy:2-alpine@'+json.loads((ROOT/'deploy/image-digests.json').read_text())['caddy:2-alpine']],stdout=subprocess.DEVNULL)
             proxy_port=port_for(proxy,8080);wait(proxy_port)
             status,headers,data=request(proxy_port,'/static/arena/championship.css',headers={'Accept-Encoding':'gzip'})
             if status!=200 or headers.get('Content-Encoding')!='gzip':raise RuntimeError('Ingress static compression unavailable.')
             evidence['static_compression']={'status':status,'encoding':headers['Content-Encoding'],'bytes':len(data)}
             for _ in range(8):
-                if request(proxy_port,'/results/')[0]!=200:raise RuntimeError('Load-balanced public page failed.')
+                status=request(proxy_port,'/results/')[0]
+                if status!=200:raise RuntimeError(f'Load-balanced public page returned {status}.')
             # Finish an authenticated request already in flight during graceful shutdown.
             jar=SimpleCookie();jar.load(request(peer_port,'/portal/documents/',cookie)[1].get('Set-Cookie',''))
             csrf_token=jar['csrftoken'].value
@@ -98,7 +99,8 @@ def runtime_checks(project,env):
 
             time.sleep(3)
             for _ in range(8):
-                if request(proxy_port,'/results/')[0]!=200:raise RuntimeError('Unhealthy peer was not bypassed.')
+                status=request(proxy_port,'/results/')[0]
+                if status!=200:raise RuntimeError(f'Unhealthy peer bypass returned {status}.')
             run(['docker','start',peer],stdout=subprocess.DEVNULL);wait(peer_port)
             evidence['load_balance_failover']='pass: stopped peer bypassed; remaining app served all probes'
             stop=threading.Event()
@@ -147,6 +149,8 @@ def runtime_checks(project,env):
             evidence['revocation_across_replicas']='pass: disabled team denied immediately on both replicas'
             shell(f"from arena.models import Team; Team.objects.filter(pk={fixture['team']!r}).update(active=True); import json; print('RESULT '+json.dumps(True))")
         finally:
+            target=ROOT/'artifacts'/'runtime';target.mkdir(parents=True,exist_ok=True)
+            (target/'runtime-checks.json').write_text(json.dumps(evidence,indent=2))
             for name in [proxy,peer]:
                 try:run(['docker','rm','--force',name],stdout=subprocess.DEVNULL)
                 except subprocess.CalledProcessError:pass
