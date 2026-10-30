@@ -262,3 +262,11 @@ class PlaybackForm(forms.Form):
             if data.get('released') and not round_.release_ready:
                 raise forms.ValidationError('Mark this round as completed before publishing its playback.')
         return data
+
+
+def prepare_dialog_form(form):
+    """Keep modal labels/help references distinct from background forms."""
+    for item in [form, getattr(form, 'lineup_form', None)]:
+        if item is not None and not item.auto_id.startswith('dialog_'):
+            item.auto_id = 'dialog_' + item.auto_id
+    return form

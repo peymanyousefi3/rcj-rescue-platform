@@ -264,7 +264,8 @@ def result_editor(request,round_id,team_id):
                 return JsonResponse({'recording_update':recording_update(round_,team)})
             messages.success(request,'Recording settings saved.' if form.recording_only else 'Results and recording settings saved.')
             return JsonResponse({'redirect':'/control/#results-recordings'}) if request.headers.get('X-ASR-Editor')=='1' else redirect('/control/#results-recordings')
-    return render(request,'arena/_result_editor.html',{'form':form,'round':round_,'team':team,'recording':form.recording,'recording_history':RunRecording.objects.filter(round=round_,team=team,current=False)})
+    from .forms import prepare_dialog_form
+    return render(request,'arena/_result_editor.html',{'form':prepare_dialog_form(form),'round':round_,'team':team,'recording':form.recording,'recording_history':RunRecording.objects.filter(round=round_,team=team,current=False)})
 
 
 @require_POST

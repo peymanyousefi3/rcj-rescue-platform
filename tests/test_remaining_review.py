@@ -127,3 +127,21 @@ def test_risky_release_controls_are_server_enforced_not_just_ui(client,event):
     client.post('/control/action/',{'action':'release-archive'})
     r.refresh_from_db();c.refresh_from_db()
     assert (r.maps_released,c.archive_released)==before
+
+
+@pytest.mark.parametrize('editor',['round','event','team','quarantine','email-settings','challenge','notice','managed-upload'])
+def test_editor_ids_do_not_collide_with_background_forms(client,event,editor):
+    from html.parser import HTMLParser
+    class IDs(HTMLParser):
+        def __init__(self):super().__init__();self.ids=set();self.references=[]
+        def handle_starttag(self,tag,attrs):
+            attrs=dict(attrs)
+            if attrs.get('id'):self.ids.add(attrs['id'])
+            for name in ['for','aria-describedby','aria-labelledby']:
+                if attrs.get(name):self.references.extend(attrs[name].split())
+    client.force_login(event[4]);main=IDs();main.feed(client.get('/control/').content.decode())
+    modal=IDs();response=client.get('/control/',{'editor':editor})
+    assert response.status_code==200
+    modal.feed(response.content.decode())
+    assert not (main.ids & modal.ids), (editor,main.ids & modal.ids)
+    assert set(modal.references) <= modal.ids, (editor,set(modal.references)-modal.ids)

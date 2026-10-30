@@ -19,7 +19,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.debug import sensitive_post_parameters
 
 from .access import can_download, can_download_file, public_asset, team_assets, team_for, superteams_for
-from .forms import (AdminQuarantineUploadForm, AdminUploadForm, AnnouncementForm, EmailConfigurationForm, InviteForm,
+from .forms import (prepare_dialog_form, AdminQuarantineUploadForm, AdminUploadForm, AnnouncementForm, EmailConfigurationForm, InviteForm,
                     ResourceForm, UploadForm, PlaybackForm, QuarantineDeadlineForm,
                     QuarantineForm, QuarantineUploadForm, SubmissionUploadForm)
 from .models import (Asset, AuditEvent, Challenge, Competition, EmailConfiguration, EmailDelivery, Notification,
@@ -458,7 +458,7 @@ def control(request):
             messages.error(request,error)
     editor=request.GET.get('editor')
     if editor in ['quarantine','email-settings']:
-        return render(request,'arena/_email_editor.html' if editor=='email-settings' else 'arena/_record_editor.html',{'editor_modal':True,'form':email_form if editor=='email-settings' else quarantine_form, 'form_kind':editor,'record':editing if editor=='quarantine' else None,'cancel_section':'quarantines' if editor=='quarantine' else 'email-settings','email_password_saved':bool(email_config.password_encrypted)})
+        return render(request,'arena/_email_editor.html' if editor=='email-settings' else 'arena/_record_editor.html',{'editor_modal':True,'form':prepare_dialog_form(email_form if editor=='email-settings' else quarantine_form), 'form_kind':editor,'record':editing if editor=='quarantine' else None,'cancel_section':'quarantines' if editor=='quarantine' else 'email-settings','email_password_saved':bool(email_config.password_encrypted)})
     from .workspaces import admin_shares
     teams=list(Team.objects.regular().filter(competition=c).prefetch_related('membership_set__user').order_by('name'))
     quarantine_rows=[]

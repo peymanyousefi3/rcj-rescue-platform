@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from .control_forms import (ChallengeForm, CompetitionForm, FileForm, FileShareForm, ManagedUploadForm, ManageAnnouncementForm,
     ProgrammeForm, RoundForm, RoundWindowForm, TeamForm)
+from .forms import prepare_dialog_form
 from .models import Announcement, Asset, Challenge, Competition, EmailDelivery, FileShare, Programme, Quarantine, Round, Team
 from .services import announce, audit, invite_team, upload_asset, upload_quarantine_files, queue_announcement_copy
 from .scheduling import LineupForm, calendar_entries, revision
@@ -208,7 +209,7 @@ def manage(request, competition):
     if editor in forms:
         section=next((s for k,m,f,s in specs if k==editor),'competition-settings' if editor=='competition' else 'files')
         return context,render(request,'arena/_calendar_editor.html' if editor in ['round','event'] else 'arena/_record_editor.html',{
-            'editor_modal':True,'form_kind':editor,'form':forms[editor],'record':records.get(editor),
+            'editor_modal':True,'form_kind':editor,'form':prepare_dialog_form(forms[editor]),'record':records.get(editor),
             'upload':editor=='managed-upload','round_choices':Round.objects.filter(competition=competition,archived_at=None),
             'cancel_section':request.GET.get('return',section),'save_label':'Save changes'})
     from datetime import timedelta

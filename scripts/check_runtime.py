@@ -101,7 +101,7 @@ def runtime_checks(project,env):
             for _ in range(8):
                 status=request(proxy_port,'/results/')[0]
                 if status!=200:raise RuntimeError(f'Unhealthy peer bypass returned {status}.')
-            run(['docker','start',peer],stdout=subprocess.DEVNULL);wait(peer_port)
+            run(['docker','start',peer],stdout=subprocess.DEVNULL);peer_port=port_for(peer,8000);wait(peer_port)
             evidence['load_balance_failover']='pass: stopped peer bypassed; remaining app served all probes'
             stop=threading.Event()
             def sample():
