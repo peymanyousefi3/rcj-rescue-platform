@@ -120,4 +120,14 @@ jobs:
           python-version: '3.12'
       - run: sudo apt-get update && sudo apt-get install -y age
       - name: Test isolated deployment and encrypted recovery
+        env:
+          RUN_SCANNER: '1'
+          RUN_ZAP: '1'
         run: python scripts/test_deployment.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: isolated-passive-scan
+          path: artifacts/zap/
+          if-no-files-found: ignore
+          retention-days: 7

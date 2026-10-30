@@ -28,6 +28,13 @@ def main():
             for path,status in [('/health/',200),('/ready/',200),('/portal/',302),('/.env',404),('/.git/config',404)]:
                 connection=http.client.HTTPConnection('127.0.0.1',8000,timeout=15);connection.request('GET',path)
                 response=connection.getresponse();response.read();assert response.status==status,(path,response.status);connection.close()
+            if os.getenv('RUN_SCANNER')=='1':
+                compose(project,env,'up','-d','--wait','--wait-timeout','360','clamav',stdout=subprocess.DEVNULL)
+                scan="from django.contrib.auth import get_user_model; from django.core.files.uploadedfile import SimpleUploadedFile; from django.core.management import call_command; from arena.models import Team; from arena.services import upload_asset; u=get_user_model().objects.create_user('scanner-test',is_staff=True); a=upload_asset(user=u,team=Team.objects.first(),kind='tdp',file=SimpleUploadedFile('antivirus-test.txt',b'X5O!P%@AP[4\\\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*')); call_command('scan_assets'); a.refresh_from_db(); assert a.scan_status=='rejected'; print('Real ClamAV rejected the harmless standard EICAR test file.')"
+                compose(project,env,'exec','-T','app','python','manage.py','shell','-c',scan)
+            if os.getenv('RUN_ZAP')=='1':
+                reports=ROOT/'artifacts'/'zap';reports.mkdir(parents=True,exist_ok=True);reports.chmod(0o777)
+                run(['docker','run','--rm','--network','host','--mount',f'type=bind,src={reports},dst=/zap/wrk','ghcr.io/zaproxy/zaproxy:stable@sha256:030d3df57735dacbb83464854758e674dd9ad01d79d12a129a8e58b1fd384238','zap-baseline.py','-t','http://127.0.0.1:8000','-m','1','-I','-J','report.json','-r','report.html'])
             # Migrations and append-only audit privileges are exercised as separate roles.
             audit="from arena.models import AuditEvent; from django.db import transaction,DatabaseError; a=AuditEvent.objects.create(action='test.runtime'); denied=False\ntry:\n with transaction.atomic(): AuditEvent.objects.filter(pk=a.pk).delete()\nexcept DatabaseError: denied=True\nassert denied"
             compose(project,env,'exec','-T','app','python','manage.py','shell','-c',audit,stdout=subprocess.DEVNULL)
