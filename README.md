@@ -1,18 +1,49 @@
-<h1 align="center">RoboCupJunior Rescue Simulation<br>Competition Platform</h1>
+<h1 align="center">RoboCupJunior Rescue Simulation CRM</h1>
 
 <p align="center"><strong>Developed by Peyman Yousefi</strong><br>For RoboCupJunior Rescue Simulation and similar competitions.</p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-0f766e?style=flat-square" alt="MIT License"></a>
-  <a href="docs/SETUP.md"><img src="https://img.shields.io/badge/Python-3.12-3776ab?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.12"></a>
-  <a href="requirements.runtime.lock"><img src="https://img.shields.io/badge/Django-6.1-092e20?style=flat-square&amp;logo=django&amp;logoColor=white" alt="Django 6.1"></a>
-  <a href="compose.yaml"><img src="https://img.shields.io/badge/Docker-Compose-2496ed?style=flat-square&amp;logo=docker&amp;logoColor=white" alt="Docker Compose"></a>
+  <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-0f766e?style=flat-square" alt="MIT License"></a>
+  <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/SETUP.md"><img src="https://img.shields.io/badge/Python-3.12-3776ab?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.12"></a>
+  <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/requirements.runtime.lock"><img src="https://img.shields.io/badge/Django-6.1-092e20?style=flat-square&amp;logo=django&amp;logoColor=white" alt="Django 6.1"></a>
+  <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/compose.yaml"><img src="https://img.shields.io/badge/Docker-Compose-2496ed?style=flat-square&amp;logo=docker&amp;logoColor=white" alt="Docker Compose"></a>
   <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/actions/workflows/verify.yml"><img src="https://github.com/peymanyousefi3/rcj-rescue-platform/actions/workflows/verify.yml/badge.svg" alt="Automated verification status"></a>
 </p>
 
 <p align="center">A web platform that helps organizers run a competition, gives teams a private workspace, and lets the public follow schedules, results and interactive match replays.</p>
 
-<p align="center"><a href="#try-the-interactive-demo">Try the demo</a> · <a href="https://rcjrescue.com/">Live demonstration</a> · <a href="https://www.youtube.com/watch?v=qQhhGdPYHms">Watch the video</a> · <a href="#quick-start">Quick start</a> · <a href="#screenshots">Screenshots</a> · <a href="docs/DEPLOYMENT.md">Deployment</a></p>
+## See it in action
+
+<table>
+<tr>
+<td width="33%" align="center" valign="top">
+<h3><a href="https://rcjrescue.com/">Live Website</a></h3>
+<a href="https://rcjrescue.com/"><img src="docs/assets/live-competition.png" alt="Live Website: Explore the real ASR competition website." width="300"></a>
+<p>Explore the real ASR competition website.</p>
+</td>
+<td width="33%" align="center" valign="top">
+<h3><a href="https://www.youtube.com/watch?v=qQhhGdPYHms">YouTube Video</a></h3>
+<a href="https://www.youtube.com/watch?v=qQhhGdPYHms"><img src="docs/assets/video-demonstration.jpg" alt="YouTube Video: Watch the narrated platform walkthrough." width="300"></a>
+<p>Watch the narrated platform walkthrough.</p>
+</td>
+<td width="33%" align="center" valign="top">
+<h3><a href="https://rcjrescue.com/demo/">Interactive Demo</a></h3>
+<a href="https://rcjrescue.com/demo/"><img src="docs/assets/interactive-demo.png" alt="Interactive Demo: Try the admin and participant workspaces." width="300"></a>
+<p>Try the admin and participant workspaces.</p>
+</td>
+</tr>
+<tr>
+<td width="33%" align="center"><a href="https://rcjrescue.com/"><img src="https://img.shields.io/badge/OPEN-LIVE_WEBSITE-2146B8?style=for-the-badge" alt="Open Live Website"></a></td>
+<td width="33%" align="center"><a href="https://www.youtube.com/watch?v=qQhhGdPYHms"><img src="https://img.shields.io/badge/PLAY-YOUTUBE_VIDEO-C62828?style=for-the-badge" alt="Open YouTube Video"></a></td>
+<td width="33%" align="center"><a href="https://rcjrescue.com/demo/"><img src="https://img.shields.io/badge/TRY-INTERACTIVE_DEMO-0F766E?style=for-the-badge" alt="Open Interactive Demo"></a></td>
+</tr>
+</table>
+
+<p align="center"><strong>Interactive demo:</strong> edits reset on reload; nothing is saved or emailed.<br><a href="#try-the-interactive-demo"><strong>View demo usernames and passwords ↓</strong></a></p>
+
+<p align="center">Demonstrated for the <strong>Junior Rescue Simulation League at RoboCup Americas Super Regional 2026</strong> — one example of the platform in use.</p>
+
+<p align="center"><a href="#public-view">Animated feature tour</a> · <a href="#quick-start">Quick start</a> · <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/DEPLOYMENT.md">Deployment guide</a></p>
 
 ## Key features
 
@@ -32,70 +63,87 @@
 | Admin | `demo_admin` | `RCJ-Admin-Preview-2026!` |
 | Participant | `demo_participant` | `RCJ-Team-Preview-2026!` |
 
-The clearly labelled demo includes a snapshot of publicly released ASR teams, scores, schedules and announcements, plus **nine interactive 3D fields and sixteen Webots match replays**. Explore the panels, rotate maps, play and seek recordings, open editors and preview calendar or score changes. Edits stay in the current page and reset on reload. Private workflow examples are illustrative.
+Explore public ASR schedules, scores and announcements, **nine interactive 3D fields and sixteen match replays**, plus illustrative private workflows. Try editors and temporary calendar or score changes; reloading restores the preview.
 
-**Public downloads are available:** released map JSON/WBT files and public replay packages. **Private team submissions are never included**: controller JSON, TDPs, internal videos and other private documents have no content or download links in the demo. Illustrative file names show how the workflow looks. There is no live account access, database saving, real upload processing or email delivery.
-
-These are public preview codes, **not** credentials for the live admin or participant portal. The hosted demo is specific to RCJRescue.com; its implementation is separate from this repository and the `v1.0.0` release.
-
-## See a demonstration
-
-The platform was demonstrated for the **Junior Rescue Simulation League at RoboCup Americas Super Regional (ASR) 2026**. This is one example of its features in use.
-
-**[View the demonstration at RCJRescue.com](https://rcjrescue.com/)** · **[Watch the 4-minute YouTube demonstration](https://www.youtube.com/watch?v=qQhhGdPYHms)**
-
-[![Watch a real Erebus/Webots Rescue Simulation replay in the platform](docs/assets/rescue-simulation-replay.jpg)](https://www.youtube.com/watch?v=qQhhGdPYHms)
-
-*Actual Rescue Simulation replay footage. Click the image to watch the demonstration. [Video chapters and English captions](docs/VIDEO.md).*
+**Demo only:** no live account access, database saving, real uploads or email. Public map/replay downloads are available; private controller JSON, TDPs, internal videos and team documents are excluded. These preview codes do not unlock the live portals. The hosted demo is separate from the source repository and stable release.
 
 ---
 
-## Screenshots
+## Public view
 
-Explore the platform from three perspectives. Replay and field images show actual Rescue Simulation footage; dashboard screenshots use fictional demonstration data.
+### Watch the run. Explore the scene. Jump to the action.
 
-### Public view
+Replays open beside a score or from the schedule in a responsive popup. Visitors can play, pause, seek, rotate the camera and use fullscreen without installing Webots. **Click an exported event to jump to its exact playback position.** Event text and match timestamps remain faithful to the recording, even where match time differs from playback time.
 
-**Follow the competition from any browser.** Visitors can check the programme, see published scores and released rankings, and open interactive match replays from the schedule or beside a score.
+![Interactive match replay, forward event navigation and rewind](docs/assets/public-replay-events.gif)
 
-- **Interactive 3D playback:** play, pause, seek, rotate the camera and use fullscreen without installing Webots. Replays open in a responsive popup; optional uploaded video is also supported.
-- **Released maps:** inspect the 3D field, thumbnail and map information, and download the map JSON and WBT.
-- **Competition updates:** browse public announcements, teams, main competition results and SuperTeam results on desktop or mobile.
+### Inspect the field before downloading the map
 
-![Public results with scores and match playback access](docs/assets/public-results.jpg)
+Published map packages include an interactive 3D field, preview and field information. Public map downloads expose the map JSON and WBT; supporting preview assets stay behind the viewer.
 
-<table>
-<tr><td width="50%"><strong>Interactive match replay</strong></td><td width="50%"><strong>Released field and map information</strong></td></tr>
-<tr><td><img src="docs/assets/rescue-simulation-replay.jpg" alt="Actual Webots Rescue Simulation replay with browser playback controls"></td><td><img src="docs/assets/rescue-simulation-field.jpg" alt="Actual Rescue Simulation field in the 3D map viewer"></td></tr>
-</table>
+![Real Rescue Simulation field explored in the browser](docs/assets/public-field-3d.gif)
 
-### Team view
+Also available: the competition programme, team roster, public announcements, round scores and **organizer-released rankings**, including SuperTeam results. Layouts adapt to desktop and mobile.
 
-**One private workspace for each team.** Participants see their upcoming runs, relevant announcements and organizer resources, with access controlled by the organizer.
+## Team view
 
-- **Private multi-file submissions:** respond to named quarantine requests within upload windows; deadlines lock further changes.
-- **Relevant resources:** access files and announcements addressed to the team, with permission changes applied immediately.
-- **Team tools:** manage passwords, use shared SuperTeam workspaces, and submit private complaints with attachments and organizer responses.
+### A private workspace with clear submission windows
 
-![Private team dashboard showing upcoming runs and SuperTeam access for fictional Aurora Robotics](docs/assets/team-dashboard.jpg)
+Named requests tell teams what to submit and when. Multiple-file uploads, visible deadlines and locking help organizers collect the right files at the right time. Team documents and competition submissions remain separate from public materials.
 
-### Admin view
+![Team submission requests and deadline workflow](docs/assets/team-submissions.gif)
 
-**Set up the event once, then let connected workflows reduce repetitive work.** Manage teams, SuperTeams, challenges, rounds, uploads, communications and release decisions from the organizer panel.
+### Raise a concern at the exact moment
 
-- **Recording to results:** upload a complete Erebus/Webots folder or ZIP. Filenames and relative paths are preserved. Recording metadata fills empty score and time fields while preserving manual values; final scores already include bonuses. Older recordings remain playable without result metadata.
-- **Lineup to schedule:** arrange teams with drag and drop, then place the round block in the calendar. Individual run times follow the lineup. Click to edit in a popup, drag to move, or select an empty interval to add an activity.
-- **One score-entry matrix:** enter or paste team-by-round scores, undo changes and highlight missing values. Main and SuperTeam tables appear together. Review normalization, discards and final percentages, then explicitly release rankings.
-- **Controlled collection and publication:** configure quarantine deadlines, browse participant files, upload map folders and choose when maps or recordings become public.
-- **One record, many recipients:** publish multi-file organizer packages or announcements with searchable audience controls, optional personalized email and configurable CC/BCC.
-- **Event administration:** configure dates, timezone, challenges, scoring policies, accounts, storage, email and activity records.
+From their own replay, a team can open a private complaint with the run and playback position already filled in. Organizers can return directly to that moment. General complaints, evidence attachments and organizer responses remain available.
 
-<table>
-<tr><td width="50%"><strong>Results and recordings</strong><br>Scores, normalization, discards and ranking release.</td><td width="50%"><strong>Schedule calendar</strong><br>Round blocks, team lineups and daily planning.</td></tr>
-<tr><td><img src="docs/assets/admin-results.jpg" alt="Administrator score-entry table with fictional teams"></td><td><img src="docs/assets/admin-calendar.jpg" alt="Administrator calendar with scheduled activities"></td></tr>
-<tr><td><strong>Announcements and recipients</strong><br>One announcement with its complete audience.</td><td><strong>Participant upload management</strong><br>Named quarantines, deadlines and private files.</td></tr>
-<tr><td><img src="docs/assets/admin-announcements.jpg" alt="Announcement editor with searchable team recipients"></td><td><img src="docs/assets/admin-quarantines.jpg" alt="Administrator participant upload and quarantine management"></td></tr>
-</table>
+![Team opens a private complaint from a selected replay timestamp](docs/assets/team-linked-complaint.gif)
+
+Teams also receive targeted announcements and organizer files, manage their passwords and access their existing SuperTeam workspace. Private files require authorized access; they are not part of the public demo.
+
+## Admin view
+
+### Recording package → replay, score and time
+
+Upload a complete **Erebus/Webots folder or ZIP**, including nested packages. The platform preserves filenames and relative paths, validates supporting files and detects the preview. Metadata fills **empty score and time fields automatically**, preserving manual entries. The exported final score already includes bonuses, so bonuses are never added twice. Optional video uploads are supported; interactive recordings remain interactive.
+
+Enter or paste scores across the entire team-by-round matrix, undo edits and spot missing values. Main competition and SuperTeam tables are available together. Normalization, lowest-score discards and final percentages recalculate while editing; **ranking publication stays an explicit organizer decision**.
+
+![Current score matrix recalculating an edit and undoing it](docs/assets/admin-score-entry.gif)
+
+### Team lineup → competition calendar
+
+Arrange team order and run times inside each round. The round duration is calculated from the lineup; placing one round block generates its team schedule. Drag activities, select time intervals and use popup editors instead of repetitive individual entry.
+
+![Organizer adjusts the interactive competition calendar](docs/assets/admin-calendar.gif)
+
+### Your competition, your identity
+
+Configure the competition name, short name, header title, league, homepage banner title and subtitle, dates, location and timezone. Upload the competition logo, partner logo and banner image from the same settings popup. The hosted demo retains the original RCJRescue/ASR identity; preview changes reset on reload.
+
+![Grouped competition identity and branding editor in the isolated demo](docs/assets/admin-branding.gif)
+
+### One announcement. One audience. One record.
+
+Search and select teams, choose public visibility, include additional email recipients and configure announcement CC/BCC. Optional personalized HTML emails accompany dashboard publication; the preview never sends them.
+
+![Announcement editor and recipient selection](docs/assets/admin-announcements.gif)
+
+### Deliver files without duplicating records
+
+Share multiple files under one subject and one recipient list. Editing that audience updates permission immediately; removing a team revokes access.
+
+![Organizer file package and audience workflow](docs/assets/admin-file-delivery.gif)
+
+### Existing teams, shared SuperTeam challenges
+
+Create pairings from existing teams, then manage their challenge rounds, maps, recordings, submissions and scores alongside the main competition.
+
+![SuperTeam challenge workspace](docs/assets/admin-superteams.gif)
+
+Organizers also configure scoring methods, quarantine windows and schedule-linked deadlines; browse private submissions; release maps early when appropriate; respond to complaints; manage accounts, storage and email; and review activity records.
+
+---
 
 ## Capabilities
 
@@ -111,8 +159,8 @@ Explore the platform from three perspectives. Replay and field images show actua
 | **Announcements** | Public, all-team or selected audiences; searchable recipient selection; bold text; optional personalized HTML email, additional email addresses and announcement CC/BCC settings. Dashboard publication does not require email. |
 | **Team accounts** | Organizer-managed accounts, password setup/change/reset, optional authenticator enrollment, trusted-browser sign-in and private workspaces. SMTP must be configured for delivery of reset links. |
 | **SuperTeams** | Group existing teams into challenge pairings; shared group workspace, submissions, rounds, schedules, maps and results alongside the main competition. |
-| **Complaints** | Private complaint forms, attachments and organizer responses. |
-| **Administration** | Event dates and timezone, challenges and calculation policies, searchable lists, popup editors, email/storage settings and activity records. |
+| **Complaints** | Private forms, attachments, organizer responses and run-linked playback timestamps that open the exact replay moment. |
+| **Administration** | Configurable competition identity, logos and homepage banner; event dates and timezone, challenges and calculation policies, searchable lists, popup editors, email/storage settings and activity records. |
 | **Storage and operations** | Private local storage, optional S3-compatible or Google Drive storage, ClamAV scanning, background workers, PostgreSQL production database, authorization checks and audit records. Optional workbook-import compatibility; no sheet is required for dashboard-managed schedules or scores. |
 
 ### Default field scoring
@@ -127,7 +175,7 @@ Team uploads and private recordings are authorized server-side for the permitted
 
 ## Quick start
 
-Requires Docker with Compose and Python 3 for the configuration helper. For a Python-only development installation, see [Setup](docs/SETUP.md).
+Requires Docker with Compose and Python 3 for the configuration helper. For a Python-only development installation, see [Setup](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/SETUP.md).
 
 ```sh
 git clone https://github.com/peymanyousefi3/rcj-rescue-platform.git
@@ -164,14 +212,16 @@ This adds fictional scores and SuperTeams; it creates no login accounts and send
 
 ## Documentation
 
-- [Setup and fictional demonstration](docs/SETUP.md)
-- [HTTPS deployment, backups and upgrades](docs/DEPLOYMENT.md)
-- [Security operations, resource limits and recovery](docs/SECURITY_OPERATIONS.md)
-- [Security and private vulnerability reporting](SECURITY.md)
-- [Contributing](CONTRIBUTING.md)
-- [Project overview PDF](docs/PROJECT_OVERVIEW.pdf)
-- [Release preparation checks](docs/RELEASE_CHECKS.md)
-- [Video walkthrough, chapters and captions](docs/VIDEO.md)
+- [Competition branding and replay-event controls](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/BRANDING.md)
+
+- [Setup and fictional demonstration](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/SETUP.md)
+- [HTTPS deployment, backups and upgrades](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/DEPLOYMENT.md)
+- [Security operations, resource limits and recovery](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/SECURITY_OPERATIONS.md)
+- [Security and private vulnerability reporting](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/SECURITY.md)
+- [Contributing](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/CONTRIBUTING.md)
+- [Project overview PDF](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/PROJECT_OVERVIEW.pdf)
+- [Release preparation checks](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/RELEASE_CHECKS.md)
+- [Video walkthrough, chapters and captions](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/VIDEO.md)
 
 ## Credit and license
 
@@ -179,6 +229,6 @@ This adds fictional scores and SuperTeams; it creates no login accounts and send
 
 **Open-source edition:** the bundled dataset is fictional; private competition records and credentials are excluded. RCJRescue.com is an operating competition website.
 
-Contributions are welcome through [pull requests](CONTRIBUTING.md). Changes require review by **Peyman Yousefi** and passing automated checks before they can be merged into `main`.
+Contributions are welcome through [pull requests](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/CONTRIBUTING.md). Changes require review by **Peyman Yousefi** and passing automated checks before they can be merged into `main`.
 
-Project-owned code is available under the [MIT License](LICENSE). Copyright © 2026 Peyman Yousefi. See [attribution](NOTICE.md) and [third-party notices](THIRD_PARTY_NOTICES.md). Third-party software, trademarks, competition maps and recording packages retain their own rights; MIT does not grant rights to those materials.
+Project-owned code is available under the [MIT License](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/LICENSE). Copyright © 2026 Peyman Yousefi. See [attribution](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/NOTICE.md) and [third-party notices](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/THIRD_PARTY_NOTICES.md). Third-party software, trademarks, competition maps and recording packages retain their own rights; MIT does not grant rights to those materials.
