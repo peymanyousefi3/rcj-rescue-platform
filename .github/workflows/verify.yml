@@ -128,11 +128,14 @@ jobs:
         env:
           RUN_SCANNER: '1'
           RUN_ZAP: '1'
+          RUN_RUNTIME: '1'
         run: python scripts/test_deployment.py
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: isolated-passive-scan
-          path: artifacts/zap/
+          path: |
+            artifacts/zap/
+            artifacts/runtime/
           if-no-files-found: ignore
           retention-days: 7

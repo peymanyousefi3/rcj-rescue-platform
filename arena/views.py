@@ -583,8 +583,9 @@ def health(request):
     try:
         with connection.cursor() as cursor: cursor.execute('SELECT 1')
     except DatabaseError:
-        return JsonResponse({'status':'unavailable'},status=503)
-    response=JsonResponse({'status':'ok'})
+        response=JsonResponse({'status':'unavailable'},status=503)
+    else:
+        response=JsonResponse({'status':'ok'})
     response['Cache-Control']='no-store'
     return response
 

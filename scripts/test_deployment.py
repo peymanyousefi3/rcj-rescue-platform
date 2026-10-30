@@ -28,6 +28,9 @@ def main():
             for path,status in [('/health/',200),('/ready/',200),('/portal/',302),('/.env',404),('/.git/config',404)]:
                 connection=http.client.HTTPConnection('127.0.0.1',8000,timeout=15);connection.request('GET',path)
                 response=connection.getresponse();response.read();assert response.status==status,(path,response.status);connection.close()
+            if os.getenv('RUN_RUNTIME')=='1':
+                from check_runtime import runtime_checks
+                runtime_checks(project,env)
             if os.getenv('RUN_SCANNER')=='1':
                 compose(project,env,'up','-d','--wait','--wait-timeout','360','clamav',stdout=subprocess.DEVNULL)
                 scan="from django.contrib.auth import get_user_model; from django.core.files.uploadedfile import SimpleUploadedFile; from django.core.management import call_command; from arena.models import Team; from arena.services import upload_asset; u=get_user_model().objects.create_user('scanner-test',is_staff=True); a=upload_asset(user=u,team=Team.objects.first(),kind='tdp',file=SimpleUploadedFile('antivirus-test.txt',b'X5O!P%@AP[4\\\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*')); call_command('scan_assets'); a.refresh_from_db(); assert a.scan_status=='rejected'; print('Real ClamAV rejected the harmless standard EICAR test file.')"
