@@ -60,7 +60,10 @@ jobs:
       - name: Python security checks
         run: bandit -r arena config scripts -ll
       - name: Generate dependency inventory
-        run: cyclonedx-py requirements requirements.runtime.lock --of JSON -o dependency-sbom.json
+        run: |
+          python -m venv /tmp/runtime-sbom
+          /tmp/runtime-sbom/bin/pip install --require-hashes -r requirements.runtime.lock
+          cyclonedx-py environment /tmp/runtime-sbom/bin/python --gather-license-texts --of JSON -o dependency-sbom.json
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: dependency-inventory
