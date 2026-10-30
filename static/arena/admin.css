@@ -293,7 +293,7 @@
 #schedule-calendar .fc-event-main { color:#172b54; padding:2px 3px; line-height:1.15; }
 #schedule-calendar .fc-event { cursor:pointer; border-radius:4px; }
 #schedule-calendar a { color:inherit; }
-#schedule-calendar .fc-timegrid-slot { height:2.25rem; }
+#schedule-calendar .fc-timegrid-slot { height:3.5rem; }
 .place-round-fields { display:flex; align-items:end; gap:1rem; padding:1rem 0; flex-wrap:wrap; }
 .place-round-fields label { display:grid; gap:.5rem; font-size:.875rem; min-width:0; }
 .place-round-fields select { width:100%; min-height:44px; padding:.5rem; border:1px solid #bdc8da; border-radius:6px; }
