@@ -24,7 +24,7 @@ Recording uploads must contain only the recording export. The validator rejects 
 
 ## Resource budgets
 
-The defaults accommodate large competition files: 1 GiB per file, 2 GiB per batch, 5,000 files, 20 GiB retained ordinary assets per team, 512 MiB extracted replay data, 64 MiB per parsed validation document and a 512 MiB free-disk reserve. Set the `UPLOAD_*`, `RECORDING_MAX_EXTRACTED_BYTES` and `VALIDATION_MAX_BYTES` variables to suit the event. Keep the proxy and application batch budgets aligned. Private submissions still accept arbitrary file types and multiple files.
+The defaults accommodate large competition files: 1 GiB per file, 2 GiB per batch, 5,000 files, 20 GiB retained ordinary assets per team, 512 MiB extracted replay data, 64 MiB per parsed validation document, 16 million image pixels and a 512 MiB free-disk reserve. Set the `UPLOAD_*`, `RECORDING_MAX_EXTRACTED_BYTES` and `VALIDATION_MAX_BYTES` variables to suit the event. Keep the proxy and application batch budgets aligned. Private submissions still accept arbitrary file types and multiple files.
 
 Limits use actual streamed bytes, not only browser-supplied size metadata. Team storage includes retained history; removing a visible file is not a promise that stored history has been purged. Contact the operator before increasing quotas. Multipart temporary files use a private disk directory, not a large RAM filesystem. Backups exclude in-progress temporary uploads.
 
@@ -41,7 +41,7 @@ The supplied Compose services have CPU, memory, process and log budgets. The app
 
 ## Recovery and rollback
 
-Install Docker Compose and the official [age](https://age-encryption.org/) CLI on the operator machine. Generate an age identity on a secure machine; keep the private identity off the production host and keep a separately protected recovery copy. Put only the public recipient on the backup host.
+On a Linux or macOS operator host, install Docker Compose and the official [age](https://age-encryption.org/) CLI on the operator machine. Generate an age identity on a secure machine; keep the private identity off the production host and keep a separately protected recovery copy. Put only the public recipient on the backup host.
 
 During a scheduled maintenance window:
 
@@ -51,7 +51,7 @@ python3 scripts/recovery.py backup --project YOUR_PROJECT --env /private/path/ev
   --confirm-maintenance --temp-dir /private/encrypted-temporary-storage
 ```
 
-This stops only previously running app/worker services, captures a database dump and private volume together, includes the private configuration inside the encrypted archive, and restarts those services in a `finally` block. Ensure there are no other writers or simultaneous migrations. Plaintext staging needs an owner-only directory on an encrypted filesystem. Protect the output directory and copy the **encrypted** archive off-server to an immutable/versioned location. Scheduling, off-host transfer and alert delivery must be configured and proven by the operator.
+A per-project lock prevents overlapping recovery operations. This stops only previously running app/worker services, captures a database dump and private volume together, includes the private configuration inside the encrypted archive, and restarts those services in a `finally` block. Ensure there are no other writers or simultaneous migrations. Plaintext staging needs an owner-only directory on an encrypted filesystem. Protect the output directory and copy the **encrypted** archive off-server to an immutable/versioned location. Scheduling, off-host transfer and alert delivery must be configured and proven by the operator.
 
 Practice recovery on a separate host or a new isolated project. Check out the exact source commit recorded in the backup first:
 

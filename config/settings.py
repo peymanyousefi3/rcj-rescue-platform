@@ -107,6 +107,9 @@ UPLOAD_TEAM_MAX_BYTES = int(os.getenv('UPLOAD_TEAM_MAX_BYTES', str(20*1024**3)))
 UPLOAD_MIN_FREE_BYTES = int(os.getenv('UPLOAD_MIN_FREE_BYTES', str(512*1024**2)))
 RECORDING_MAX_EXTRACTED_BYTES = int(os.getenv('RECORDING_MAX_EXTRACTED_BYTES', str(512*1024**2)))
 VALIDATION_MAX_BYTES = int(os.getenv('VALIDATION_MAX_BYTES', str(64*1024**2)))
+IMAGE_MAX_PIXELS = int(os.getenv('IMAGE_MAX_PIXELS','16000000'))
+if any(value<=0 for value in [UPLOAD_MAX_FILE_BYTES,UPLOAD_MAX_BATCH_BYTES,UPLOAD_MAX_FILES,UPLOAD_TEAM_MAX_BYTES,UPLOAD_MIN_FREE_BYTES,RECORDING_MAX_EXTRACTED_BYTES,VALIDATION_MAX_BYTES,IMAGE_MAX_PIXELS]):
+    raise ImproperlyConfigured('Upload, storage and validation budgets must be positive.')
 FILE_UPLOAD_HANDLERS = ['arena.uploads.BoundedUploadHandler',
                         'django.core.files.uploadhandler.TemporaryFileUploadHandler']
 DATA_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024

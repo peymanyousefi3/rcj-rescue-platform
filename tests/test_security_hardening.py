@@ -25,6 +25,7 @@ def test_replay_rejects_unrelated_private_files_without_replacing_scores(client,
     assert RunRecording.objects.get().pk==before.pk
 
 
+@pytest.mark.django_db(transaction=True)
 def test_replay_animation_and_result_json_are_explicitly_public(client,event):
     client.force_login(event[4]);event[1].completed=True;event[1].save()
     result=json.dumps({'final_score':123.45,'events':[]}).encode()
@@ -145,6 +146,7 @@ def test_unauthenticated_superteam_upload_is_denied_before_body_parsing(client,e
     assert not Asset.objects.exists()
 
 
+@pytest.mark.django_db(transaction=True)
 def test_cached_thumbnail_still_checks_current_recipient_access(client,event):
     from arena.models import Asset
     from tests.test_field_images import picture
@@ -173,3 +175,22 @@ def test_production_defaults_require_mfa_and_bounded_connections():
     for name in ['REQUIRE_STAFF_OTP','TRUST_PROXY_CLIENT_IP']:env.pop(name,None)
     check="from config import settings as s; assert s.REQUIRE_STAFF_OTP; assert s.DATABASES['default']['CONN_MAX_AGE']==0; assert s.DATABASES['default']['OPTIONS']['pool']['max_size']==4; assert s.SESSION_COOKIE_SECURE"
     subprocess.run([sys.executable,'-c',check],env=env,check=True)
+
+
+def test_recovery_refuses_overlapping_operations(monkeypatch,tmp_path):
+    import importlib.util
+    root=Path(__file__).resolve().parents[1]
+    spec=importlib.util.spec_from_file_location('recovery_check',root/'scripts/recovery.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    monkeypatch.setattr(module.tempfile,'gettempdir',lambda:str(tmp_path))
+    with module.operation_lock('rcj-restore-test'):
+        with pytest.raises(ValueError,match='Another recovery'):
+            with module.operation_lock('rcj-restore-test'):pass
+    with module.operation_lock('rcj-restore-test'):pass
+
+
+def test_image_decode_budget_rejects_pixel_bombs(monkeypatch):
+    from PIL import Image
+    from arena.fields import validate_field
+    from tests.test_field_images import picture
+    file,_=picture('PNG','png');monkeypatch.setattr(Image,'MAX_IMAGE_PIXELS',10)
+    with pytest.raises(ValidationError):validate_field(file,'jpeg')

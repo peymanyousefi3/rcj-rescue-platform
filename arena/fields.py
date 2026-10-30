@@ -19,6 +19,7 @@ from defusedxml import ElementTree
 from defusedxml.common import DefusedXmlException
 
 register_heif_opener()
+Image.MAX_IMAGE_PIXELS=settings.IMAGE_MAX_PIXELS
 IMAGE_SUFFIXES=set(Image.registered_extensions()) | {'.svg'}
 
 

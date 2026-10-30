@@ -3,6 +3,8 @@
 Requires Docker Compose and the official age CLI. Never prints backup contents or secrets.
 """
 import argparse
+import fcntl
+from contextlib import contextmanager
 import hashlib
 import json
 import os
@@ -122,6 +124,19 @@ def restore(args):
         print('Application and mail worker were NOT started. Verify the restored environment before use.')
 
 
+@contextmanager
+def operation_lock(project):
+    if not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,62}',project):raise ValueError('Invalid Compose project name.')
+    directory=Path(tempfile.gettempdir())/f'rcj-recovery-locks-{os.getuid()}'
+    directory.mkdir(mode=0o700,exist_ok=True)
+    if directory.is_symlink() or directory.stat().st_uid!=os.getuid():raise ValueError('Unsafe recovery lock directory.')
+    with (directory/(project+'.lock')).open('a') as lock:
+        try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        except BlockingIOError:raise ValueError('Another recovery operation is using this project.') from None
+        try:yield
+        finally:fcntl.flock(lock,fcntl.LOCK_UN)
+
+
 def main():
     os.umask(0o077)
     parser=argparse.ArgumentParser(description=__doc__)
@@ -131,7 +146,8 @@ def main():
     for command in [create,recover]:command.add_argument('--temp-dir',help='Private encrypted filesystem with sufficient temporary space.')
     args=parser.parse_args()
     if not shutil.which('docker') or not shutil.which('age'):parser.error('Install Docker Compose and the official age CLI first.')
-    try:(backup if args.mode=='backup' else restore)(args)
+    try:
+        with operation_lock(args.project):(backup if args.mode=='backup' else restore)(args)
     except (ValueError,OSError,subprocess.SubprocessError,tarfile.TarError) as exc:
         if isinstance(exc,ValueError):parser.error(str(exc))
         parser.error('Recovery operation failed. Review local service health and private operator logs; no backup contents were printed.')
