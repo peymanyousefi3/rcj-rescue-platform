@@ -84,6 +84,7 @@ jobs:
       - name: Scan deployment configuration
         uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
+          version: v0.76.1
           scan-type: config
           scan-ref: .
           exit-code: '1'
@@ -93,6 +94,7 @@ jobs:
       - name: Scan runtime image
         uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
+          version: v0.76.1
           image-ref: rcj-platform:audit
           exit-code: '1'
           severity: CRITICAL,HIGH
