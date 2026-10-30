@@ -71,13 +71,12 @@ def runtime_checks(project,env):
             for port in [8000,peer_port]:
                 if request(port,path,cookie)[0]!=200 or request(port,path)[0]!=404:raise RuntimeError('Replica private-file authorization failed.')
             evidence['shared_session_and_private_storage']='pass across two independent app containers'
-            # Public static compression is tested against the production WhiteNoise stack.
-            status,headers,data=request(8000,'/static/arena/championship.css',headers={'Accept-Encoding':'gzip'})
-            if status!=200 or headers.get('Content-Encoding')!='gzip':raise RuntimeError('Static compression unavailable.')
-            evidence['static_compression']={'status':status,'encoding':headers['Content-Encoding'],'bytes':len(data)}
-            config.write_text(f':8080 {{\n reverse_proxy app:8000 {peer}:8000 {{\n lb_policy round_robin\n health_uri /ready/\n health_interval 1s\n health_timeout 2s\n fail_duration 3s\n lb_try_duration 3s\n }}\n}}\n')
+            config.write_text(f':8080 {{\n encode gzip\n reverse_proxy app:8000 {peer}:8000 {{\n lb_policy round_robin\n health_uri /ready/\n health_interval 1s\n health_timeout 2s\n fail_duration 3s\n lb_try_duration 3s\n }}\n}}\n')
             run(['docker','run','-d','--name',proxy,'--label','com.docker.compose.project='+project,'--network',project+'_default','-p','127.0.0.1::8080','--mount',f'type=bind,src={config},dst=/etc/caddy/Caddyfile,readonly','caddy:2-alpine@'+json.loads((ROOT/'deploy/image-digests.json').read_text())['caddy:2-alpine']],stdout=subprocess.DEVNULL)
             proxy_port=port_for(proxy,8080);wait(proxy_port)
+            status,headers,data=request(proxy_port,'/static/arena/championship.css',headers={'Accept-Encoding':'gzip'})
+            if status!=200 or headers.get('Content-Encoding')!='gzip':raise RuntimeError('Ingress static compression unavailable.')
+            evidence['static_compression']={'status':status,'encoding':headers['Content-Encoding'],'bytes':len(data)}
             for _ in range(8):
                 if request(proxy_port,'/results/')[0]!=200:raise RuntimeError('Load-balanced public page failed.')
             # Finish an authenticated request already in flight during graceful shutdown.
