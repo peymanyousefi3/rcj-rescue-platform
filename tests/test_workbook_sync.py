@@ -20,7 +20,7 @@ def test_shared_link_sync_uses_validated_workbook(event, monkeypatch):
         # The fixed October fixture can contain past deadlines as the event proceeds.
         call_command('sync_workbook', initial_past_import=True)
     get.assert_called_once_with('https://drive.google.com/uc',
-        params={'export': 'download', 'id': 'verified-workbook-id'}, stream=True, timeout=20)
+        params={'export': 'download', 'id': 'verified-workbook-id'}, allow_redirects=False, stream=True, timeout=20)
     assert Programme.objects.count() == 60
     assert Round.objects.get(pk=event[1].pk).opens_at == event[1].opens_at
     assert Competition.objects.get(pk=event[0].pk).workbook_last_synced is not None
@@ -49,3 +49,12 @@ def test_shared_link_failure_preserves_existing_data(event, monkeypatch, failure
     assert competition.workbook_last_synced is None
     assert competition.workbook_digest == ''
     assert not AuditEvent.objects.filter(action='workbook.synced').exists()
+
+
+@pytest.mark.parametrize('location',['http://127.0.0.1/private','https://example.invalid/file','https://drive.google.com:8443/file','file:///etc/passwd'])
+def test_shared_workbook_redirect_cannot_reach_unapproved_hosts(location):
+    from arena.management.commands.sync_workbook import download_shared_workbook
+    response=MagicMock();response.__enter__.return_value=response;response.status_code=302;response.headers={'Location':location}
+    with patch('arena.management.commands.sync_workbook.requests.get',return_value=response) as get:
+        with pytest.raises(CommandError):download_shared_workbook('test-identifier')
+    assert get.call_count==1

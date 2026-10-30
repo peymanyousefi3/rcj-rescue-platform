@@ -143,3 +143,33 @@ def test_unauthenticated_superteam_upload_is_denied_before_body_parsing(client,e
     path=f'/portal/superteams/{event[2][0].pk}/submit/round_file/{event[1].pk}/'
     assert client.post(path,{'files':SimpleUploadedFile('a.bin',b'abc')}).status_code in [302,403]
     assert not Asset.objects.exists()
+
+
+def test_cached_thumbnail_still_checks_current_recipient_access(client,event):
+    from arena.models import Asset
+    from tests.test_field_images import picture
+    from tests.test_dialogs_fields_scores import round_data
+    from arena.fields import thumbnail_preview
+    client.force_login(event[4]);upload,_=picture('PNG','png')
+    client.post(f'/control/?editor=round&round={event[1].pk}',round_data(event[1],event[2],completed='on',maps_released='on',jpeg=upload),HTTP_X_ASR_EDITOR='1')
+    asset=Asset.objects.get(round=event[1],map_role='jpeg');asset.scan_status='clean';asset.save()
+    client.force_login(event[3][0])
+    with patch('arena.fields.thumbnail_preview',wraps=thumbnail_preview) as render:
+        for _ in range(2):
+            response=client.get(f'/field-media/{asset.pk}/');assert response.status_code==200;response.close()
+        assert render.call_count==1
+    client.force_login(event[3][1]);assert client.get(f'/field-media/{asset.pk}/').status_code==404
+
+
+def test_private_files_are_owner_readable_only_on_disk(event):
+    import stat
+    item=upload_asset(user=event[3][0],team=event[2][0],round_=event[1],kind='round_file',file=SimpleUploadedFile('a',b'private'),attested=True)
+    assert stat.S_IMODE(Path(default_storage.path(item.blob_key)).stat().st_mode)==0o600
+
+
+def test_production_defaults_require_mfa_and_bounded_connections():
+    import os,subprocess,sys
+    env=dict(os.environ,DJANGO_DEBUG='0',DJANGO_SECRET_KEY='TEST-ONLY-NOT-A-PRODUCTION-KEY-123456789012345678901234567890',PUBLIC_ORIGIN='https://rescue.example.test',DATABASE_URL='postgres://audit:audit@127.0.0.1:65432/audit')
+    for name in ['REQUIRE_STAFF_OTP','TRUST_PROXY_CLIENT_IP']:env.pop(name,None)
+    check="from config import settings as s; assert s.REQUIRE_STAFF_OTP; assert s.DATABASES['default']['CONN_MAX_AGE']==0; assert s.DATABASES['default']['OPTIONS']['pool']['max_size']==4; assert s.SESSION_COOKIE_SECURE"
+    subprocess.run([sys.executable,'-c',check],env=env,check=True)

@@ -1,6 +1,8 @@
 import hashlib
 import io
 import os
+import re
+from urllib.parse import urljoin,urlsplit
 from pathlib import Path
 import requests
 from django.core.exceptions import ValidationError
@@ -13,17 +15,23 @@ from arena.workbook import apply_snapshot, parse_workbook
 
 
 def download_shared_workbook(identifier):
-    if not identifier:
-        raise CommandError('SOURCE_WORKBOOK_ID is not configured.')
-    content = bytearray()
-    with requests.get('https://drive.google.com/uc',
-            params={'export': 'download', 'id': identifier}, stream=True, timeout=20) as response:
-        response.raise_for_status()
-        for chunk in response.iter_content(1024 * 1024):
-            content.extend(chunk)
-            if len(content) > 10 * 1024 * 1024:
-                raise CommandError('Workbook too large.')
-    return bytes(content)
+    if not identifier or not re.fullmatch(r'[A-Za-z0-9_-]{1,200}',identifier):
+        raise CommandError('SOURCE_WORKBOOK_ID must be a Google file identifier.')
+    url='https://drive.google.com/uc';params={'export':'download','id':identifier}
+    for attempt in range(5):
+        parsed=urlsplit(url);host=(parsed.hostname or '').lower()
+        if (parsed.scheme!='https' or parsed.username or parsed.password or parsed.port not in (None,443)
+                or not (host.endswith('.google.com') or host.endswith('.googleusercontent.com'))):
+            raise CommandError('Workbook redirect left the approved Google download hosts.')
+        with requests.get(url,params=params,allow_redirects=False,stream=True,timeout=20) as response:
+            if response.status_code in [301,302,303,307,308]:
+                url=urljoin(url,response.headers['Location']);params=None;continue
+            response.raise_for_status();content=bytearray()
+            for chunk in response.iter_content(1024*1024):
+                content.extend(chunk)
+                if len(content)>10*1024*1024:raise CommandError('Workbook too large.')
+            return bytes(content)
+    raise CommandError('Too many workbook redirects.')
 
 
 class Command(BaseCommand):

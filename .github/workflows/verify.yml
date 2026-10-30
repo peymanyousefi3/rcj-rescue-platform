@@ -121,4 +121,3 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y age
       - name: Test isolated deployment and encrypted recovery
         run: python scripts/test_deployment.py
-
