@@ -9,8 +9,9 @@ import time
 if sys.argv[1] == 'worker':
     try:
         state = json.loads(Path('/app/var/private/.worker-health.json').read_text())
-        assert time.time() - state['updated'] < 150 and state['ok']
-    except (OSError,ValueError,KeyError,AssertionError):
+        if not (0 <= time.time() - state['updated'] < 150 and state['ok']):
+            raise ValueError('Worker heartbeat is unhealthy or stale.')
+    except (OSError,ValueError,KeyError,TypeError):
         raise SystemExit(1)
 else:
     connection = http.client.HTTPConnection('127.0.0.1',8000,timeout=5)
