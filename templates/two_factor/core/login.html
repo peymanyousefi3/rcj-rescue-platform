@@ -1,6 +1,6 @@
 {% extends 'two_factor/_base_focus.html' %}
 {% load two_factor_tags %}
-{% block title %}Sign in · ASR 26{% endblock %}
+{% block title %}Sign in · {{ competition.short_name }}{% endblock %}
 {% block extra_media %}{{ form.media }}{% endblock %}
 {% block content %}
 {% if wizard.steps.current == 'auth' %}

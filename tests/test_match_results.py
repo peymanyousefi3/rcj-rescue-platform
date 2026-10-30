@@ -48,7 +48,7 @@ def test_complete_package_result_paths_isolation_and_permissions(client, event, 
     expected = {'available': True,
                 'scores': {'final_score': '215.38', 'field_score': '180.10', 'exit_bonus': '20.00', 'map_bonus': '15.28'},
                 'times': {'elapsed_seconds': '07:34', 'max_seconds': '08:00', 'remaining_seconds': '00:26'},
-                'event_history_available': False}
+                'event_history_available': False, 'events': []}
     assert client.get(endpoint).json()['result'] == expected
     client.force_login(users[0])
     response = client.get(endpoint)
@@ -75,7 +75,7 @@ def test_legacy_or_invalid_result_metadata_does_not_prevent_playback(client, eve
     recording = RunRecording.objects.get()
     response = client.get(f'/recordings/{recording.pk}/player/')
     assert response.status_code == 200 and response.json()['url']
-    assert response.json()['result'] == {'available': False, 'scores': {}, 'times': {}, 'event_history_available': False}
+    assert response.json()['result'] == {'available': False, 'scores': {}, 'times': {}, 'event_history_available': False, 'events': []}
 
 
 @pytest.mark.parametrize('metadata', [

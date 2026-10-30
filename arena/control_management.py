@@ -77,7 +77,7 @@ def manage(request, competition):
     context['superteam_challenge_ids']=list(Challenge.objects.filter(competition=competition,category='superteam',archived_at=None).values_list('pk',flat=True))
     context['superteams']=Team.objects.filter(competition=competition,superteam_challenge__isnull=False).select_related('superteam_challenge').prefetch_related('members')
     forms['competition']=context['competition_form']=CompetitionForm(
-        request.POST if kind=='competition' else None,instance=competition,auto_id='competition_%s')
+        request.POST if kind=='competition' else None,request.FILES if kind=='competition' else None,instance=competition,auto_id='competition_%s')
     replacement=None
     if request.GET.get('replace'):
         try: replacement=get_object_or_404(Asset,pk=request.GET['replace'],competition=competition,current=True,deleted_at=None)
@@ -204,6 +204,7 @@ def manage(request, competition):
                 return context,redirect('/control/#'+section)
         except (ValidationError,PermissionDenied,IntegrityError) as exc:
             for asset in map_uploads: default_storage.delete(asset.blob_key)
+            for key in getattr(form,'branding_created',[]):default_storage.delete(key)
             form.add_error(None,' '.join(exc.messages) if isinstance(exc,ValidationError) else 'Another record already uses this value. Check the team code, username or round number.' if isinstance(exc,IntegrityError) else str(exc))
     editor=request.GET.get('editor')
     if editor in forms:

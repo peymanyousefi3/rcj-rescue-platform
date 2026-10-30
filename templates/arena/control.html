@@ -1,6 +1,6 @@
 {% extends 'base.html' %}{% load static %}
 {% block body_class %}admin-page{% endblock %}
-{% block title %}Administration · ASR 26{% endblock %}{% block breadcrumb %}Administration{% endblock %}
+{% block title %}Administration · {{ competition.short_name }}{% endblock %}{% block breadcrumb %}Administration{% endblock %}
 {% block navigation %}<nav aria-label="Administration"><a href="#programme">Schedule calendar</a><a href="#results-recordings">Results &amp; recordings</a><a href="#rounds" aria-current="page">Rounds &amp; archive</a><a href="#quarantines">Participant uploads</a><a href="#files">Organizer uploads</a><a href="#announce">Announcements</a><a href="#complaints">Complaints</a><a href="#accounts">Team accounts</a><a href="#competition-settings">Competition settings</a><a href="#email-settings">Email settings</a><a href="#audit">Activity</a></nav>{% endblock %}
 {% block extra_media %}<link rel="stylesheet" href="{% static 'arena/replay.css' %}"><script src="{% static 'arena/replay.js' %}" defer></script><meta name="csp-nonce" content="{{ request.csp_nonce }}"><script src="{% static 'arena/vendor/fullcalendar-6.1.22.min.js' %}" defer></script><script src="{% static 'arena/vendor/sortable-1.15.6.min.js' %}" defer></script><link rel="stylesheet" href="{% static 'arena/admin.css' %}"><script src="{% static 'arena/admin.js' %}" defer></script><script src="{% static 'arena/calendar.js' %}" defer></script>{% endblock %}
 {% block content %}<div class="organizer-workspace">

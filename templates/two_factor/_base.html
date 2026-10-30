@@ -1,3 +1,3 @@
 {% extends 'base.html' %}
-{% block title %}Secure sign in · ASR 26{% endblock %}
-{% block content_wrapper %}<div class="auth-layout"><div class="auth-intro"><p class="eyebrow">ASR 26 · TEAM WORKSPACE</p><h1>Your mission<br>starts here<span class="accent">.</span></h1><p>Private submissions. Clear deadlines.<br>Everything your team needs to compete.</p><span class="badge neutral">Administrator-created accounts only</span></div><section class="panel auth-card">{% block content %}{% endblock %}</section></div>{% endblock %}
+{% block title %}Secure sign in · {{ competition.short_name }}{% endblock %}
+{% block content_wrapper %}<div class="auth-layout"><div class="auth-intro"><p class="eyebrow">{{ competition.short_name }} · TEAM WORKSPACE</p><h1>Your mission<br>starts here<span class="accent">.</span></h1><p>Private submissions. Clear deadlines.<br>Everything your team needs to compete.</p><span class="badge neutral">Administrator-created accounts only</span></div><section class="panel auth-card">{% block content %}{% endblock %}</section></div>{% endblock %}

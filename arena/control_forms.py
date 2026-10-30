@@ -193,26 +193,66 @@ class ChallengeForm(forms.ModelForm):
         return data
 
 class CompetitionForm(forms.ModelForm):
+    logo=forms.FileField(required=False,label='Competition logo',help_text='Public image. Upload a raster image; the server removes metadata and stores a PNG.')
+    remove_logo=forms.BooleanField(required=False,label='Use the default competition logo')
+    partner_logo=forms.FileField(required=False,label='Partner / federation logo',help_text='Optional public image displayed beside the event identity.')
+    remove_partner_logo=forms.BooleanField(required=False,label='Remove the partner logo')
+    banner_image=forms.FileField(required=False,label='Homepage banner image',help_text='Optional public image on the right side of the navy banner. The title remains readable on the left.')
+    remove_banner_image=forms.BooleanField(required=False,label='Use the default banner image')
+
     first_day=forms.DateField(widget=forms.DateInput(attrs={'type':'date'}),label='First competition day')
     last_day=forms.DateField(widget=forms.DateInput(attrs={'type':'date'}),label='Last competition day')
     class Meta:
         model=Competition
-        fields=['name','location','first_day','last_day','phase','workbook_enabled']
-        labels={'workbook_enabled':'Import teams, programme and scores from the linked workbook'}
+        fields=['name','short_name','header_title','league_name','location','banner_title','banner_subtitle','first_day','last_day','phase','workbook_enabled']
+        labels={'name':'Full competition name','short_name':'Short event name','header_title':'Header heading','league_name':'League name','banner_title':'Homepage banner title','banner_subtitle':'Homepage banner subtitle','workbook_enabled':'Import teams, programme and scores from the linked workbook'}
         help_texts={'workbook_enabled':'Manual edits pause workbook updates to preserve your changes.'}
     def __init__(self,*args,**kwargs):
+        # Existing open settings forms retain new branding values when submitted after an upgrade.
+        if args and args[0] is not None:
+            data=args[0].copy();instance=kwargs.get('instance')
+            for name in ['short_name','header_title','league_name','banner_title','banner_subtitle']:
+                if name not in data:data[name]=getattr(instance,name,'')
+            args=(data,*args[1:])
         super().__init__(*args,**kwargs)
         self.original_start=self.instance.starts_at;self.original_end=self.instance.ends_at
         self.fields['first_day'].initial=timezone.localtime(self.original_start).date()
         self.fields['last_day'].initial=timezone.localtime(self.original_end-timedelta(microseconds=1)).date() if timezone.localtime(self.original_end).time()==time() else timezone.localtime(self.original_end).date()
     def clean(self):
         d=super().clean();first=d.get('first_day');last=d.get('last_day')
+        from .branding import normalize_image
+        self.branding_images={}
+        for field in ['logo','partner_logo','banner_image']:
+            if d.get(field):
+                if d.get('remove_'+field):self.add_error(field,'Choose a replacement image or select removal, not both.')
+                else:
+                    try:self.branding_images[field]=normalize_image(d[field])
+                    except forms.ValidationError as exc:self.add_error(field,exc)
+
         if first and last:
             if last<first: self.add_error('last_day','The last day must be on or after the first day.')
             else:
                 if first!=self.fields['first_day'].initial: self.instance.starts_at=timezone.make_aware(datetime.combine(first,time()))
                 if last!=self.fields['last_day'].initial: self.instance.ends_at=timezone.make_aware(datetime.combine(last+timedelta(days=1),time()))
         return d
+
+    def save(self,commit=True):
+        instance=super().save(commit=False)
+        self.branding_created=[]
+        from .branding import store_image
+        slots={'logo':'logo_key','partner_logo':'partner_logo_key','banner_image':'banner_key'}
+        try:
+            for field,key in slots.items():
+                if field in self.branding_images:
+                    value=store_image(instance,self.branding_images[field]);self.branding_created.append(value);setattr(instance,key,value)
+                elif self.cleaned_data.get('remove_'+field):setattr(instance,key,'')
+            if commit:instance.save();self._save_m2m()
+        except Exception:
+            from django.core.files.storage import default_storage
+            for key in self.branding_created:default_storage.delete(key)
+            raise
+        return instance
+
 
 class ProgrammeForm(TimeRangeMixin,forms.ModelForm):
     revision=forms.CharField(required=False,widget=forms.HiddenInput)

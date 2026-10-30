@@ -10,7 +10,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 from .access import owns_team, can_download, public_asset
 from .forms import MultipleFileField, MultipleFileInput
-from .models import Challenge, Complaint, FileShare, Team
+from .models import Challenge, Complaint, FileShare, Team, RunRecording
 from .services import audit, upload_asset
 from .widgets import TeamPicker
 
@@ -46,7 +46,36 @@ class SuperTeamForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
+class PlaybackTimeField(forms.CharField):
+    def clean(self,value):
+        value=super().clean(value)
+        if not value: return None
+        import re
+        if not re.fullmatch(r'\d{1,6}:[0-5]\d',value):
+            raise ValidationError('Enter playback time as MM:SS, for example 01:45.')
+        minutes,seconds=map(int,value.split(':'))
+        return (minutes*60+seconds)*1000
+
+
 class ComplaintForm(forms.ModelForm):
+    recording=forms.ModelChoiceField(queryset=RunRecording.objects.none(),required=False,label='Related run',empty_label='General complaint — no run')
+    position_ms=forms.IntegerField(required=False,min_value=0,max_value=10**18,widget=forms.HiddenInput)
+    playback_time=PlaybackTimeField(required=False,label='Playback position (MM:SS)',help_text='Position in the recording, not the wall-clock or match clock.',widget=forms.TextInput(attrs={'placeholder':'01:45','inputmode':'numeric'}))
+    def __init__(self,*args,team,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.order_fields(['recording','playback_time','subject','message','files'])
+        self.fields['recording'].queryset=RunRecording.objects.filter(team=team,round__competition=team.competition,current=True).select_related('round__challenge','team')
+        self.fields['recording'].label_from_instance=lambda item:f'{item.round} · {item.team.name}'
+    def clean(self):
+        data=super().clean();recording=data.get('recording');position=data.get('playback_time')
+        if position is not None and not recording: self.add_error('recording','Choose the run for this playback position.')
+        exact=data.get('position_ms')
+        if exact is not None and position is not None and exact//1000==position//1000:
+            position=exact;data['playback_time']=exact
+        if recording and position is not None and not recording.video_key and position>recording.duration_ms:
+            self.add_error('playback_time','This position is past the end of the recording.')
+        return data
+
     files=MultipleFileField(required=False,widget=MultipleFileInput,label='Attachments',help_text='Optional. Select multiple files of any type. Only your team and administrators can access them.')
     class Meta:
         model=Complaint
@@ -71,6 +100,12 @@ def save_complaint(form,user,team):
             if not owns_team(user,team): raise PermissionDenied()
             complaint=form.save(commit=False)
             complaint.team=team;complaint.competition=team.competition;complaint.author=user
+            recording=form.cleaned_data.get('recording')
+            if recording:
+                recording=RunRecording.objects.select_for_update().get(pk=recording.pk)
+                if recording.team_id!=team.pk or recording.round.competition_id!=team.competition_id or not recording.current:
+                    raise ValidationError('This run changed. Reload and select it again.')
+            complaint.recording=recording;complaint.playback_time_ms=form.cleaned_data.get('playback_time')
             complaint.save()
             for file in form.cleaned_data.get('files') or []:
                 stored.append(upload_asset(user=user,team=team,kind='complaint_file',file=file,complaint=complaint,append=True))
@@ -87,7 +122,7 @@ def complaints(request,superteam_id=None):
     from .views import team_required
     @team_required
     def page(request):
-        form=ComplaintForm(request.POST if request.method=='POST' else None,request.FILES if request.method=='POST' else None)
+        form=ComplaintForm(request.POST if request.method=='POST' else None,request.FILES if request.method=='POST' else None,team=request.team,initial={'recording':request.GET.get('recording'),'playback_time':request.GET.get('at',''),'position_ms':request.GET.get('at_ms','')})
         if request.method=='POST' and form.is_valid():
             try: save_complaint(form,request.user,request.team)
             except (ValidationError,PermissionDenied) as exc: form.add_error(None,str(exc))
@@ -95,7 +130,7 @@ def complaints(request,superteam_id=None):
                 messages.success(request,'Your complaint and attachments were submitted privately. No email was sent.')
                 return redirect(base_url(request.team)+'/complaints/')
         return render(request,'arena/complaints.html',{'team':request.team,'portal_base':base_url(request.team),'section':'complaints','form':form,
-            'complaints':Complaint.objects.filter(team=request.team).prefetch_related('attachments')})
+            'complaints':Complaint.objects.filter(team=request.team).select_related('recording__round__challenge','recording__team').prefetch_related('attachments')})
     return page(request,superteam_id=superteam_id) if superteam_id else page(request)
 
 
@@ -129,7 +164,7 @@ def review_complaint(request,complaint_id):
     from .views import staff_required,current_competition
     @staff_required
     def page(request):
-        complaint=get_object_or_404(Complaint,pk=complaint_id,competition=current_competition())
+        complaint=get_object_or_404(Complaint.objects.select_related('recording__round__challenge','recording__team'),pk=complaint_id,competition=current_competition())
         form=ComplaintReviewForm(request.POST if request.method=='POST' else None,instance=complaint)
         if request.method=='POST' and form.is_valid():
             with transaction.atomic():

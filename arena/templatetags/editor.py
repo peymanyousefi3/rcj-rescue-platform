@@ -10,6 +10,11 @@ def editor_groups(form):
         ('Account access',{'leader_email','username','active','create_account'}),
         ('Scoring',{'expected_rounds','calculation','discard_count','tie_break','top_count','score_source','zero_score_policy'}),
         ('Publication & status',{'completed','maps_released','playback_url','playback_released','confirmed','phase','workbook_enabled','submissions_enabled'})]
+    if form.__class__.__name__=='CompetitionForm':
+        groups=[('Event identity',{'name','short_name','header_title','league_name','location'}),
+            ('Public logos',{'logo','remove_logo','partner_logo','remove_partner_logo'}),
+            ('Homepage banner',{'banner_title','banner_subtitle','banner_image','remove_banner_image'}),
+            ('Competition dates',{'first_day','last_day'}),('Publication & data source',{'phase','workbook_enabled'})]
     result=[];placed=set()
     for title,names in groups:
         fields=[field for field in form.visible_fields() if field.name in names and field.name not in inline and not (form.__class__.__name__=='RoundForm' and field.name in {'maps_released','targets','wbt','map_json','info_json','glb','jpeg','field_files'})]

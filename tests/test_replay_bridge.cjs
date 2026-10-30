@@ -34,3 +34,17 @@ test('the popup bridge preserves exported ready and playback callbacks, includin
  keys.keydown({key:'ArrowLeft',preventDefault(){}});
  assert.equal(received.at(-1),0);
 });
+
+test('event navigation authenticates parent/nonce and uses recorded time instead of match time',()=>{
+ const handlers={},messages=[],received=[];
+ const animation={data:{frames:[{time:0},{time:100},{time:260},{time:800}]},gui:'pause',pause(){},updateAnimationState(step){received.push(step);this.stepCallback(this.data.frames[step].time);}};
+ const slider={setAttribute(){},addEventListener(){}};
+ const player={_view:{animation},querySelectorAll:()=>[],addEventListener(){},querySelector:()=>({shadowRoot:{querySelector:()=>slider}}),setAnimationStepCallback(fn){animation.stepCallback=fn;}};
+ const parent={postMessage:message=>messages.push(message)};
+ vm.runInNewContext(fs.readFileSync('static/arena/replay-bridge.js','utf8'),{location:{hash:'#private-nonce'},parent,window:{addEventListener:(name,fn)=>handlers[name]=fn},document:{querySelector:()=>player,createElement:()=>({}),head:{append(){}}},queueMicrotask});
+ player.onready();
+ const seek=(time,source=parent,nonce='private-nonce')=>handlers.message({source,data:{type:'asr-replay-seek',nonce,time_ms:time}});
+ seek(270,{},'private-nonce');seek(270,parent,'wrong');seek(NaN);seek(-1);seek('260');assert.equal(received.length,0);
+ seek(270);assert.equal(received.at(-1),2);assert.equal(messages.at(-1).time_ms,260);
+ seek(100);assert.equal(received.at(-1),1);seek(0);assert.equal(received.at(-1),0);seek(999);assert.equal(received.at(-1),3);
+});

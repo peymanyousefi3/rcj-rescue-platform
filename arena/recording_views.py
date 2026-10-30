@@ -28,7 +28,7 @@ def allowed(request,recording):
     if recording.public_open: return True
     if not request.user.is_authenticated or not request.user.is_active: return False
     if request.user.is_staff: return True
-    return bool(owns_team(request.user,recording.team) and recording.current
+    return bool(owns_team(request.user,recording.team) and (recording.current or recording.complaints.filter(team=recording.team).exists())
         and not recording.round.archived_at and not (recording.round.challenge_id and recording.round.challenge.archived_at))
 
 
@@ -307,14 +307,19 @@ def player(request,recording_id):
     if not allowed(request,recording): raise Http404()
     from .recordings import match_result
     result=match_result(recording)
+    complaint_url=None
+    if recording.current and request.user.is_authenticated and not request.user.is_staff and owns_team(request.user,recording.team):
+        from .workspaces import base_url
+        complaint_url=base_url(recording.team)+'/complaints/'
+    context={'recording_id':str(recording.pk),'complaint_url':complaint_url}
     if recording.video_key:
         from django.urls import reverse
-        return JsonResponse({'kind':'video','url':reverse('recording-video',args=[recording.pk]),'title':f'{recording.team.name} · {recording.round}','result':result})
+        return JsonResponse({**context,'kind':'video','url':reverse('recording-video',args=[recording.pk]),'title':f'{recording.team.name} · {recording.round}','result':result})
     token=signing.dumps({'id':str(recording.pk),'public':recording.public_open,'history':not recording.current,
         'session':None if recording.public_open else replay_session(request)},salt='webots-replay')
     from django.urls import reverse
     url=reverse('replay-asset',kwargs={'token':token,'path':recording.entry_path})
-    response=JsonResponse({'url':url+'#'+secrets.token_urlsafe(24),'title':f'{recording.team.name} · {recording.round}',
+    response=JsonResponse({**context,'url':url+'#'+secrets.token_urlsafe(24),'title':f'{recording.team.name} · {recording.round}',
         'version':recording.player_version,'frames':recording.frame_count,'duration_ms':recording.duration_ms,'result':result})
     if not recording.public_open:
         # Only replay requests may use this short-lived, HttpOnly session cookie.
