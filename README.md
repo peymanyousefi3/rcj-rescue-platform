@@ -119,9 +119,9 @@ Arrange team order and run times inside each round. The round duration is calcul
 
 ### Your competition, your identity
 
-Configure the competition name, short name, header title, league, homepage banner title and subtitle, dates, location and timezone. Upload the competition logo, partner logo and banner image from the same settings popup. The hosted demo retains the original RCJRescue/ASR identity; preview changes reset on reload.
+Configure the competition name, short name, header title, league, homepage banner title and subtitle, dates, location and timezone. Upload the competition logo, partner logo and banner image from the same settings popup. Current logos and the homepage image appear beside their replacement controls. The hosted demo retains the original RCJRescue/ASR identity; preview changes reset on reload.
 
-![Grouped competition identity and branding editor in the isolated demo](docs/assets/admin-branding.gif)
+![Current logos, homepage banner previews and organized branding settings in the interactive demo](docs/assets/admin-branding.gif)
 
 ### One announcement. One audience. One record.
 
