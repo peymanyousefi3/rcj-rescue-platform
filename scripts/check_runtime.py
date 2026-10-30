@@ -133,7 +133,8 @@ def runtime_checks(project,env):
             shell(f"from arena.models import Team; Team.objects.filter(pk={fixture['team']}).update(active=True); import json; print('RESULT '+json.dumps(True))")
         finally:
             for name in [proxy,peer]:
-                run(['docker','rm','--force',name],stdout=subprocess.DEVNULL)
+                try:run(['docker','rm','--force',name],stdout=subprocess.DEVNULL)
+                except subprocess.CalledProcessError:pass
             compose(second,second_env,'down','--volumes','--remove-orphans',stdout=subprocess.DEVNULL)
     target=ROOT/'artifacts'/'runtime';target.mkdir(parents=True,exist_ok=True)
     (target/'runtime-checks.json').write_text(json.dumps(evidence,indent=2))

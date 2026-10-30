@@ -31,6 +31,10 @@ docker compose exec app python manage.py check --deploy
 
 `bootstrap_event` is for a new installation only. Do not seed demonstration data into production. The application port remains bound to the host loopback; Caddy reaches the app on the internal Compose network. Secure any other reverse proxy so untrusted clients cannot supply trusted forwarding headers.
 
+## Concurrent events
+
+One installation serves one competition. For two concurrent events, create two separately named Compose projects, each with its own hostname, configuration secrets, database and private-storage volumes. Do not point both installations at one database or reuse session-signing secrets. A separate application replica within one event may share that event's database and private storage; it is not a second event. Size the host against the combined measured load. The isolated CI profile exercises two events with 30 teams each, not a guarantee for an unmeasured production host.
+
 ## Services and secrets
 
 - PostgreSQL stores application records; keep its volume and regular backups private.
