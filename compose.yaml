@@ -1,48 +1,282 @@
+x-runtime-env:
+  DATABASE_URL: postgres://arena_app:${APP_DB_PASSWORD:?Set APP_DB_PASSWORD}@db:5432/arena
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY}
+  DJANGO_DEBUG: ${DJANGO_DEBUG:-0}
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+  DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+  PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://127.0.0.1:8000}
+  REQUIRE_STAFF_OTP: ${REQUIRE_STAFF_OTP:-1}
+  TRUST_PROXY_HTTPS: ${TRUST_PROXY_HTTPS:-0}
+  TRUST_PROXY_CLIENT_IP: ${TRUST_PROXY_CLIENT_IP:-0}
+  PROXY_SHARED_SECRET: ${PROXY_SHARED_SECRET:-}
+  CLAMAV_HOST: clamav
+  CLAMAV_PORT: '3310'
+  STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+  EMAIL_HOST: ${EMAIL_HOST:-}
+  EMAIL_PORT: ${EMAIL_PORT:-587}
+  EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+  EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+  DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+  AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+  AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+  AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME:-}
+  AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL:-}
+  AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME:-auto}
+  GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
+  GOOGLE_DRIVE_PRIVATE_FOLDER_ID: ${GOOGLE_DRIVE_PRIVATE_FOLDER_ID:-}
+  SOURCE_WORKBOOK_ID: ${SOURCE_WORKBOOK_ID:-}
+  SOURCE_WORKBOOK_ACCESS: ${SOURCE_WORKBOOK_ACCESS:-google}
+  DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-4}
+  UPLOAD_MAX_FILE_BYTES: ${UPLOAD_MAX_FILE_BYTES:-1073741824}
+  UPLOAD_MAX_BATCH_BYTES: ${UPLOAD_MAX_BATCH_BYTES:-2147483648}
+  UPLOAD_MAX_FILES: ${UPLOAD_MAX_FILES:-5000}
+  UPLOAD_TEAM_MAX_BYTES: ${UPLOAD_TEAM_MAX_BYTES:-21474836480}
+  UPLOAD_MIN_FREE_BYTES: ${UPLOAD_MIN_FREE_BYTES:-536870912}
+  RECORDING_MAX_EXTRACTED_BYTES: ${RECORDING_MAX_EXTRACTED_BYTES:-536870912}
+  VALIDATION_MAX_BYTES: ${VALIDATION_MAX_BYTES:-67108864}
+  MAIL_MAX_PENDING: ${MAIL_MAX_PENDING:-10000}
+x-logging: &id001
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: '3'
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:17-alpine@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b
     environment:
       POSTGRES_DB: arena
-      POSTGRES_USER: arena
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your local untracked .env}
-    volumes: ['postgres:/var/lib/postgresql/data']
+      POSTGRES_USER: ${DB_ADMIN_USER:-arena_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Set APP_DB_PASSWORD}
+    volumes:
+    - postgres:/var/lib/postgresql/data
+    - ./deploy/init-db.sh:/docker-entrypoint-initdb.d/10-runtime-role.sh:ro
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U arena]
+      test:
+      - CMD-SHELL
+      - pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
       interval: 5s
       timeout: 5s
       retries: 12
     restart: unless-stopped
+    mem_limit: ${DB_MEMORY_LIMIT:-1g}
+    cpus: ${DB_CPUS:-1.0}
+    pids_limit: 256
+    logging: *id001
   app:
     build: .
-    env_file: .env
     environment:
-      DATABASE_URL: postgres://arena:${POSTGRES_PASSWORD}@db:5432/arena
+      DATABASE_URL: postgres://arena_app:${APP_DB_PASSWORD:?Set APP_DB_PASSWORD}@db:5432/arena
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-0}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://127.0.0.1:8000}
+      REQUIRE_STAFF_OTP: ${REQUIRE_STAFF_OTP:-1}
+      TRUST_PROXY_HTTPS: ${TRUST_PROXY_HTTPS:-0}
+      TRUST_PROXY_CLIENT_IP: ${TRUST_PROXY_CLIENT_IP:-0}
+      PROXY_SHARED_SECRET: ${PROXY_SHARED_SECRET:-}
       CLAMAV_HOST: clamav
-    ports: ['127.0.0.1:8000:8000']
-    volumes: ['private:/app/var/private']
+      CLAMAV_PORT: '3310'
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME:-}
+      AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL:-}
+      AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME:-auto}
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
+      GOOGLE_DRIVE_PRIVATE_FOLDER_ID: ${GOOGLE_DRIVE_PRIVATE_FOLDER_ID:-}
+      SOURCE_WORKBOOK_ID: ${SOURCE_WORKBOOK_ID:-}
+      SOURCE_WORKBOOK_ACCESS: ${SOURCE_WORKBOOK_ACCESS:-google}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-4}
+      UPLOAD_MAX_FILE_BYTES: ${UPLOAD_MAX_FILE_BYTES:-1073741824}
+      UPLOAD_MAX_BATCH_BYTES: ${UPLOAD_MAX_BATCH_BYTES:-2147483648}
+      UPLOAD_MAX_FILES: ${UPLOAD_MAX_FILES:-5000}
+      UPLOAD_TEAM_MAX_BYTES: ${UPLOAD_TEAM_MAX_BYTES:-21474836480}
+      UPLOAD_MIN_FREE_BYTES: ${UPLOAD_MIN_FREE_BYTES:-536870912}
+      RECORDING_MAX_EXTRACTED_BYTES: ${RECORDING_MAX_EXTRACTED_BYTES:-536870912}
+      VALIDATION_MAX_BYTES: ${VALIDATION_MAX_BYTES:-67108864}
+      MAIL_MAX_PENDING: ${MAIL_MAX_PENDING:-10000}
+    volumes:
+    - private:/app/var/private
+    tmpfs:
+    - /tmp:size=67108864,mode=1777
     depends_on:
-      db: {condition: service_healthy}
+      db:
+        condition: service_healthy
     restart: unless-stopped
-    security_opt: ['no-new-privileges:true']
-    cap_drop: [ALL]
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    read_only: true
+    mem_limit: ${APP_MEMORY_LIMIT:-1536m}
+    cpus: ${APP_CPUS:-1.0}
+    pids_limit: 128
+    logging: *id001
+    ports:
+    - 127.0.0.1:8000:8000
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - scripts/healthcheck.py
+      - app
+      interval: 30s
+      timeout: 10s
+      start_period: 45s
+      retries: 3
   worker:
     build: .
-    command: [python, manage.py, run_workers]
-    env_file: .env
     environment:
-      DATABASE_URL: postgres://arena:${POSTGRES_PASSWORD}@db:5432/arena
+      DATABASE_URL: postgres://arena_app:${APP_DB_PASSWORD:?Set APP_DB_PASSWORD}@db:5432/arena
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-0}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://127.0.0.1:8000}
+      REQUIRE_STAFF_OTP: ${REQUIRE_STAFF_OTP:-1}
+      TRUST_PROXY_HTTPS: ${TRUST_PROXY_HTTPS:-0}
+      TRUST_PROXY_CLIENT_IP: ${TRUST_PROXY_CLIENT_IP:-0}
+      PROXY_SHARED_SECRET: ${PROXY_SHARED_SECRET:-}
       CLAMAV_HOST: clamav
-    volumes: ['private:/app/var/private']
+      CLAMAV_PORT: '3310'
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME:-}
+      AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL:-}
+      AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME:-auto}
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
+      GOOGLE_DRIVE_PRIVATE_FOLDER_ID: ${GOOGLE_DRIVE_PRIVATE_FOLDER_ID:-}
+      SOURCE_WORKBOOK_ID: ${SOURCE_WORKBOOK_ID:-}
+      SOURCE_WORKBOOK_ACCESS: ${SOURCE_WORKBOOK_ACCESS:-google}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-4}
+      UPLOAD_MAX_FILE_BYTES: ${UPLOAD_MAX_FILE_BYTES:-1073741824}
+      UPLOAD_MAX_BATCH_BYTES: ${UPLOAD_MAX_BATCH_BYTES:-2147483648}
+      UPLOAD_MAX_FILES: ${UPLOAD_MAX_FILES:-5000}
+      UPLOAD_TEAM_MAX_BYTES: ${UPLOAD_TEAM_MAX_BYTES:-21474836480}
+      UPLOAD_MIN_FREE_BYTES: ${UPLOAD_MIN_FREE_BYTES:-536870912}
+      RECORDING_MAX_EXTRACTED_BYTES: ${RECORDING_MAX_EXTRACTED_BYTES:-536870912}
+      VALIDATION_MAX_BYTES: ${VALIDATION_MAX_BYTES:-67108864}
+      MAIL_MAX_PENDING: ${MAIL_MAX_PENDING:-10000}
+    volumes:
+    - private:/app/var/private
+    tmpfs:
+    - /tmp:size=67108864,mode=1777
     depends_on:
-      db: {condition: service_healthy}
+      db:
+        condition: service_healthy
     restart: unless-stopped
-    security_opt: ['no-new-privileges:true']
-    cap_drop: [ALL]
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    read_only: true
+    mem_limit: ${APP_MEMORY_LIMIT:-1536m}
+    cpus: ${APP_CPUS:-1.0}
+    pids_limit: 128
+    logging: *id001
+    command:
+    - python
+    - manage.py
+    - run_workers
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - scripts/healthcheck.py
+      - worker
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+  migrate:
+    build: .
+    profiles:
+    - ops
+    command:
+    - python
+    - manage.py
+    - migrate
+    - --noinput
+    environment:
+      DATABASE_URL: postgres://${DB_ADMIN_USER:-arena_admin}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/arena
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-0}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://127.0.0.1:8000}
+      REQUIRE_STAFF_OTP: ${REQUIRE_STAFF_OTP:-1}
+      TRUST_PROXY_HTTPS: ${TRUST_PROXY_HTTPS:-0}
+      TRUST_PROXY_CLIENT_IP: ${TRUST_PROXY_CLIENT_IP:-0}
+      PROXY_SHARED_SECRET: ${PROXY_SHARED_SECRET:-}
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: '3310'
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_STORAGE_BUCKET_NAME: ${AWS_STORAGE_BUCKET_NAME:-}
+      AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL:-}
+      AWS_S3_REGION_NAME: ${AWS_S3_REGION_NAME:-auto}
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
+      GOOGLE_DRIVE_PRIVATE_FOLDER_ID: ${GOOGLE_DRIVE_PRIVATE_FOLDER_ID:-}
+      SOURCE_WORKBOOK_ID: ${SOURCE_WORKBOOK_ID:-}
+      SOURCE_WORKBOOK_ACCESS: ${SOURCE_WORKBOOK_ACCESS:-google}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-4}
+      UPLOAD_MAX_FILE_BYTES: ${UPLOAD_MAX_FILE_BYTES:-1073741824}
+      UPLOAD_MAX_BATCH_BYTES: ${UPLOAD_MAX_BATCH_BYTES:-2147483648}
+      UPLOAD_MAX_FILES: ${UPLOAD_MAX_FILES:-5000}
+      UPLOAD_TEAM_MAX_BYTES: ${UPLOAD_TEAM_MAX_BYTES:-21474836480}
+      UPLOAD_MIN_FREE_BYTES: ${UPLOAD_MIN_FREE_BYTES:-536870912}
+      RECORDING_MAX_EXTRACTED_BYTES: ${RECORDING_MAX_EXTRACTED_BYTES:-536870912}
+      VALIDATION_MAX_BYTES: ${VALIDATION_MAX_BYTES:-67108864}
+      MAIL_MAX_PENDING: ${MAIL_MAX_PENDING:-10000}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+    - private:/app/var/private
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    logging: *id001
   clamav:
-    image: clamav/clamav:stable
-    volumes: ['clamav:/var/lib/clamav']
+    image: clamav/clamav:stable@sha256:bda39705e291105049c3936e2803ac90b955172af8030f94f05dce1252df6c6d
+    volumes:
+    - clamav:/var/lib/clamav
     restart: unless-stopped
+    mem_limit: ${CLAMAV_MEMORY_LIMIT:-2g}
+    cpus: ${CLAMAV_CPUS:-1.0}
+    pids_limit: 128
+    logging: *id001
+    healthcheck:
+      test:
+      - CMD
+      - clamdscan
+      - --ping
+      - '3'
+      interval: 60s
+      timeout: 15s
+      start_period: 180s
+      retries: 3
 volumes:
-  postgres:
-  private:
-  clamav:
+  postgres: null
+  private: null
+  clamav: null

@@ -377,7 +377,7 @@ def control(request):
                         try:
                             connection.close()
                         except Exception:
-                            pass
+                            connection=None  # Failed cleanup must not turn a successful check into an error.
                 return redirect('/control/#email-settings')
             if form_kind=='email-settings' and email_form.is_valid():
                 config=email_form.save()
@@ -579,10 +579,27 @@ def audit_export(request):
 
 @require_GET
 def health(request):
-    from django.db import connection
-    with connection.cursor() as cursor:
-        cursor.execute('SELECT 1')
-    return JsonResponse({'status':'ok'})
+    from django.db import connection, DatabaseError
+    try:
+        with connection.cursor() as cursor: cursor.execute('SELECT 1')
+    except DatabaseError:
+        return JsonResponse({'status':'unavailable'},status=503)
+    response=JsonResponse({'status':'ok'})
+    response['Cache-Control']='no-store'
+    return response
+
+@require_GET
+def readiness(request):
+    import shutil
+    from django.conf import settings
+    result=health(request)
+    if result.status_code!=200: return result
+    try:
+        ready=shutil.disk_usage(settings.PRIVATE_ROOT).free>=settings.UPLOAD_MIN_FREE_BYTES
+    except (OSError,ValueError,KeyError): ready=False
+    response=JsonResponse({'status':'ok' if ready else 'unavailable'},status=200 if ready else 503)
+    response['Cache-Control']='no-store'
+    return response
 
 @never_cache
 @require_POST

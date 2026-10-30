@@ -33,7 +33,7 @@ def mail_connection(*, allow_paused=False):
         return get_connection(), settings.DEFAULT_FROM_EMAIL
     if (not config.enabled and not allow_paused) or not config.host or not config.sender_email:
         raise ImproperlyConfigured('Email delivery is paused or incomplete; queued messages retained.')
-    password = ''
+    password = ''  # nosec B105
     if config.password_encrypted:
         for secret in [settings.SECRET_KEY, *settings.SECRET_KEY_FALLBACKS]:
             try:

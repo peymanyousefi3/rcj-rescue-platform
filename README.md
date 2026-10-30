@@ -133,8 +133,10 @@ Requires Docker with Compose and Python 3 for the configuration helper. For a Py
 git clone https://github.com/peymanyousefi3/rcj-rescue-platform.git
 cd rcj-rescue-platform
 python3 scripts/configure_local.py
-docker compose up -d --build
-docker compose exec app python manage.py migrate
+docker compose build
+docker compose up -d db clamav
+docker compose run --rm migrate
+docker compose up -d app worker
 docker compose exec app python manage.py bootstrap_event
 docker compose exec app python manage.py createsuperuser
 ```
@@ -164,6 +166,7 @@ This adds fictional scores and SuperTeams; it creates no login accounts and send
 
 - [Setup and fictional demonstration](docs/SETUP.md)
 - [HTTPS deployment, backups and upgrades](docs/DEPLOYMENT.md)
+- [Security operations, resource limits and recovery](docs/SECURITY_OPERATIONS.md)
 - [Security and private vulnerability reporting](SECURITY.md)
 - [Contributing](CONTRIBUTING.md)
 - [Project overview PDF](docs/PROJECT_OVERVIEW.pdf)

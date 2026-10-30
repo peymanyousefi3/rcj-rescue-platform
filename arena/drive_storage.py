@@ -34,5 +34,8 @@ class PrivateDriveStorage(Storage):
         return False
     def delete(self,name):
         self.service().files().delete(fileId=name, supportsAllDrives=True).execute()
+    def size(self,name):
+        result = self.service().files().get(fileId=name, fields='size', supportsAllDrives=True).execute()
+        return int(result['size'])
     def url(self,name):
         raise NotImplementedError('Private files must pass application authorization.')

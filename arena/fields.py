@@ -2,6 +2,9 @@
 import io, json, struct, warnings
 from pathlib import PurePath
 from django import forms
+from django.core.cache import cache
+from django.conf import settings
+from .media_validation import bounded_read
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.http import FileResponse, Http404
@@ -22,7 +25,7 @@ IMAGE_SUFFIXES=set(Image.registered_extensions()) | {'.svg'}
 def thumbnail_preview(file,name=None):
     """Keep the original upload; decode a browser-compatible, non-scriptable preview."""
     try:
-        data=file.read()
+        data=bounded_read(file)
         if PurePath(name or file.name).suffix.lower()=='.svg' or data.lstrip().startswith(b'<'):
             root=ElementTree.fromstring(data)
             if root.tag!='{http://www.w3.org/2000/svg}svg': raise ValueError()
@@ -56,7 +59,7 @@ def validate_field(file,role):
     info={}
     try:
         if role in ['map_json','info_json']:
-            data=json.load(file,parse_constant=reject_constant)
+            data=json.loads(bounded_read(file),parse_constant=reject_constant)
             if not isinstance(data,(dict,list)): raise ValueError()
             if role=='info_json': info=data
         elif role=='wbt':
@@ -68,7 +71,7 @@ def validate_field(file,role):
             if len(header)!=12 or struct.unpack('<4sII',header)!=(b'glTF',2,file.size): raise ValueError()
             chunk=file.read(8)
             length,kind=struct.unpack('<II',chunk)
-            if kind!=0x4E4F534A or length>file.size-20: raise ValueError()
+            if kind!=0x4E4F534A or length>min(file.size-20,settings.VALIDATION_MAX_BYTES): raise ValueError()
             data=json.loads(file.read(length),parse_constant=reject_constant)
             if not isinstance(data,dict) or not data.get('scenes'): raise ValueError()
             # A field GLB must be self-contained; no surprise cross-origin requests.
@@ -110,7 +113,7 @@ def detect_package(files, paths=None, choices=None):
                 metadata=[];geometry=[]
                 for path in candidates:
                     stream=entries[path]
-                    try: data=json.load(stream,parse_constant=reject_constant)
+                    try: data=json.loads(bounded_read(stream),parse_constant=reject_constant)
                     except (ValueError,UnicodeError): continue
                     finally: stream.seek(0)
                     if isinstance(data,dict):
@@ -234,8 +237,13 @@ def media(request,asset_id):
     try: stream=default_storage.open(asset.blob_key,'rb')
     except OSError: raise Http404()
     if asset.map_role=='jpeg':
-        # ponytail: render previews on demand; cache derivatives if public traffic warrants it.
-        try: data,mime=thumbnail_preview(stream,asset.original_name)
+        # Authorization always runs before retrieving an in-process derivative.
+        key=f'field-thumbnail:{asset.pk}:{asset.sha256}'
+        try:
+            derivative=cache.get(key)
+            if derivative is None:
+                derivative=thumbnail_preview(stream,asset.original_name);cache.set(key,derivative)
+            data,mime=derivative
         except ValidationError: stream.close();raise Http404('Thumbnail temporarily unavailable.')
         stream.close();stream=io.BytesIO(data)
     else: mime='model/gltf-binary'

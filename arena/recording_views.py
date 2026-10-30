@@ -20,7 +20,7 @@ from django.views.decorators.http import require_GET,require_POST,require_http_m
 from django.utils.crypto import salted_hmac,constant_time_compare
 from .access import owns_team
 from .models import Challenge,Round,RunRecording,Score,Team
-from .recordings import ResultForm,RoundScoresForm,save_round_scores,round_scores_response,save_result,safe_path
+from .recordings import ResultForm,RoundScoresForm,save_round_scores,round_scores_response,save_result,safe_path,recording_key,public_recording_path
 from .views import staff_required,current_competition
 
 
@@ -38,7 +38,7 @@ def visible_recordings(request,competition):
 
 
 def replay_session(request):
-    return salted_hmac('webots-session',request.session.session_key or '').hexdigest()
+    return salted_hmac('webots-session',request.session.session_key or '',algorithm='sha256').hexdigest()
 
 
 def score_rounds(competition,challenge=None):
@@ -329,7 +329,7 @@ def player(request,recording_id):
 def preview(request,recording_id):
     recording=get_object_or_404(RunRecording.objects.select_related('round__challenge','team'),pk=recording_id)
     if not allowed(request,recording): raise Http404()
-    try: stream=default_storage.open(f'recordings/{recording.pk}/{recording.preview_path}','rb')
+    try: stream=default_storage.open(recording_key(recording,recording.preview_path),'rb')
     except OSError: raise Http404('Preview temporarily unavailable.')
     response=FileResponse(stream,content_type=mimetypes.guess_type(recording.preview_path)[0] or 'image/jpeg')
     response['Content-Security-Policy']="sandbox; default-src 'none'";response['X-Content-Type-Options']='nosniff'
@@ -386,8 +386,8 @@ def replay_asset(request,token,path):
     if not capability.get('public') and (not request.user.is_authenticated or not constant_time_compare(capability.get('session') or '',replay_session(request))): raise Http404()
     if not recording.current and not capability.get('history'): raise Http404()
     if capability['public'] and not recording.public_open: raise Http404()
-    if path not in recording.manifest: raise Http404()
-    try: stream=default_storage.open(f'recordings/{recording.pk}/{path}','rb')
+    if path not in recording.manifest or not public_recording_path(recording,path): raise Http404()
+    try: stream=default_storage.open(recording_key(recording,path),'rb')
     except OSError: raise Http404('A required replay file is temporarily unavailable.')
     mime=mimetypes.guess_type(path)[0] or 'application/octet-stream'
     if path.lower().endswith(('.html','.htm')):

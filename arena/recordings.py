@@ -14,11 +14,15 @@ from pathlib import Path, PurePosixPath
 from urllib.parse import unquote, urlsplit
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from django import forms
+from django.conf import settings
+from defusedxml import ElementTree as SafeXML
+from defusedxml.common import DefusedXmlException
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.db import transaction
 from .forms import MultipleFileField, MultipleFileInput
+from .media_validation import bounded_read
 from .models import RunRecording, Score, Team
 from .timing import RemainingTimeField, RUN_ALLOWANCE_SECONDS
 
@@ -152,12 +156,22 @@ def validate_reference(entry,reference,files):
     if not parsed.scheme and not reference.startswith(('#','//')): local_reference(entry,reference,files)
 
 
+def recording_key(recording, path):
+    """Provider IDs are private storage keys; browser paths remain unchanged.
+
+    Existing local/S3 manifests without storage_key remain readable.
+    """
+    item = recording.manifest.get(path)
+    if not isinstance(item, dict): raise OSError('Unknown recording asset.')
+    return item.get('storage_key') or f'recordings/{recording.pk}/{path}'
+
+
 def recording_result_data(recording):
     if not recording: return {}
     path=posixpath.join(posixpath.dirname(recording.entry_path),'match-result.json')
     if path not in recording.manifest: return {}
     try:
-        with default_storage.open(f'recordings/{recording.pk}/{path}','rb') as stream:
+        with default_storage.open(recording_key(recording,path),'rb') as stream:
             content=stream.read(1024*1024+1)
         if len(content)>1024*1024: return {}
         data=json.loads(content.decode('utf-8-sig'),parse_float=Decimal)
@@ -200,7 +214,8 @@ def validate_export(files,entry='',preview=''):
     for name,path in files.items():
         if name.lower().endswith(('.html','.htm')):
             parser=ExportHTML()
-            try: parser.feed(path.read_text(encoding='utf-8-sig'))
+            try:
+                with path.open('rb') as source: parser.feed(bounded_read(source).decode('utf-8-sig'))
             except (UnicodeError,ValueError): raise ValidationError('The replay HTML must use UTF-8 text.')
             if parser.viewer: candidates.append((name,parser))
     if entry:
@@ -221,7 +236,7 @@ def validate_export(files,entry='',preview=''):
         raise ValidationError('The preview is not a supported image.')
     if not scene.lower().endswith(('.x3d','.w3d')) or not animation.lower().endswith('.json'): raise ValidationError('Use a matching exported Webots scene and JSON animation.')
     try:
-        with files[animation].open() as stream: data=json.load(stream)
+        with files[animation].open('rb') as stream: data=json.loads(bounded_read(stream))
     except (ValueError,UnicodeError): raise ValidationError('The animation JSON is not valid.')
     frames=data.get('frames') if isinstance(data,dict) else None
     if not isinstance(frames,list) or len(frames)<2: raise ValidationError('The animation must contain at least two recorded frames.')
@@ -237,9 +252,9 @@ def validate_export(files,entry='',preview=''):
     # Check local HTML dependencies and scene texture/mesh references before publishing.
     for reference in parser.references:
         validate_reference(entry,reference,files)
-    import xml.etree.ElementTree as ET
-    try: scene_root=ET.fromstring(files[scene].read_text(encoding='utf-8-sig'))
-    except (ET.ParseError,UnicodeError): raise ValidationError('The exported scene is not valid XML.')
+    try:
+        with files[scene].open('rb') as stream: scene_root=SafeXML.fromstring(bounded_read(stream))
+    except (SafeXML.ParseError,DefusedXmlException,UnicodeError): raise ValidationError('The exported scene is not valid XML.')
     ids={node.get('id') for node in scene_root.iter() if node.get('id')}
     animated_ids={f"n{update['id']}" for frame in frames for update in frame.get('updates',[]) if isinstance(update,dict) and 'id' in update}
     if not animated_ids or not animated_ids.issubset(ids): raise ValidationError('The scene and animation do not match. Upload the files from one export together.')
@@ -250,8 +265,49 @@ def validate_export(files,entry='',preview=''):
                     if reference: validate_reference(scene,reference,files)
     scene_version=next((node.get('content') for node in scene_root.iter('meta') if node.get('name')=='version'),None)
     if scene_version and scene_version!=parser.versions[0]: raise ValidationError('The scene and Webots player versions differ. Keep the original export files together.')
+    validate_recording_files(files, entry, animation, parser)
     return dict(entry_path=entry,preview_path=preview,scene_path=scene,animation_path=animation,
         player_version=parser.versions[0],frame_count=len(frames),duration_ms=round(last))
+
+
+REPLAY_VISUAL_SUFFIXES = {'.html','.htm','.css','.x3d','.w3d','.jpg','.jpeg','.png','.webp','.gif','.svg',
+              '.hdr','.exr','.stl','.obj','.mtl','.dae','.bin','.glb','.gltf','.woff','.woff2','.ttf','.ico'}
+
+
+def public_recording_path(recording,path):
+    """Apply privacy filtering to legacy manifests too, without changing stored files."""
+    if any(part.startswith('.') for part in PurePosixPath(path).parts): return False
+    if path in [recording.entry_path,recording.scene_path,recording.animation_path,recording.preview_path,
+                posixpath.join(posixpath.dirname(recording.entry_path),'match-result.json')]: return True
+    suffix=PurePosixPath(path).suffix.lower()
+    return suffix in REPLAY_VISUAL_SUFFIXES or (suffix in ('.js','.mjs') and recording.manifest.get(path,{}).get('public_asset') is True)
+
+
+def validate_recording_files(files, entry, animation, parser):
+    """Only visual replay assets belong in a publishable recording package."""
+    result_path = posixpath.join(posixpath.dirname(entry), 'match-result.json')
+    script_paths = set()
+    for reference in parser.references:
+        parsed = urlsplit(reference)
+        if not parsed.scheme and not parsed.netloc and parsed.path:
+            script_paths.add(posixpath.normpath(posixpath.join(posixpath.dirname(entry), unquote(parsed.path))))
+    # Follow local module imports; allow exported helper scripts without accepting stray controller code.
+    pending = [path for path in script_paths if path.endswith(('.js', '.mjs'))]
+    while pending:
+        path = pending.pop()
+        if path not in files: continue
+        with files[path].open('rb') as stream: source = bounded_read(stream).decode('utf-8-sig')
+        for reference in re.findall(r"(?:from\s*|import\s*\(?\s*)['\"]([^'\"]+)['\"]", source):
+            if urlsplit(reference).scheme or not reference.startswith('.'): continue
+            child = local_reference(path, reference, files)
+            if child not in script_paths:
+                script_paths.add(child); pending.append(child)
+    for path in files:
+        suffix = PurePosixPath(path).suffix.lower()
+        hidden = any(part.startswith('.') for part in PurePosixPath(path).parts)
+        if hidden or not (suffix in REPLAY_VISUAL_SUFFIXES or path in (animation, result_path) or
+                          suffix in ('.js','.mjs') and path in script_paths):
+            raise ValidationError(f'Unexpected private or unrelated file in recording: {path}. Upload only the replay export; team code, submission JSON and documents belong in private submissions.')
 
 
 class ResultForm(forms.Form):
@@ -326,20 +382,28 @@ def save_result(form,user):
     stored=[]
     try:
         with tempfile.TemporaryDirectory(prefix='asr-replay-') as directory:
-            paths={};seen=set()
+            paths={};seen=set();extracted=0
             def add(name,stream):
+                nonlocal extracted
+                if len(paths) >= settings.UPLOAD_MAX_FILES: raise ValidationError('The recording contains too many files.')
                 name=safe_path(name)
                 if name.casefold() in seen: raise ValidationError('The export contains duplicate filenames.')
                 seen.add(name.casefold())
                 target=Path(directory)/name;target.parent.mkdir(parents=True,exist_ok=True)
                 import shutil
-                with target.open('wb') as output: shutil.copyfileobj(stream,output)
+                with target.open('wb') as output:
+                    file_bytes=0
+                    for chunk in iter(lambda:stream.read(65536),b''):
+                        file_bytes+=len(chunk);extracted+=len(chunk)
+                        if file_bytes>settings.UPLOAD_MAX_FILE_BYTES or extracted>settings.RECORDING_MAX_EXTRACTED_BYTES or shutil.disk_usage(directory).free < settings.UPLOAD_MIN_FREE_BYTES:
+                            raise ValidationError('The recording exceeds the configured extraction/storage budget.')
+                        output.write(chunk)
                 paths[name]=target
             if len(files)==1 and zipfile.is_zipfile(files[0]):
                 with zipfile.ZipFile(files[0]) as archive:
                     items=[i for i in archive.infolist() if not i.is_dir() and not i.filename.startswith('__MACOSX/')]
                     import shutil
-                    if len(items)>20000 or sum(i.file_size for i in items)>shutil.disk_usage(directory).free//2:
+                    if len(items)>settings.UPLOAD_MAX_FILES or sum(i.file_size for i in items)>min(settings.RECORDING_MAX_EXTRACTED_BYTES,max(0,shutil.disk_usage(directory).free-settings.UPLOAD_MIN_FREE_BYTES)):
                         raise ValidationError('This export exceeds the available safe extraction space. Upload a smaller recording or free server space.')
                     for item in items:
                         if stat.S_ISLNK(item.external_attr>>16) or item.flag_bits&1: raise ValidationError('Encrypted files and symbolic links are not supported.')
@@ -374,11 +438,10 @@ def save_result(form,user):
                         with path.open('rb') as stream:
                             actual=default_storage.save(key,File(stream,name=PurePosixPath(name).name))
                         stored.append(actual)
-                        if actual!=key: raise ValidationError('Could not preserve the export filenames. Try uploading the recording again.')
                         digest=hashlib.sha256()
                         with path.open('rb') as stream:
                             for chunk in iter(lambda:stream.read(1024*1024),b''): digest.update(chunk)
-                        manifest[name]={'size':path.stat().st_size,'sha256':digest.hexdigest()}
+                        manifest[name]={'size':path.stat().st_size,'sha256':digest.hexdigest(),'storage_key':actual,'public_asset':True}
                     if old: old.current=False;old.published=False;old.save(update_fields=['current','published'])
                     recording.manifest=manifest;recording.full_clean();recording.save()
                 elif old:

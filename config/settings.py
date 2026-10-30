@@ -25,7 +25,7 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware', 'whitenoise.middleware.WhiteNoiseMiddleware',
-    'arena.middleware.ProxyAddressMiddleware',
+    'arena.middleware.ProxyAddressMiddleware', 'arena.middleware.UploadBoundaryMiddleware',
     'arena.middleware.ReplaySessionMiddleware', 'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_otp.middleware.OTPMiddleware', 'django.contrib.messages.middleware.MessageMiddleware',
@@ -39,9 +39,15 @@ TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'django.contrib.auth.context_processors.auth', 'django.contrib.messages.context_processors.messages',
     'arena.context.site_context']}}]
 WSGI_APPLICATION = 'config.wsgi.application'
-DATABASES = {'default': dj_database_url.config(default=f'sqlite:///{BASE_DIR / "var/db.sqlite3"}', conn_max_age=60)}
+DATABASES = {'default': dj_database_url.config(default=f'sqlite:///{BASE_DIR / "var/db.sqlite3"}', conn_max_age=0)}
 if not DEBUG and DATABASES['default']['ENGINE'] != 'django.db.backends.postgresql':
     raise ImproperlyConfigured('Production requires PostgreSQL for transactional upload locks.')
+if DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql':
+    DATABASES['default'].setdefault('OPTIONS', {}).update({
+        'pool': {'min_size': 0, 'max_size': int(os.getenv('DB_POOL_MAX_SIZE', '4')),
+                 'timeout': 10, 'max_waiting': 16},
+        'options': '-c statement_timeout=30000 -c lock_timeout=10000 -c idle_in_transaction_session_timeout=60000',
+    })
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 14}},
@@ -56,7 +62,7 @@ AXES_LOCKOUT_PARAMETERS = [['username', 'ip_address']]
 AXES_RESET_ON_SUCCESS = True
 AXES_SENSITIVE_PARAMETERS = ['username', 'password', 'otp_token']
 AXES_IPWARE_PROXY_COUNT = 0
-REQUIRE_STAFF_OTP = os.getenv('REQUIRE_STAFF_OTP', '0') == '1'
+REQUIRE_STAFF_OTP = os.getenv('REQUIRE_STAFF_OTP', '0' if DEBUG else '1') == '1'
 LOGIN_URL = 'two_factor:login'
 LOGIN_REDIRECT_URL = '/portal/'
 LOGOUT_REDIRECT_URL = '/'
@@ -69,7 +75,13 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CACHES = {'default': {'BACKEND':'django.core.cache.backends.locmem.LocMemCache',
+    'TIMEOUT':300,'OPTIONS':{'MAX_ENTRIES':16}}}
 PRIVATE_ROOT = BASE_DIR / 'var/private'
+FILE_UPLOAD_TEMP_DIR = str(PRIVATE_ROOT / '.upload-tmp')
+Path(FILE_UPLOAD_TEMP_DIR).mkdir(parents=True, exist_ok=True, mode=0o700)
+FILE_UPLOAD_PERMISSIONS = 0o600
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o700
 STORAGE_BACKEND = os.getenv('STORAGE_BACKEND', 'local')
 STORAGES = {
     'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage', 'OPTIONS': {'location': str(PRIVATE_ROOT)}},
@@ -87,9 +99,18 @@ elif STORAGE_BACKEND == 'drive':
 elif STORAGE_BACKEND != 'local':
     raise ImproperlyConfigured('Unsupported private storage backend.')
 FILE_UPLOAD_MAX_MEMORY_SIZE = 512 * 1024
-FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler']
+# Generous, configurable resource budgets; file types remain unrestricted for private submissions.
+UPLOAD_MAX_FILE_BYTES = int(os.getenv('UPLOAD_MAX_FILE_BYTES', str(1024**3)))
+UPLOAD_MAX_BATCH_BYTES = int(os.getenv('UPLOAD_MAX_BATCH_BYTES', str(2*1024**3)))
+UPLOAD_MAX_FILES = int(os.getenv('UPLOAD_MAX_FILES', '5000'))
+UPLOAD_TEAM_MAX_BYTES = int(os.getenv('UPLOAD_TEAM_MAX_BYTES', str(20*1024**3)))
+UPLOAD_MIN_FREE_BYTES = int(os.getenv('UPLOAD_MIN_FREE_BYTES', str(512*1024**2)))
+RECORDING_MAX_EXTRACTED_BYTES = int(os.getenv('RECORDING_MAX_EXTRACTED_BYTES', str(512*1024**2)))
+VALIDATION_MAX_BYTES = int(os.getenv('VALIDATION_MAX_BYTES', str(64*1024**2)))
+FILE_UPLOAD_HANDLERS = ['arena.uploads.BoundedUploadHandler',
+                        'django.core.files.uploadhandler.TemporaryFileUploadHandler']
 DATA_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024
-DATA_UPLOAD_MAX_NUMBER_FILES = None
+DATA_UPLOAD_MAX_NUMBER_FILES = UPLOAD_MAX_FILES
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST', '')
@@ -98,6 +119,7 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = True
 EMAIL_TIMEOUT = 20
+MAIL_MAX_PENDING = int(os.getenv('MAIL_MAX_PENDING','10000'))
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@localhost' if DEBUG else '')
 SESSION_COOKIE_NAME = 'asr_session'
 SESSION_COOKIE_HTTPONLY = True
@@ -117,7 +139,10 @@ SECURE_REFERRER_POLICY = 'same-origin'
 X_FRAME_OPTIONS = 'DENY'
 if os.getenv('TRUST_PROXY_HTTPS') == '1':
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-TRUST_PROXY_CLIENT_IP = os.getenv('TRUST_PROXY_HTTPS') == '1'
+TRUST_PROXY_CLIENT_IP = os.getenv('TRUST_PROXY_CLIENT_IP', '0') == '1'
+PROXY_SHARED_SECRET = os.getenv('PROXY_SHARED_SECRET', '')
+if TRUST_PROXY_CLIENT_IP and len(PROXY_SHARED_SECRET) < 32:
+    raise ImproperlyConfigured('Trusted client-IP forwarding requires a fresh PROXY_SHARED_SECRET of at least 32 characters.')
 LOGGING = {'version': 1, 'disable_existing_loggers': False,
     'handlers': {'console': {'class': 'logging.StreamHandler'}},
     'root': {'handlers': ['console'], 'level': 'WARNING'}}

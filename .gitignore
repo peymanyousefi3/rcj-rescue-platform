@@ -21,3 +21,11 @@ credentials*.json
 service-account*.json
 .DS_Store
 artifacts/
+
+backups/
+recovery/
+*.age
+*.agekey
+*.dump
+backup-key*.txt
+recovery-key*.txt

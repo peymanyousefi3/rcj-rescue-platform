@@ -1,6 +1,8 @@
 from datetime import timedelta
 from django.conf import settings
 from django import forms
+from django.core.exceptions import ValidationError
+from .outbox import queue_delivery
 from .widgets import TeamPicker, recipient_data, recipient_fields
 from django.contrib.auth.forms import PasswordResetForm
 from django.template.loader import render_to_string
@@ -13,11 +15,14 @@ class QueuedPasswordResetForm(PasswordResetForm):
                   to_email, html_email_template_name=None):
         import uuid
         membership = Membership.objects.filter(user=context['user']).first()
-        EmailDelivery.objects.create(team=membership.team if membership else None,
+        try: queue_delivery(team=membership.team if membership else None,
             dedupe_key=f'password-reset:{uuid.uuid4()}', recipient=to_email,
             expires_at=timezone.now()+timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT),
             subject=''.join(render_to_string(subject_template_name, context).splitlines())[:200],
             body=render_to_string(email_template_name, context))
+        except ValidationError:
+            # Keep recovery responses identical for existing and unknown accounts.
+            return
 
 class AdminUploadForm(forms.Form):
     team = forms.ModelChoiceField(queryset=Team.objects.none(), required=False)
@@ -182,7 +187,7 @@ class EmailConfigurationForm(forms.ModelForm):
         config=super().save(commit=False)
         config.pk=1
         if self.cleaned_data.get('clear_password'):
-            config.password_encrypted=''
+            config.password_encrypted=''  # nosec B105
         if self.cleaned_data.get('password'):
             config.password_encrypted=credential_cipher().encrypt(self.cleaned_data['password'].encode()).decode()
         if commit:

@@ -173,12 +173,13 @@ def test_trusted_proxy_uses_one_validated_ip_and_ignores_untrusted_headers(setti
     from django.test import RequestFactory
     from arena.middleware import ProxyAddressMiddleware
     middleware=ProxyAddressMiddleware(lambda request: request.META['REMOTE_ADDR'])
-    request=RequestFactory().get('/',REMOTE_ADDR='127.0.0.1',HTTP_X_ASR_CLIENT_IP='2001:db8::1')
+    request=RequestFactory().get('/',REMOTE_ADDR='127.0.0.1',HTTP_X_ASR_CLIENT_IP='2001:db8::1',HTTP_X_ASR_PROXY_TOKEN='test-only-ingress-secret')
     settings.TRUST_PROXY_CLIENT_IP=False
     assert middleware(request)=='127.0.0.1'
     settings.TRUST_PROXY_CLIENT_IP=True
+    settings.PROXY_SHARED_SECRET='test-only-ingress-secret'
     assert middleware(request)=='2001:db8::1'
-    request=RequestFactory().get('/',REMOTE_ADDR='127.0.0.1',HTTP_X_ASR_CLIENT_IP='203.0.113.1, 192.0.2.1')
+    request=RequestFactory().get('/',REMOTE_ADDR='127.0.0.1',HTTP_X_ASR_CLIENT_IP='203.0.113.1, 192.0.2.1',HTTP_X_ASR_PROXY_TOKEN='test-only-ingress-secret')
     assert middleware(request)=='127.0.0.1'
 
 
@@ -188,12 +189,13 @@ def test_proxy_visitors_have_separate_anonymous_rate_limits(settings,event):
     from arena.throttle import allow_request
     from django.contrib.auth.models import AnonymousUser
     settings.TRUST_PROXY_CLIENT_IP=True
+    settings.PROXY_SHARED_SECRET='test-only-ingress-secret'
     def check(request):
         request.user=AnonymousUser()
         return allow_request(request,limit=1,period=3600)[0]
     middleware=ProxyAddressMiddleware(check)
     factory=RequestFactory()
-    def request(ip): return factory.post('/accounts/reset/',REMOTE_ADDR='172.20.0.2',HTTP_X_ASR_CLIENT_IP=ip)
+    def request(ip): return factory.post('/accounts/reset/',REMOTE_ADDR='172.20.0.2',HTTP_X_ASR_CLIENT_IP=ip,HTTP_X_ASR_PROXY_TOKEN='test-only-ingress-secret')
     assert middleware(request('203.0.113.1'))
     assert not middleware(request('203.0.113.1'))
     assert middleware(request('203.0.113.2'))
