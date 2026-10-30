@@ -1,7 +1,7 @@
 <section class="branding-image-card branding-image-{{ card.slot }}" aria-label="{{ card.title }}">
 <h3>{{ card.title }}</h3>
 <div class="branding-current-image">{% if card.url %}<img src="{{ card.url }}" alt="Current {{ card.title|lower }}">{% else %}<p>No image is currently displayed.</p>{% endif %}</div>
-<p class="branding-current-label">Currently displayed on your website</p>
+<p class="branding-current-label">{% if card.url %}Currently displayed on your website{% else %}Optional image for your website{% endif %}</p>
 {% include 'arena/_admin_field.html' with field=card.field %}
 {% include 'arena/_admin_field.html' with field=card.reset %}
 </section>

@@ -219,8 +219,8 @@ class CompetitionForm(forms.ModelForm):
         previews=branding_urls(self.instance)
         self.branding_cards=[]
         for field,slot,title in [('logo','logo','Competition logo'),('partner_logo','partner','Partner / federation logo'),('banner_image','banner','Homepage banner image')]:
-            self.fields[field].label='Replace image (optional)'
-            self.fields[field].help_text='Leave this empty to keep the image shown above. Uploads are safely stored as PNG.'
+            self.fields[field].label='Replace image (optional)' if previews[slot] else 'Upload image (optional)'
+            self.fields[field].help_text=('Leave this empty to keep the image shown above.' if previews[slot] else 'No image is set. Choose a file to display one.')+' Uploads are safely stored as PNG.'
             self.fields[field].widget.attrs['accept']='image/*'
             self.branding_cards.append({'title':title,'slot':slot,'url':previews[slot],'field':self[field],'reset':self['remove_'+field]})
         self.original_start=self.instance.starts_at;self.original_end=self.instance.ends_at
