@@ -20,7 +20,7 @@
 </tr>{% empty %}<tr><td colspan="99" class="empty-cell">No team scores yet.</td></tr>{% endfor %}</tbody>
 </table></div>
 
-<div class="mobile-standings" aria-label="{{ group.challenge.name }} team results">
+<div class="mobile-standings" role="region" aria-label="{{ group.challenge.name }} team results">
 {% for row in group.rows %}<details class="team-result">
 <summary><span class="mobile-rank">{{ row.rank|default_if_none:'—' }}{% if row.tie %}<small>Tie</small>{% endif %}</span><span class="mobile-team"><strong>{{ row.team.name }}</strong><small>{{ row.team.code }} · {{ row.team.country }}</small></span><span class="mobile-final">{% if row.total != None %}{{ row.total|floatformat:2 }}{% if group.challenge.calculation == 'trimmed_mean' %}<small>%</small>{% endif %}{% else %}<span class="score-pending">Pending</span>{% endif %}</span><span class="result-chevron" aria-hidden="true"></span></summary>
 <div class="team-result-detail">{% if row.issue %}<p class="result-issue">{{ row.issue }}</p>{% endif %}
