@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ team.name }} · ASR 26{% endblock %}
+{% block title %}{{ team.name }} · {{ competition.short_name }}{% endblock %}
 {% block extra_media %}<link rel="stylesheet" href="{% static 'arena/workspaces.css' %}"><link rel="stylesheet" href="{% static 'arena/fields.css' %}"><script src="{% static 'arena/fields.js' %}" defer></script><link rel="stylesheet" href="{% static 'arena/replay.css' %}"><script src="{% static 'arena/replay.js' %}" defer></script>{% endblock %}
 {% block breadcrumb %}Team dashboard{% endblock %}
 {% block navigation %}

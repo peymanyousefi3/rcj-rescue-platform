@@ -188,7 +188,7 @@ def result_number(value):
 
 def match_result(recording):
     """Format this export's final results without inventing missing values."""
-    result={'available':False,'scores':{},'times':{},'event_history_available':False}
+    result={'available':False,'scores':{},'times':{},'event_history_available':False,'events':[]}
     data=recording_result_data(recording)
     if not data: return result
     for name in ['final_score','field_score','exit_bonus','map_bonus']:
@@ -205,6 +205,11 @@ def match_result(recording):
         and bool(re.fullmatch(r'\d+:[0-5]\d',event['timestamp'])) and bool(event['text'].strip())
         and (playback_time:=result_number(event.get('playback_time_ms'))) is not None and playback_time>=0
         for event in events)
+    if result['event_history_available']:
+        # Stable ordering preserves exported order when timestamps are equal.
+        result['events']=sorted([{'timestamp':event['timestamp'],'text':event['text'],
+            'playback_time_ms':float(result_number(event['playback_time_ms']))} for event in events],
+            key=lambda event:event['playback_time_ms'])
     result['available']=result['scores']['final_score'] is not None
     return result
 

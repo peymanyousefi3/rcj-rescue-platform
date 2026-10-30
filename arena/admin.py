@@ -6,6 +6,11 @@ from .models import (Asset, AuditEvent, Competition, EmailDelivery, Membership,
                      Programme, Round, Score, Team)
 
 class OrganizerAdminSite(admin.AdminSite):
+    def each_context(self,request):
+        context=super().each_context(request);competition=Competition.objects.first()
+        if competition:context.update(site_header=competition.short_name+' · System administration',site_title=competition.short_name)
+        return context
+
     def has_permission(self,request):
         return super().has_permission(request) and (
             not staff_otp_required(request.user) or request.user.is_verified())

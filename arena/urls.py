@@ -1,6 +1,8 @@
+from . import branding
 from django.urls import path
 from . import views, recording_views, fields, workspaces
 urlpatterns = [
+    path('branding/<int:competition_id>/<str:slot>/',branding.image,name='branding-image'),
     path('fields/<int:round_id>/',fields.detail,name='field-detail'),
     path('field-media/<uuid:asset_id>/',fields.media,name='field-media'),
     path('field-viewer/<uuid:asset_id>/',fields.viewer,name='field-viewer'),

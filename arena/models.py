@@ -8,6 +8,14 @@ from django.utils import timezone
 
 class Competition(models.Model):
     name = models.CharField(max_length=160, default='Americas Super Regional 2026')
+    short_name = models.CharField(max_length=40, default='Competition')
+    header_title = models.CharField(max_length=160, default='Rescue Competition Platform')
+    league_name = models.CharField(max_length=100, default='Rescue Simulation')
+    banner_title = models.CharField(max_length=160, default='Rescue Simulation')
+    banner_subtitle = models.CharField(max_length=200, blank=True)
+    logo_key = models.CharField(max_length=240, blank=True, editable=False)
+    partner_logo_key = models.CharField(max_length=240, blank=True, editable=False)
+    banner_key = models.CharField(max_length=240, blank=True, editable=False)
     slug = models.SlugField(unique=True, default='asr26')
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField()
@@ -20,6 +28,12 @@ class Competition(models.Model):
     workbook_digest = models.CharField(max_length=64, blank=True)
     class Meta:
         constraints = [models.CheckConstraint(condition=Q(ends_at__gt=models.F('starts_at')), name='competition_valid_times')]
+    @property
+    def display_end_date(self):
+        from datetime import timedelta,time
+        end=timezone.localtime(self.ends_at)
+        return (end-timedelta(microseconds=1) if end.time()==time() else end).date()
+
     @property
     def archive_open(self):
         return self.phase == 'finished' and self.archive_released and timezone.now() >= self.ends_at
@@ -299,6 +313,8 @@ class Complaint(models.Model):
     competition = models.ForeignKey(Competition, on_delete=models.PROTECT)
     team = models.ForeignKey(Team, on_delete=models.PROTECT)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    recording = models.ForeignKey('RunRecording', on_delete=models.PROTECT, null=True, blank=True, related_name='complaints')
+    playback_time_ms = models.PositiveBigIntegerField(null=True, blank=True)
     subject = models.CharField(max_length=180)
     message = models.TextField(max_length=12000)
     status = models.CharField(max_length=12, choices=[('submitted','Submitted'),('reviewing','Under review'),('resolved','Resolved')], default='submitted')
@@ -307,6 +323,12 @@ class Complaint(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     class Meta:
         ordering = ['-created_at','-pk']
+
+    @property
+    def playback_timestamp(self):
+        if self.playback_time_ms is None: return ''
+        seconds=self.playback_time_ms//1000
+        return f'{seconds//60:02d}:{seconds%60:02d}'
 
 class Announcement(models.Model):
     archived_at = models.DateTimeField(null=True, blank=True)
