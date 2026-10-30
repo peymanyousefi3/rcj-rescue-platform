@@ -68,3 +68,27 @@ def test_branding_controls_are_grouped_and_keep_modal_ids_unique(client,event):
     assert response.status_code==200
     for text in [b'Event identity',b'Public logos',b'Homepage banner',b'Competition dates',b'dialog_competition_logo']:
         assert text in response.content
+
+
+def test_branding_popup_shows_current_default_images(client,event):
+    client.force_login(event[-1]);html=client.get('/control/?editor=competition').content
+    for text in [b'Current competition logo',b'Current homepage banner image',b'brand/platform.svg',b'brand/platform-hero.svg',b'No image is currently displayed.',b'Leave this empty to keep the image shown above.']:
+        assert text in html
+    assert html.count(b'name="logo"')==1 and html.count(b'name="banner_image"')==1
+
+def test_editing_text_keeps_uploaded_images_and_reloads_saved_previews(client,event):
+    c=event[0];client.force_login(event[-1])
+    assert client.post('/control/',{**values(c),'logo':picture(),'partner_logo':picture(),'banner_image':picture()}).status_code==302
+    c.refresh_from_db();keys=(c.logo_key,c.partner_logo_key,c.banner_key)
+    html=client.get('/control/?editor=competition').content
+    for slot in ['logo','partner','banner']:assert f'/branding/{c.pk}/{slot}/'.encode() in html
+    assert client.post('/control/',values(c,header_title='Updated title')).status_code==302
+    c.refresh_from_db();assert keys==(c.logo_key,c.partner_logo_key,c.banner_key)
+
+
+def test_branding_entry_precedes_scoring_and_all_fields_render_once(client,event):
+    client.force_login(event[-1]);html=client.get('/control/').content
+    assert html.index(b'Edit branding &amp; event details')<html.index(b'id="challenge-editor"')
+    c=event[0];form=CompetitionForm(instance=c)
+    html=client.get('/control/?editor=competition',HTTP_X_ASR_EDITOR='1').content
+    for name in form.fields:assert html.count(f'name="{name}"'.encode())==1,name

@@ -1,0 +1,16 @@
+<fieldset class="editor-group competition-identity"><legend>Event identity</legend><p class="branding-section-help">These are the names currently used on your website.</p><div class="form-grid">
+{% include 'arena/_admin_field.html' with field=form.name %}{% include 'arena/_admin_field.html' with field=form.short_name %}
+{% include 'arena/_admin_field.html' with field=form.header_title %}{% include 'arena/_admin_field.html' with field=form.league_name %}
+</div></fieldset>
+<fieldset class="editor-group"><legend>Public logos</legend><p class="branding-section-help">Your current images are shown below. Replacements are optional.</p><div class="branding-logo-grid">
+{% for card in form.branding_cards %}{% if card.slot != 'banner' %}{% include 'arena/_branding_image_field.html' %}{% endif %}{% endfor %}
+</div></fieldset>
+<fieldset class="editor-group"><legend>Homepage banner</legend><div class="form-grid">
+{% include 'arena/_admin_field.html' with field=form.banner_title %}{% include 'arena/_admin_field.html' with field=form.banner_subtitle %}
+</div>{% for card in form.branding_cards %}{% if card.slot == 'banner' %}{% include 'arena/_branding_image_field.html' %}{% endif %}{% endfor %}</fieldset>
+<fieldset class="editor-group"><legend>Competition dates &amp; location</legend><div class="form-grid">
+{% include 'arena/_admin_field.html' with field=form.location %}{% include 'arena/_admin_field.html' with field=form.first_day %}{% include 'arena/_admin_field.html' with field=form.last_day %}
+</div></fieldset>
+<fieldset class="editor-group"><legend>Publication &amp; data source</legend><div class="form-grid">
+{% include 'arena/_admin_field.html' with field=form.phase %}{% include 'arena/_admin_field.html' with field=form.workbook_enabled %}
+</div></fieldset>
