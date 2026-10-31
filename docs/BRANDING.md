@@ -32,3 +32,7 @@ The schedule selects only one date in the configured application timezone: the f
 The introduction uses Open Sans and Roboto; tables also use Arial and the bundled Barlow Condensed fonts. Open Font License files accompany the self-hosted font assets. The initial default graphics remain generic; configure event branding rather than depending on the RCJRescue demo's event artwork.
 
 The hosted read-only demo uses its existing public snapshot and browser-memory overrides. Its slideshow preview and temporary branding changes never save to the event database, upload files or send email. Reload restores the initial snapshot.
+
+### Presenting inside the venue
+
+Open `/slide` on the computer connected to a venue TV or video projector, then use the display’s fullscreen control. Keep the computer connected to the website so schedules and released results refresh automatically. Fonts are served with the platform; no font installation is required on the display computer. The screen shows only data already released publicly.

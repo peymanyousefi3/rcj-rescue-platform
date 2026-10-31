@@ -51,6 +51,7 @@
 - **Automatic results:** import a recording package to fill empty score and time fields.
 - **Easy scheduling:** arrange team lineups and move rounds with drag and drop.
 - **Flexible scoring:** choose scoring methods, discard rules and when rankings are released.
+- **Venue screens:** loop the introduction, daily schedule and released results on TVs or projectors, updated automatically from the website.
 - **Private submissions:** collect team files with deadlines, upload locking and controlled access.
 - **Competition tools:** publish maps, share organizer files, target announcements, manage teams and SuperTeams, and handle complaints.
 
@@ -82,6 +83,16 @@ Replays open beside a score or from the schedule in a responsive popup. Visitors
 Published map packages include an interactive 3D field, preview and field information. Public map downloads expose the map JSON and WBT; supporting preview assets stay behind the viewer.
 
 ![Real Rescue Simulation field explored in the browser](docs/assets/public-field-3d.gif)
+
+### Keep everyone in the venue up to date
+
+Referees can open **`/slide`** in a browser and present it in fullscreen on venue **TVs or video projectors**. A continuous 16:9 loop shows the competition introduction, daily schedule and released results, so participants can follow updates without repeatedly checking their phones. Self-hosted fonts keep the slide typography consistent across display computers.
+
+Names, logos, images, dates, round information and public scores follow the website automatically. The schedule uses the first scheduled day before the competition, the current day during it, and the final competition day afterward. **Private submissions stay private, and rankings appear only after organizer release.**
+
+![Venue display cycles through the competition introduction, daily schedule, and released Main competition and SuperTeam results](docs/assets/venue-slideshow.gif)
+
+[Try the venue slideshow](https://rcjrescue.com/demo/slide.html) · [Configure the display](#a-live-display-without-duplicate-data-entry)
 
 Also available: the competition programme, team roster, public announcements, round scores and **organizer-released rankings**, including SuperTeam results. Layouts adapt to desktop and mobile.
 
@@ -125,9 +136,11 @@ Configure the competition name, short name, header title, league, homepage banne
 
 ### A live display, without duplicate data entry
 
-Open **`/slide`** for a looping 16:9 introduction, daily schedule and complete results tables. Names, logos, the banner, dates, round information and public scores come from the website automatically. The schedule shows the first scheduled day before the event, today during it, and the final competition day afterward. Rankings still require organizer release.
+Configure the venue display under **Competition settings → Slideshow settings**. Set the introduction, schedule and results timings, automatic refresh frequency, colors, text and image overrides. Current logos and images appear in the editor before replacement.
 
-Administrators control section visibility, timings, refresh frequency, text, colors and image overrides under **Competition settings → Slideshow settings**. Shared fields display their current website values; **Use website data automatically** keeps them linked. Slideshow-specific overrides do not change the competition records. The [interactive demo](https://rcjrescue.com/demo/) previews these controls and the slideshow entirely in the browser; reload resets its edits.
+Shared fields display their current website values; **Use website data automatically** keeps them linked to competition settings and branding. Clear it only for a slideshow-specific override. Changing an override does not alter the competition records. The [interactive demo](https://rcjrescue.com/demo/) lets you try these controls with temporary browser-only edits; reload restores the original settings.
+
+![Admin opens slideshow settings, views timing controls and inherited logos, and sees text linked automatically to website data](docs/assets/admin-slideshow-settings.gif)
 
 ### One announcement. One audience. One record.
 
@@ -156,6 +169,7 @@ Organizers also configure scoring methods, quarantine windows and schedule-linke
 | Area | Included capabilities |
 | --- | --- |
 | **Public experience** | Competition programme, team roster, announcements, round results, released rankings, released maps and recording Play buttons beside scores and in the schedule. Responsive layouts and replay popups. |
+| **Venue slideshow** | Fullscreen 16:9 introduction, date-aware daily schedule and complete public results for TVs and projectors. Automatic website data and branding, self-hosted fonts, configurable timings, refresh, colors and optional text/image overrides. |
 | **Interactive recordings** | Folder and ZIP intake, nested replay-page detection, separate package storage, asset validation, preview detection, Webots controls, optional video, metadata extraction, final scores and time, exported timeline event display. |
 | **Scoring** | Raw or normalized inputs; average after configurable lowest-score discards, sum, average or best scores; configurable top count and tie policy; zero-maximum round decisions; map maximum score from metadata; manual overrides and administrator-controlled rank release. |
 | **Score entry** | Teams as rows, rounds as columns; Excel-style paste, Undo, missing scores, final percentage and rank; recordings attached to individual matches. Multiple challenge tables visible together. |
