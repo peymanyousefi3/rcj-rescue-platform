@@ -2,6 +2,8 @@
 from pathlib import PurePath
 from datetime import timedelta,datetime,time
 from django import forms
+from django.conf import settings
+from django.utils.html import format_html
 from .widgets import TeamPicker, recipient_data, recipient_fields
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -255,6 +257,97 @@ class CompetitionForm(forms.ModelForm):
                     value=store_image(instance,self.branding_images[field]);self.branding_created.append(value);setattr(instance,key,value)
                 elif self.cleaned_data.get('remove_'+field):setattr(instance,key,'')
             if commit:instance.save();self._save_m2m()
+        except Exception:
+            from django.core.files.storage import default_storage
+            for key in self.branding_created:default_storage.delete(key)
+            raise
+        return instance
+
+
+class SlideshowForm(forms.ModelForm):
+    class Meta:
+        model=Competition
+        fields=['slideshow_enabled','slide_intro','slide_schedule','slide_results','slide_intro_seconds',
+            'slide_schedule_seconds','slide_results_seconds','slide_refresh_seconds']
+        labels={'slideshow_enabled':'Enable public slideshow at /slide','slide_intro':'Introduction',
+            'slide_schedule':'Schedule','slide_results':'Results','slide_intro_seconds':'Introduction (seconds)',
+            'slide_schedule_seconds':'Schedule (seconds)','slide_results_seconds':'Results (seconds)',
+            'slide_refresh_seconds':'Check for website updates (seconds)'}
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        from .slide_settings import TEXTS,COLORS,IMAGE_SLOTS,values,resolve,automatic_text,text_template,challenge_context
+        from .slideshow import display_day,slide_images
+        now=timezone.now();context=values(self.instance,display_day(self.instance,now),now)
+        design=self.instance.slide_design or {}
+        challenge=self.instance.challenge_set.filter(archived_at=None).first()
+        context.update(challenge_context(challenge,challenge.round_set.filter(archived_at=None).count() if challenge else 0))
+        for name in ['slide_intro_seconds','slide_schedule_seconds','slide_results_seconds','slide_refresh_seconds']:
+            old=self.fields[name];self.fields[name]=forms.IntegerField(label=old.label,min_value=15 if name=='slide_refresh_seconds' else 3,max_value=300 if name=='slide_refresh_seconds' else 120)
+        self.slide_text_groups=[]
+        for prefix,heading in [('Introduction','Introduction text'),('Schedule','Schedule text'),('Results','Results & table labels')]:
+            group=[]
+            for key,(label,default) in TEXTS.items():
+                if not label.startswith(prefix):continue
+                name='text_'+key;template=text_template(design,key);automatic=automatic_text(design,key)
+                current=resolve(template,context)
+                self.fields[name]=forms.CharField(label=label.split(' · ',1)[-1],required=False,max_length=300,initial=current if automatic else template,
+                    widget=forms.Textarea(attrs={'rows':2}) if '\n' in default else forms.TextInput(),
+                    help_text=format_html('Current display: {}',current))
+                auto_field=None
+                if '{' in default:
+                    auto_name='auto_'+key
+                    self.fields[auto_name]=forms.BooleanField(required=False,label='Use website data automatically',initial=automatic,widget=forms.CheckboxInput(attrs={'data-slide-auto':name}))
+                    self.fields[name].widget.attrs['data-slide-automatic-value']=resolve(default,context)
+                    if automatic:self.fields[name].widget.attrs['readonly']=True
+                    auto_field=self[auto_name]
+                group.append({'field':self[name],'automatic':auto_field})
+            self.slide_text_groups.append({'title':heading,'fields':group})
+        self.slide_color_fields=[]
+        for key,(label,default) in COLORS.items():
+            name='color_'+key;self.fields[name]=forms.RegexField(r'^#[0-9a-fA-F]{6}$',label=label,initial=design.get('colors',{}).get(key,default),widget=forms.TextInput(attrs={'type':'color'}));self.slide_color_fields.append(self[name])
+        self.slide_image_cards=[]
+        urls=slide_images(self.instance)
+        for slot,label in IMAGE_SLOTS.items():
+            name='image_'+slot;reset='reset_'+slot
+            self.fields[name]=forms.FileField(required=False,label='Replace '+label.lower(),widget=forms.FileInput(attrs={'accept':'image/*'}))
+            self.fields[reset]=forms.BooleanField(required=False,label='Use automatic / original image')
+            self.slide_image_cards.append({'title':label,'url':urls[slot],'field':self[name],'reset':self[reset]})
+        self.fields['qr_destination']=forms.URLField(required=False,assume_scheme='https',max_length=1000,label='QR code destination',initial=design.get('qr_destination') or settings.PUBLIC_ORIGIN,help_text='Uses the website address automatically unless you enter a different destination. An uploaded QR image replaces the generated code.')
+    def clean(self):
+        data=super().clean()
+        if data.get('slideshow_enabled') and not any(data.get(k) for k in ['slide_intro','slide_schedule','slide_results']):
+            raise forms.ValidationError('Choose at least one slide section, or disable the public slideshow.')
+        from .branding import normalize_image
+        from .slide_settings import IMAGE_SLOTS
+        self.slide_uploads={}
+        for slot in IMAGE_SLOTS:
+            if data.get('image_'+slot):
+                if data.get('reset_'+slot):self.add_error('image_'+slot,'Choose a replacement or reset, not both.')
+                else:
+                    try:self.slide_uploads[slot]=normalize_image(data['image_'+slot])
+                    except forms.ValidationError as exc:self.add_error('image_'+slot,exc)
+        if data.get('qr_destination') and data['qr_destination']!=settings.PUBLIC_ORIGIN:
+            from urllib.parse import urlsplit
+            url=urlsplit(data['qr_destination'])
+            if url.scheme!='https' or url.username or url.password:self.add_error('qr_destination','Use an HTTPS URL without credentials.')
+        return data
+    def save(self,commit=True):
+        instance=super().save(commit=False)
+        from .slide_settings import TEXTS,COLORS,IMAGE_SLOTS
+        from .branding import store_image
+        design={'texts':{k:default if self.cleaned_data.get('auto_'+k) else self.cleaned_data.get('text_'+k,'') for k,(_,default) in TEXTS.items()},
+            'automatic':{k:bool(self.cleaned_data.get('auto_'+k)) for k,(_,default) in TEXTS.items() if '{' in default},
+            'colors':{k:self.cleaned_data['color_'+k] for k in COLORS},
+            'images':dict((instance.slide_design or {}).get('images',{})), 'qr_destination':self.cleaned_data.get('qr_destination','')}
+        if design['qr_destination']==settings.PUBLIC_ORIGIN:design['qr_destination']=''
+        self.branding_created=[]
+        try:
+            for slot in IMAGE_SLOTS:
+                if slot in self.slide_uploads:
+                    key=store_image(instance,self.slide_uploads[slot]);self.branding_created.append(key);design['images'][slot]=key
+                elif self.cleaned_data.get('reset_'+slot):design['images'].pop(slot,None)
+            instance.slide_design=design
+            if commit:instance.save(update_fields=[*self.Meta.fields,'slide_design'])
         except Exception:
             from django.core.files.storage import default_storage
             for key in self.branding_created:default_storage.delete(key)

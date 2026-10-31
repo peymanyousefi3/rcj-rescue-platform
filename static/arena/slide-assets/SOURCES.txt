@@ -1,0 +1,5 @@
+Slide geometry, text hierarchy and competition illustration follow the competition organizer's supplied Google Slides reference.
+
+Fonts are self-hosted copies from Google Fonts (fonts.googleapis.com / fonts.gstatic.com).
+Open Sans, Roboto and Barlow Condensed are distributed under their included SIL Open Font License files.
+All dynamic competition records are supplied by the website's public-data feed, not by the reference deck.

@@ -119,9 +119,15 @@ Arrange team order and run times inside each round. The round duration is calcul
 
 ### Your competition, your identity
 
-Configure the competition name, short name, header title, league, homepage banner title and subtitle, dates, location and timezone. Upload the competition logo, partner logo and banner image from the same settings popup. Current logos and the homepage image appear beside their replacement controls. The hosted demo retains the original RCJRescue/ASR identity; preview changes reset on reload.
+Configure the competition name, short name, header title, league, homepage banner title and subtitle, dates and location. Upload the competition logo, partner logo and banner image from the same settings popup. Current logos and the homepage image appear beside their replacement controls. The hosted demo retains the original RCJRescue/ASR identity; preview changes reset on reload.
 
 ![Current logos, homepage banner previews and organized branding settings in the interactive demo](docs/assets/admin-branding.gif)
+
+### A live display, without duplicate data entry
+
+Open **`/slide`** for a looping 16:9 introduction, daily schedule and complete results tables. Names, logos, the banner, dates, round information and public scores come from the website automatically. The schedule shows the first scheduled day before the event, today during it, and the final competition day afterward. Rankings still require organizer release.
+
+Administrators control section visibility, timings, refresh frequency, text, colors and image overrides under **Competition settings → Slideshow settings**. Shared fields display their current website values; **Use website data automatically** keeps them linked. Slideshow-specific overrides do not change the competition records. The [interactive demo](https://rcjrescue.com/demo/) previews these controls and the slideshow entirely in the browser; reload resets its edits.
 
 ### One announcement. One audience. One record.
 

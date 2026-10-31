@@ -15,6 +15,10 @@ def editor_groups(form):
             ('Public logos',{'logo','remove_logo','partner_logo','remove_partner_logo'}),
             ('Homepage banner',{'banner_title','banner_subtitle','banner_image','remove_banner_image'}),
             ('Competition dates',{'first_day','last_day'}),('Publication & data source',{'phase','workbook_enabled'})]
+    if form.__class__.__name__=='SlideshowForm':
+        groups=[('Public display',{'slideshow_enabled','slide_intro','slide_schedule','slide_results'}),
+            ('Timing & automatic updates',{'slide_intro_seconds','slide_schedule_seconds','slide_results_seconds','slide_refresh_seconds'}),
+            ('Table layout',{'slide_rows','slide_schedule_scope'})]
     result=[];placed=set()
     for title,names in groups:
         fields=[field for field in form.visible_fields() if field.name in names and field.name not in inline and not (form.__class__.__name__=='RoundForm' and field.name in {'maps_released','targets','wbt','map_json','info_json','glb','jpeg','field_files'})]

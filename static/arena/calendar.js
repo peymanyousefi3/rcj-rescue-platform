@@ -6,7 +6,13 @@ function finishEditor(url){
  const next=new URL(url,location.origin);
  if(next.pathname===location.pathname&&next.search===location.search){location.hash=next.hash;location.reload();}else location.assign(next.href);
 }
-function initEditor(content){ASRAdmin.init(content);ASRAdmin.lineups(content);initResultUploads(content);initFieldFolders(content);initScoringSettings(content);}
+function initEditor(content){
+ content.querySelectorAll('[data-slide-auto]').forEach(toggle=>{
+  const field=toggle.form.elements[toggle.dataset.slideAuto];
+  const update=()=>{field.readOnly=toggle.checked;if(toggle.checked && field.dataset.slideAutomaticValue!==undefined)field.value=field.dataset.slideAutomaticValue;field.setAttribute('aria-readonly',String(toggle.checked));};
+  toggle.addEventListener('change',update);update();
+ });
+ ASRAdmin.init(content);ASRAdmin.lineups(content);initResultUploads(content);initFieldFolders(content);initScoringSettings(content);}
 
 function initScoringSettings(root){
  root.querySelectorAll('[data-form-kind="challenge"]').forEach(form=>{
@@ -26,7 +32,7 @@ async function openCalendarEditor(url){
     const response=await fetch(requestedUrl,{credentials:'same-origin',signal:editorController.signal});
     if(!response.ok||response.redirected)throw new Error('The editor could not be opened. Refresh and sign in again.');
     const html=await response.text();if(!adminDialog.open||requestedUrl.href!==editorUrl.href)return;content.innerHTML=html;
-    const titles={round:'Round settings',event:'Schedule activity',superteam:'SuperTeam profile',team:'Team & account',quarantine:'File quarantine',window:'Round upload window',share:'Shared file delivery',file:'File details',notice:'Announcement',challenge:'Challenge & scoring',competition:'Competition settings','email-settings':'Email settings','managed-upload':'Upload files'};
+    const titles={round:'Round settings',event:'Schedule activity',superteam:'SuperTeam profile',team:'Team & account',quarantine:'File quarantine',window:'Round upload window',share:'Shared file delivery',file:'File details',notice:'Announcement',challenge:'Challenge & scoring',competition:'Competition settings',slideshow:'Slideshow settings','email-settings':'Email settings','managed-upload':'Upload files'};
     adminDialog.querySelector('h2').textContent=editorUrl.pathname.includes('/results/')?(editorUrl.searchParams.get('recording')==='1'?'Team recording':'Team results & recording'):titles[editorUrl.searchParams.get('editor')]||'Edit entry';
     initEditor(content);
     content.querySelector('.admin-form input:not([type=hidden]),.admin-form select')?.focus({preventScroll:true});

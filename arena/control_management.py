@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from .control_forms import (ChallengeForm, CompetitionForm, FileForm, FileShareForm, ManagedUploadForm, ManageAnnouncementForm,
+from .control_forms import (ChallengeForm, CompetitionForm, SlideshowForm, FileForm, FileShareForm, ManagedUploadForm, ManageAnnouncementForm,
     ProgrammeForm, RoundForm, RoundWindowForm, TeamForm)
 from .forms import prepare_dialog_form
 from .models import Announcement, Asset, Challenge, Competition, EmailDelivery, FileShare, Programme, Quarantine, Round, Team
@@ -78,6 +78,7 @@ def manage(request, competition):
     context['superteams']=Team.objects.filter(competition=competition,superteam_challenge__isnull=False).select_related('superteam_challenge').prefetch_related('members')
     forms['competition']=context['competition_form']=CompetitionForm(
         request.POST if kind=='competition' else None,request.FILES if kind=='competition' else None,instance=competition,auto_id='competition_%s')
+    forms['slideshow']=context['slideshow_form']=SlideshowForm(request.POST if kind=='slideshow' else None,request.FILES if kind=='slideshow' else None,instance=competition,auto_id='slideshow_%s')
     replacement=None
     if request.GET.get('replace'):
         try: replacement=get_object_or_404(Asset,pk=request.GET['replace'],competition=competition,current=True,deleted_at=None)
@@ -107,7 +108,7 @@ def manage(request, competition):
         form=forms[kind]
         try:
             with transaction.atomic():
-                if kind in ['team','superteam','round','event','competition','challenge','window','lineup']:
+                if kind in ['team','superteam','round','event','competition','slideshow','challenge','window','lineup']:
                     Competition.objects.select_for_update(no_key=True).get(pk=competition.pk)
                 if kind=='superteam':
                     team=form.save()
@@ -142,6 +143,8 @@ def manage(request, competition):
                     form.save(request.user);pause_workbook(competition)
                     messages.success(request,'Team order and run times saved. The calendar and public schedule now use this lineup.')
                     return context,redirect(f'/control/?round={records["round"].pk}#lineup-editor')
+                elif kind=='slideshow':
+                    form.save(commit=False).save(update_fields=[*form.Meta.fields,'slide_design']);audit(request.user,'slideshow.updated',object_id=competition.pk,detail={'fields':form.changed_data})
                 elif kind=='competition':
                     resumed='workbook_enabled' in form.changed_data and form.cleaned_data['workbook_enabled']
                     if resumed: form.instance.workbook_digest=''
@@ -188,7 +191,7 @@ def manage(request, competition):
                 elif kind=='managed-upload':
                     upload_batch(request.user,competition,form.cleaned_data)
                 messages.success(request,'Changes saved.'+(' Workbook updates are paused so your edits are preserved.' if kind in ['team','round','event'] and not competition.workbook_enabled else ''))
-                section=next((s for k,m,f,s in specs if k==kind),'competition-settings' if kind=='competition' else 'files')
+                section=next((s for k,m,f,s in specs if k==kind),'competition-settings' if kind in ['competition','slideshow'] else 'files')
                 if kind=='file' and form.instance.team_id and not form.instance.public_copy: section='quarantines'
                 if kind=='managed-upload' and form.cleaned_data['destination'] in ['team','quarantine']: section='quarantines'
                 if kind in ['challenge','round'] and request.POST.get('_return')=='results-recordings':
@@ -208,7 +211,7 @@ def manage(request, competition):
             form.add_error(None,' '.join(exc.messages) if isinstance(exc,ValidationError) else 'Another record already uses this value. Check the team code, username or round number.' if isinstance(exc,IntegrityError) else str(exc))
     editor=request.GET.get('editor')
     if editor in forms:
-        section=next((s for k,m,f,s in specs if k==editor),'competition-settings' if editor=='competition' else 'files')
+        section=next((s for k,m,f,s in specs if k==editor),'competition-settings' if editor in ['competition','slideshow'] else 'files')
         return context,render(request,'arena/_calendar_editor.html' if editor in ['round','event'] else 'arena/_record_editor.html',{
             'editor_modal':True,'form_kind':editor,'form':prepare_dialog_form(forms[editor]),'record':records.get(editor),
             'upload':editor=='managed-upload','round_choices':Round.objects.filter(competition=competition,archived_at=None),
