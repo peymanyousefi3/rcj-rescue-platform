@@ -2,6 +2,8 @@
 
 <p align="center"><strong>Developed by Peyman Yousefi</strong><br>For RoboCupJunior Rescue Simulation and similar competitions.</p>
 
+<p align="center"><strong>Original repository:</strong> <a href="https://github.com/peymanyousefi3/rcj-rescue-platform">peymanyousefi3/rcj-rescue-platform</a></p>
+
 <p align="center">
   <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-0f766e?style=flat-square" alt="MIT License"></a>
   <a href="https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/docs/SETUP.md"><img src="https://img.shields.io/badge/Python-3.12-3776ab?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.12"></a>
@@ -253,4 +255,14 @@ This adds fictional scores and SuperTeams; it creates no login accounts and send
 
 Contributions are welcome through [pull requests](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/CONTRIBUTING.md). Changes require review by **Peyman Yousefi** and passing automated checks before they can be merged into `main`.
 
-Project-owned code is available under the [MIT License](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/LICENSE). Copyright © 2026 Peyman Yousefi. See [attribution](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/NOTICE.md) and [third-party notices](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/THIRD_PARTY_NOTICES.md). Third-party software, trademarks, competition maps and recording packages retain their own rights; MIT does not grant rights to those materials.
+**Copyright © 2026 Peyman Yousefi.**
+
+**Original repository:** [peymanyousefi3/rcj-rescue-platform](https://github.com/peymanyousefi3/rcj-rescue-platform).
+
+Project-owned code is licensed under the [MIT License](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/LICENSE).
+
+**Preserving the original notice.** The copyright notice and MIT permission notice must be included in all copies or substantial portions of the software, as required by the license. When copying, modifying or redistributing this project, retain the original copyright notice naming **Peyman Yousefi** and the MIT license text. You may add copyright notices for your own contributions; do not remove or replace the original notice for portions retained from this project.
+
+**Attribution request.** For forks, adaptations and redistributed versions, please also retain the original repository link and acknowledge **Peyman Yousefi** in your README or accompanying documentation. This is a professional courtesy request, not an additional condition of the MIT License.
+
+See [attribution](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/NOTICE.md) and [third-party notices](https://github.com/peymanyousefi3/rcj-rescue-platform/blob/main/THIRD_PARTY_NOTICES.md). Third-party software, trademarks, competition maps and recording packages retain their own rights; MIT does not grant rights to those materials.
