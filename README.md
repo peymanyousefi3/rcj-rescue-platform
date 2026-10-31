@@ -90,7 +90,9 @@ Referees can open **`/slide`** in a browser and present it in fullscreen on venu
 
 Names, logos, images, dates, round information and public scores follow the website automatically. The schedule uses the first scheduled day before the competition, the current day during it, and the final competition day afterward. **Private submissions stay private, and rankings appear only after organizer release.**
 
-![Venue display cycles through the competition introduction, daily schedule, and released Main competition and SuperTeam results](docs/assets/venue-slideshow.gif)
+![Illustrative competition venue: a TV on a wheeled stand cycles through the actual introduction, daily schedule and released results](docs/assets/venue-slideshow.gif)
+
+*Illustrative venue mockup with the actual platform slides.*
 
 [Try the venue slideshow](https://rcjrescue.com/demo/slide.html) · [Configure the display](#a-live-display-without-duplicate-data-entry)
 
