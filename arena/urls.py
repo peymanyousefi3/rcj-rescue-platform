@@ -1,7 +1,13 @@
+from . import slideshow
 from . import branding
 from django.urls import path
 from . import views, recording_views, fields, workspaces
 urlpatterns = [
+    path('slide',slideshow.display,name='slideshow'),
+    path('slide/',slideshow.display),
+    path('slide/image/<int:competition_id>/<slug:slot>/',slideshow.image,name='slideshow-image'),
+    path('slide/qr/<int:competition_id>/',slideshow.qr,name='slideshow-qr'),
+    path('slide/data/',slideshow.data,name='slideshow-data'),
     path('branding/<int:competition_id>/<str:slot>/',branding.image,name='branding-image'),
     path('fields/<int:round_id>/',fields.detail,name='field-detail'),
     path('field-media/<uuid:asset_id>/',fields.media,name='field-media'),

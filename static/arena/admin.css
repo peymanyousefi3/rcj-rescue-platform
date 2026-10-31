@@ -434,3 +434,8 @@
 .admin-dialog .branding-image-banner .branding-current-image{height:180px}
 .admin-dialog .admin-form[data-form-kind=competition] .field-location{grid-column:1/-1}
 @media(max-width:650px){.admin-dialog .branding-logo-grid{grid-template-columns:1fr}.admin-dialog .branding-image-card{padding:16px}.admin-dialog .branding-current-image{height:120px}}
+/* Keep each slideshow value and its source switch together in the shared grid. */
+.admin-dialog [data-form-kind=slideshow] .slide-setting{grid-column:span 6;min-width:0;display:flex;flex-direction:column;gap:6px}
+.admin-dialog [data-form-kind=slideshow] .slide-setting .form-field{min-width:0;width:100%;margin:0}
+.admin-dialog [data-form-kind=slideshow] .slide-setting input[readonly]{background:#f5f7fc;color:#526074}
+@media(max-width:650px){.admin-dialog [data-form-kind=slideshow] .slide-setting{grid-column:1/-1}}
