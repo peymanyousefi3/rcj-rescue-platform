@@ -85,7 +85,7 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           /tmp/gitleaks git . --log-opts=--all --redact
       - name: Scan deployment configuration
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           version: v0.76.1
           scan-type: config
@@ -95,7 +95,7 @@ jobs:
       - name: Build runtime image
         run: docker build -t rcj-platform:audit .
       - name: Scan runtime image
-        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           version: v0.76.1
           image-ref: rcj-platform:audit
